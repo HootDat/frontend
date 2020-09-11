@@ -2,12 +2,12 @@ import React from 'react';
 import { Button, Link, Typography } from '@material-ui/core';
 import { Link as RouterLink } from 'react-router-dom';
 
+import LogInOutButton from '../login/LogInOutButton';
+
 const Home: React.FC = () => {
   return (
     <>
-      <Link color="primary" component={RouterLink} to="/login">
-        LOGIN
-      </Link>
+      <LogInOutButton />
       <Typography variant="h1">Hoot Dat</Typography>
       <Typography variant="body1">Guess who that answer belongs to</Typography>
       <Typography variant="body1">3 - 12 players</Typography>
