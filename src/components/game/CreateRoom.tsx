@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import CreatePlayer from './CreatePlayer';
 import GameContext from './GameContext';
+import { Mode } from './GameState';
 
 const CreateRoom: React.FC = () => {
   const context = useContext(GameContext);
@@ -10,9 +11,17 @@ const CreateRoom: React.FC = () => {
     context.createRoom(name, hoot);
   };
 
+  const handleBack = () => {
+    context.updateMode(Mode.HOME);
+  };
+
   return (
     <>
-      <CreatePlayer handleSubmit={handleSubmit} participants={{}} />
+      <CreatePlayer
+        handleSubmit={handleSubmit}
+        handleBack={handleBack}
+        participants={{}}
+      />
     </>
   );
 };

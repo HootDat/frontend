@@ -6,6 +6,7 @@ import { Button } from '@material-ui/core';
 import GameContext from './GameContext';
 import JoinRoom from './JoinRoom';
 import CreateRoom from './CreateRoom';
+import WaitingRoom from './WaitingRoom';
 
 const context = new GameManager();
 
@@ -30,6 +31,7 @@ const GameShell: React.FC = () => {
       {gameState.mode === Mode.HOME && <Home />}
       {gameState.mode === Mode.JOIN_ROOM && <JoinRoom />}
       {gameState.mode === Mode.CREATE_ROOM && <CreateRoom />}
+      {gameState.mode === Mode.WAITING_ROOM && <WaitingRoom />}
     </GameContext.Provider>
   );
 };

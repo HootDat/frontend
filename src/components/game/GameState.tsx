@@ -2,6 +2,7 @@ export enum Mode {
   HOME,
   JOIN_ROOM,
   CREATE_ROOM,
+  WAITING_ROOM,
 }
 
 export default interface GameState {

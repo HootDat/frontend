@@ -4,8 +4,9 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
 
 const CreatePlayer: React.FC<{
   handleSubmit: (name: string, hoot: number) => void;
+  handleBack: () => void;
   participants: { [key: string]: [string, number] };
-}> = ({ handleSubmit, participants }) => {
+}> = ({ handleSubmit, handleBack, participants }) => {
   // 0 to 11, inclusive
   const [hoot, setHoot] = useState(-1);
   // 1 or 2
@@ -94,6 +95,7 @@ const CreatePlayer: React.FC<{
       >
         CREATE ROOM
       </Button>
+      <Button onClick={handleBack}>Back</Button>
     </>
   );
 };
