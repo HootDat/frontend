@@ -1,23 +1,37 @@
-import React, { useEffect } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect, useState } from 'react';
 import Home from './Home';
+import GameManager from './GameManager';
+import GameState, { Mode } from './GameState';
+import { Button } from '@material-ui/core';
+import GameContext from './GameContext';
+import JoinRoom from './JoinRoom';
+import CreateRoom from './CreateRoom';
+
+const context = new GameManager();
 
 const GameShell: React.FC = () => {
-  useEffect(() => {
-    const socket = io();
+  const [gameState, setGameState] = useState<GameState>(context.getGameState());
 
-    // TODO: setup error handlers for each event
+  useEffect(() => {
+    context.setStateUpdater(setGameState);
+    context.connectToServer();
+
     // TODO: if there is a query pin, send in connection to join room immediately
-    // TODO: on reconnecting, display disconencted, reconnecting
-    // on reconnect, display reconnected
-    // on reconnect_failed, display fail, redirect to home
     // and all other event handlers for the game events
 
     return () => {
-      socket.close();
+      context.cleanup();
     };
   }, []);
-  return <Home />;
+
+  return (
+    <GameContext.Provider value={context}>
+      <Button onClick={() => context.push()}>{gameState.cid}</Button>
+      {gameState.mode === Mode.HOME && <Home />}
+      {gameState.mode === Mode.JOIN_ROOM && <JoinRoom />}
+      {gameState.mode === Mode.CREATE_ROOM && <CreateRoom />}
+    </GameContext.Provider>
+  );
 };
 
 export default GameShell;
