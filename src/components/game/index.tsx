@@ -11,7 +11,9 @@ import WaitingRoom from './WaitingRoom';
 const context = new GameManager();
 
 const GameShell: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState>(context.getGameState());
+  const [{ cid, mode, roomId, participants }, setGameState] = useState<
+    GameState
+  >(context.getGameState());
 
   useEffect(() => {
     context.setStateUpdater(setGameState);
@@ -27,11 +29,13 @@ const GameShell: React.FC = () => {
 
   return (
     <GameContext.Provider value={context}>
-      <Button onClick={() => context.push()}>{gameState.cid}</Button>
-      {gameState.mode === Mode.HOME && <Home />}
-      {gameState.mode === Mode.JOIN_ROOM && <JoinRoom />}
-      {gameState.mode === Mode.CREATE_ROOM && <CreateRoom />}
-      {gameState.mode === Mode.WAITING_ROOM && <WaitingRoom />}
+      <Button onClick={() => context.push()}>{cid}</Button>
+      {mode === Mode.HOME && <Home />}
+      {mode === Mode.JOIN_ROOM && (
+        <JoinRoom roomId={roomId} participants={participants} />
+      )}
+      {mode === Mode.CREATE_ROOM && <CreateRoom />}
+      {mode === Mode.WAITING_ROOM && <WaitingRoom />}
     </GameContext.Provider>
   );
 };

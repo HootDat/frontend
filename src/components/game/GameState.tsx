@@ -7,8 +7,8 @@ export enum Mode {
 
 export default interface GameState {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
-  room?: string;
+  roomId: string | null;
   cid: string;
   participants: { [key: string]: [string, number] } /* cid, [name, icon] */;
-  host_cid?: string;
+  hostCid: string | null;
 }

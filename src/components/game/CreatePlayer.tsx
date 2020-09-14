@@ -93,9 +93,9 @@ const CreatePlayer: React.FC<{
         disabled={hoot === -1 || name === ''}
         onClick={() => handleSubmit(name, hoot)}
       >
-        CREATE ROOM
+        CREATE HOOT
       </Button>
-      <Button onClick={handleBack}>Back</Button>
+      <Button onClick={handleBack}>BACK</Button>
     </>
   );
 };

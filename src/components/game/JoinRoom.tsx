@@ -1,41 +1,40 @@
-import React, { useState, useContext } from 'react';
-import { TextField, Button, Typography } from '@material-ui/core';
+import React, { useContext } from 'react';
 import GameContext from './GameContext';
 import { Mode } from './GameState';
+import JoinRoomForm from './JoinRoomForm';
+import CreatePlayer from './CreatePlayer';
 
-const JoinRoom: React.FC = () => {
-  const [input, setInput] = useState('');
+// load form if room in state is empty. otherwise load player
+const JoinRoom: React.FC<{
+  roomId: string | null;
+  participants: { [key: string]: [string, number] };
+}> = ({ roomId, participants }) => {
   const context = useContext(GameContext);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const re = /^[0-9\b]{0,4}$/;
-
-    if (re.test(e.target.value)) setInput(e.target.value);
-  };
-
-  const handleJoin = () => {
-    context.joinRoom(input);
+  const handleJoin = (roomId: string) => {
+    context.joinRoom(roomId);
   };
 
   const handleBack = () => {
     context.updateMode(Mode.HOME);
   };
 
+  const handleCreatePlayer = (name: string, hoot: number) => {
+    // TODO: update server
+    context.updateMode(Mode.WAITING_ROOM);
+  };
+
   return (
     <>
-      <Typography variant="h3">Enter Room PIN</Typography>
-      <TextField placeholder="XXXX" onChange={handleChange} value={input} />
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={input.length !== 4}
-        onClick={handleJoin}
-      >
-        Join Room
-      </Button>
-      <Button color="primary" onClick={handleBack}>
-        Back
-      </Button>
+      {roomId === null ? (
+        <JoinRoomForm handleSubmit={handleJoin} handleBack={handleBack} />
+      ) : (
+        <CreatePlayer
+          handleSubmit={handleCreatePlayer}
+          handleBack={handleBack}
+          participants={participants}
+        />
+      )}
     </>
   );
 };

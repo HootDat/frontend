@@ -5,10 +5,10 @@ const noOp = () => {};
 
 class GameManager {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
-  room?: string;
+  roomId: string | null;
   cid: string;
   participants: { [key: string]: [string, number] } /* cid, [name, icon] */;
-  host_cid?: string;
+  hostCid: string | null;
 
   conn: Connection;
   stateUpdater: (mode: GameState) => void;
@@ -16,10 +16,11 @@ class GameManager {
   constructor() {
     // placeholders
     this.mode = Mode.HOME;
-    this.cid = '123';
-    this.room = '1234';
-    this.participants = {};
     this.conn = new Connection();
+    this.participants = {};
+    this.cid = '123';
+    this.roomId = null;
+    this.hostCid = null;
     this.stateUpdater = noOp;
   }
 
@@ -37,8 +38,8 @@ class GameManager {
   }
 
   getGameState() {
-    const { mode, room, cid, participants } = this;
-    return { mode, room, cid, participants };
+    const { mode, roomId, cid, participants, hostCid } = this;
+    return { mode, roomId, cid, participants, hostCid };
   }
 
   setStateUpdater(stateUpdater: (mode: GameState) => void) {
@@ -49,8 +50,17 @@ class GameManager {
     this.stateUpdater(this.getGameState());
   }
 
+  resetAttributes() {
+    this.participants = {};
+    this.roomId = null;
+    this.hostCid = null;
+  }
+
   updateMode(mode: Mode) {
     this.mode = mode;
+    if (mode === Mode.HOME) {
+      this.resetAttributes();
+    }
     this.push();
   }
 
@@ -60,7 +70,8 @@ class GameManager {
   }
 
   joinRoom(roomId: string) {
-    this.mode = Mode.HOME;
+    this.roomId = roomId;
+    // TODO actually send to server
     this.push();
   }
 }
