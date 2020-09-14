@@ -9,9 +9,10 @@ const CreateRoom: React.FC = () => {
     // TODO
     context.createRoom(name, hoot);
   };
+
   return (
     <>
-      <CreatePlayer handleSubmit={handleSubmit} />
+      <CreatePlayer handleSubmit={handleSubmit} participants={{}} />
     </>
   );
 };

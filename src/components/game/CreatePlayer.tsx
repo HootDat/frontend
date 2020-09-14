@@ -4,14 +4,15 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
 
 const CreatePlayer: React.FC<{
   handleSubmit: (name: string, hoot: number) => void;
-}> = ({ handleSubmit }) => {
+  participants: { [key: string]: [string, number] };
+}> = ({ handleSubmit, participants }) => {
   // 0 to 11, inclusive
   const [hoot, setHoot] = useState(-1);
-  // 0 or 1
+  // 1 or 2
   const [page, setPage] = useState(1);
   const [name, setName] = useState('');
 
-  // TODO disabled owls for when joining a room
+  const occupiedNumbers = Object.values(participants).map(arr => arr[1]);
 
   const handleHootSelect = (hootNumber: number) => {
     // temporarily identify each one by id, shd pick something better
@@ -22,7 +23,7 @@ const CreatePlayer: React.FC<{
     setName(e.target.value);
   };
 
-  const changePage = (page: number) => {
+  const handleChangePage = (page: number) => {
     return () => setPage(page);
   };
 
@@ -45,6 +46,7 @@ const CreatePlayer: React.FC<{
         variant={variant}
         color="primary"
         id={hootNumber.toString()}
+        disabled={occupiedNumbers.includes(hootNumber)}
         onClick={handleHootSelect(hootNumber)}
       >
         {hootNumber}
@@ -52,13 +54,13 @@ const CreatePlayer: React.FC<{
     );
   };
 
-  const pageSelector = (
+  const PageSelector = (
     <>
-      <Button size="small" onClick={changePage(1)} disabled={page === 1}>
+      <Button size="small" onClick={handleChangePage(1)} disabled={page === 1}>
         <KeyboardArrowLeft />
       </Button>
       {page}/2
-      <Button size="small" onClick={changePage(2)} disabled={page === 2}>
+      <Button size="small" onClick={handleChangePage(2)} disabled={page === 2}>
         <KeyboardArrowRight />
       </Button>
     </>
@@ -70,7 +72,7 @@ const CreatePlayer: React.FC<{
         {makeHootRow(page === 1 ? 0 : 6)}
         {makeHootRow(page === 1 ? 3 : 9)}
       </ButtonGroup>
-      {pageSelector}
+      {PageSelector}
     </>
   );
 
