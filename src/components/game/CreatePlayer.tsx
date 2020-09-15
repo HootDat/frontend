@@ -5,7 +5,7 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
 const CreatePlayer: React.FC<{
   handleCreate: (name: string, hoot: number) => void;
   handleBack: () => void;
-  participants: { [key: string]: [string, number] };
+  participants: { [key: string]: [string, number, number] };
 }> = ({ handleCreate, handleBack, participants }) => {
   // 0 to 11, inclusive
   const [hoot, setHoot] = useState(-1);

@@ -9,7 +9,9 @@ class ConnManager {
   cid: string;
 
   roomId: string | null;
-  participants: { [key: string]: [string, number] } /* cid, [name, icon] */;
+  participants: {
+    [key: string]: [string, number, number];
+  } /* cid, [name, icon, score] */;
   hostCid: string | null;
   currentQuestion: string | null;
   currentAnswer: string | null;
@@ -108,7 +110,7 @@ class ConnManager {
     this.mode = Mode.WAITING_ROOM;
     this.roomId = '1234';
     this.hostCid = this.cid;
-    this.participants = { [this.cid]: [name, hoot] };
+    this.participants = { [this.cid]: [name, hoot, 0] };
     this.questions = [];
     this.push();
     return this.roomId;
@@ -118,8 +120,8 @@ class ConnManager {
     this.roomId = roomId;
     this.hostCid = 'cid2'; // someone else
     this.participants = {
-      cid2: ['hostisme', 0],
-      cid3: ['player2', 5],
+      cid2: ['hostisme', 0, 0],
+      cid3: ['player2', 5, 2],
     };
     this.questions = [
       'How long do you sleep?',
@@ -131,7 +133,7 @@ class ConnManager {
   }
 
   createPlayer(name: string, hoot: number) {
-    this.participants = { ...this.participants, cid1: [name, hoot] };
+    this.participants = { ...this.participants, cid1: [name, hoot, 0] };
     this.mode = Mode.WAITING_ROOM;
     this.push();
   }

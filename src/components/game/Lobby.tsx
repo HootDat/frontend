@@ -43,7 +43,7 @@ const Lobby: React.FC<{
         {Object.entries(participants)
           // sort to ensure everyone sees the same order, host is first.
           .sort((a, b) => (a[0] === hostCid ? -1 : a[0].localeCompare(b[0])))
-          .map(([cid, [name, hoot]]) => {
+          .map(([cid, [name, hoot, _]]) => {
             return (
               <ListItem key={cid}>
                 <ListItemIcon>{hoot}</ListItemIcon>

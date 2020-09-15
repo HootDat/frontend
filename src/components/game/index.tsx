@@ -12,6 +12,7 @@ import GameState, { Mode } from './GameState';
 import Home from './Home';
 import JoinRoom from './JoinRoom';
 import AnsweringQuestion from './AnsweringQuestion';
+import WaitingForAnswer from './WaitingForAnswer';
 
 const conn = new ConnManager();
 
@@ -58,6 +59,8 @@ const GameShell: React.FC = () => {
         return wrapInChatShell(<WaitingRoom />);
       case Mode.ANSWERING_QUESTION:
         return wrapInChatShell(<AnsweringQuestion />);
+      case Mode.WAITING_FOR_ANSWER:
+        return wrapInChatShell(<WaitingForAnswer />);
     }
   };
 

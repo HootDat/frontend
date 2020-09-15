@@ -14,7 +14,9 @@ export default interface GameState {
   mode: Mode /* determines the screen the client is on */;
   cid: string /* id to uniquely identify the client */;
   roomId: string | null;
-  participants: { [key: string]: [string, number] } /* cid, [name, hoot] */;
+  participants: {
+    [key: string]: [string, number, number];
+  } /* cid, [name, hoot, score] */;
   hostCid: string | null;
   currentQuestion: string | null;
   currentAnswer: string | null;
