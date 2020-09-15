@@ -38,6 +38,7 @@ const AddQuestions: React.FC<{
     // TODO
   };
 
+  // would be good to auto focus on new
   const questionList = questions.map((question, index) => {
     return (
       <div key={index}>
@@ -46,11 +47,13 @@ const AddQuestions: React.FC<{
           <Clear />
         </Button>
         <TextField
-          error={question === ''}
+          error={question.trim() === ''}
           onChange={handleChange(index)}
           value={question}
           helperText={
-            question === '' ? 'Your question cannot be blank!' : undefined
+            question.trim() === ''
+              ? 'Your question cannot be blank!'
+              : undefined
           }
         />
       </div>

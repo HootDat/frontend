@@ -16,6 +16,8 @@ export default interface GameState {
   roomId: string | null;
   participants: { [key: string]: [string, number] } /* cid, [name, hoot] */;
   hostCid: string | null;
+  currentQuestion: string | null;
+  currentAnswer: string | null;
 }
 
 export function home(): GameState {
@@ -25,5 +27,7 @@ export function home(): GameState {
     roomId: null,
     participants: {},
     hostCid: null,
+    currentQuestion: null,
+    currentAnswer: null,
   };
 }

@@ -11,7 +11,11 @@ class ConnManager {
   roomId: string | null;
   participants: { [key: string]: [string, number] } /* cid, [name, icon] */;
   hostCid: string | null;
+  currentQuestion: string | null;
+  currentAnswer: string | null;
+
   // this probably will be removed. placeholder for testing
+  round: number;
   questions: string[];
 
   conn: Connection;
@@ -19,7 +23,15 @@ class ConnManager {
 
   constructor() {
     // placeholders
-    const { mode, participants, cid, roomId, hostCid } = home();
+    const {
+      mode,
+      participants,
+      cid,
+      roomId,
+      hostCid,
+      currentQuestion,
+      currentAnswer,
+    } = home();
     this.conn = new Connection();
 
     this.mode = mode;
@@ -27,7 +39,11 @@ class ConnManager {
     this.cid = cid;
     this.roomId = roomId;
     this.hostCid = hostCid;
+    this.currentQuestion = currentQuestion;
+    this.currentAnswer = currentAnswer;
+
     this.questions = [];
+    this.round = 0;
 
     this.stateUpdater = noOp;
   }
@@ -45,9 +61,8 @@ class ConnManager {
     this.conn.cleanup();
   }
 
-  getGameState() {
-    const { mode, roomId, cid, participants, hostCid } = this;
-    return { mode, roomId, cid, participants, hostCid };
+  getGameState(): GameState {
+    return { ...this };
   }
 
   setStateUpdater(stateUpdater: (mode: GameState) => void) {
@@ -59,9 +74,23 @@ class ConnManager {
   }
 
   resetAttributes() {
-    this.participants = {};
-    this.roomId = null;
-    this.hostCid = null;
+    const {
+      mode,
+      participants,
+      cid,
+      roomId,
+      hostCid,
+      currentQuestion,
+      currentAnswer,
+    } = home();
+
+    this.mode = mode;
+    this.participants = participants;
+    this.cid = cid;
+    this.roomId = roomId;
+    this.hostCid = hostCid;
+    this.currentQuestion = currentQuestion;
+    this.currentAnswer = currentAnswer;
   }
 
   updateMode(mode: Mode) {
@@ -116,6 +145,13 @@ class ConnManager {
   startGame(questions: string[]) {
     this.questions = questions;
     this.mode = Mode.ANSWERING_QUESTION;
+    this.currentQuestion = this.questions[this.round];
+    this.push();
+  }
+
+  sendAnswer(answer: string) {
+    this.currentAnswer = answer;
+    this.mode = Mode.GUESSING_ANSWERER;
     this.push();
   }
 }

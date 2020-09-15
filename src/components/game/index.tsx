@@ -11,6 +11,7 @@ import GameContext from './GameContext';
 import GameState, { Mode } from './GameState';
 import Home from './Home';
 import JoinRoom from './JoinRoom';
+import AnsweringQuestion from './AnsweringQuestion';
 
 const conn = new ConnManager();
 
@@ -55,6 +56,8 @@ const GameShell: React.FC = () => {
         return <CreateRoom />;
       case Mode.WAITING_ROOM:
         return wrapInChatShell(<WaitingRoom />);
+      case Mode.ANSWERING_QUESTION:
+        return wrapInChatShell(<AnsweringQuestion />);
     }
   };
 
