@@ -3,6 +3,11 @@ export enum Mode {
   JOIN_ROOM,
   CREATE_ROOM,
   WAITING_ROOM,
+  ANSWERING_QUESTION,
+  WAITING_FOR_ANSWER,
+  GUESSING_ANSWERER,
+  ROUND_END,
+  GAME_END,
 }
 
 export default interface GameState {
@@ -16,7 +21,7 @@ export default interface GameState {
 export function home(): GameState {
   return {
     mode: Mode.HOME,
-    cid: '1234',
+    cid: 'cid1',
     roomId: null,
     participants: {},
     hostCid: null,

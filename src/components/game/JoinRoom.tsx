@@ -19,6 +19,9 @@ const JoinRoom: React.FC = () => {
     history.replace(`/?roomId=${roomId}`);
   };
 
+  // when they are in the createPlayer page and leave,
+  // they need to tell the server
+  // they aren't in the room anymore, so this isn't sufficient.
   const handleBack = () => {
     conn.updateMode(Mode.HOME);
     history.replace('/');
@@ -26,7 +29,7 @@ const JoinRoom: React.FC = () => {
 
   const handleCreatePlayer = (name: string, hoot: number) => {
     // TODO: update server
-    conn.updateMode(Mode.WAITING_ROOM);
+    conn.createPlayer(name, hoot);
   };
 
   return (
