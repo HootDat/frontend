@@ -3,10 +3,10 @@ import { Typography, TextField, Button, ButtonGroup } from '@material-ui/core';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
 
 const CreatePlayer: React.FC<{
-  handleSubmit: (name: string, hoot: number) => void;
+  handleCreate: (name: string, hoot: number) => void;
   handleBack: () => void;
   participants: { [key: string]: [string, number] };
-}> = ({ handleSubmit, handleBack, participants }) => {
+}> = ({ handleCreate, handleBack, participants }) => {
   // 0 to 11, inclusive
   const [hoot, setHoot] = useState(-1);
   // 1 or 2
@@ -15,17 +15,8 @@ const CreatePlayer: React.FC<{
 
   const occupiedNumbers = Object.values(participants).map(arr => arr[1]);
 
-  const handleHootSelect = (hootNumber: number) => {
-    // temporarily identify each one by id, shd pick something better
-    return () => setHoot(hootNumber);
-  };
-
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
-  };
-
-  const handleChangePage = (page: number) => {
-    return () => setPage(page);
   };
 
   const makeHootRow = (firstHootId: number) => {
@@ -48,7 +39,7 @@ const CreatePlayer: React.FC<{
         color="primary"
         id={hootNumber.toString()}
         disabled={occupiedNumbers.includes(hootNumber)}
-        onClick={handleHootSelect(hootNumber)}
+        onClick={() => setHoot(hootNumber)}
       >
         {hootNumber}
       </Button>
@@ -57,11 +48,11 @@ const CreatePlayer: React.FC<{
 
   const PageSelector = (
     <>
-      <Button size="small" onClick={handleChangePage(1)} disabled={page === 1}>
+      <Button size="small" onClick={() => setPage(1)} disabled={page === 1}>
         <KeyboardArrowLeft />
       </Button>
       {page}/2
-      <Button size="small" onClick={handleChangePage(2)} disabled={page === 2}>
+      <Button size="small" onClick={() => setPage(2)} disabled={page === 2}>
         <KeyboardArrowRight />
       </Button>
     </>
@@ -91,7 +82,7 @@ const CreatePlayer: React.FC<{
         variant="contained"
         color="primary"
         disabled={hoot === -1 || name === ''}
-        onClick={() => handleSubmit(name, hoot)}
+        onClick={() => handleCreate(name, hoot)}
       >
         CREATE HOOT
       </Button>

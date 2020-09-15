@@ -3,9 +3,9 @@ import { TextField, Button, Typography } from '@material-ui/core';
 
 // load form if room in state is empty. otherwise load character.
 const JoinRoomForm: React.FC<{
-  handleSubmit: (roomId: string) => void;
+  handleJoin: (roomId: string) => void;
   handleBack: () => void;
-}> = ({ handleSubmit, handleBack }) => {
+}> = ({ handleJoin, handleBack }) => {
   const [input, setInput] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,8 +13,6 @@ const JoinRoomForm: React.FC<{
 
     if (re.test(e.target.value)) setInput(e.target.value);
   };
-
-  const handleClick = () => handleSubmit(input);
 
   return (
     <>
@@ -24,7 +22,7 @@ const JoinRoomForm: React.FC<{
         variant="contained"
         color="primary"
         disabled={input.length !== 4}
-        onClick={handleClick}
+        onClick={() => handleJoin(input)}
       >
         Join Room
       </Button>

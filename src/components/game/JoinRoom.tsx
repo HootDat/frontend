@@ -35,10 +35,10 @@ const JoinRoom: React.FC = () => {
   return (
     <>
       {roomId === null ? (
-        <JoinRoomForm handleSubmit={handleJoin} handleBack={handleBack} />
+        <JoinRoomForm handleJoin={handleJoin} handleBack={handleBack} />
       ) : (
         <CreatePlayer
-          handleSubmit={handleCreatePlayer}
+          handleCreate={handleCreatePlayer}
           handleBack={handleBack}
           participants={participants}
         />

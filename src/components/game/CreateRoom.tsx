@@ -23,7 +23,7 @@ const CreateRoom: React.FC = () => {
   return (
     <>
       <CreatePlayer
-        handleSubmit={handleSubmit}
+        handleCreate={handleSubmit}
         handleBack={handleBack}
         participants={{}}
       />

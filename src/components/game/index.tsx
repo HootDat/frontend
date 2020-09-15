@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Button } from '@material-ui/core';
 
 import ConnContext from './connection/ConnContext';
 import ConnManager from './connection/ConnManager';
+import ChatShell from './ChatShell';
 import CreateRoom from './CreateRoom';
 import WaitingRoom from './WaitingRoom';
 import GameContext from './GameContext';
 import GameState, { Mode } from './GameState';
 import Home from './Home';
 import JoinRoom from './JoinRoom';
-import { useLocation, useHistory } from 'react-router-dom';
 
 const conn = new ConnManager();
 
@@ -40,14 +41,28 @@ const GameShell: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const render = () => {
+    const wrapInChatShell = (element: JSX.Element) => (
+      <ChatShell>{element}</ChatShell>
+    );
+
+    switch (mode) {
+      case Mode.HOME:
+        return <Home />;
+      case Mode.JOIN_ROOM:
+        return <JoinRoom />;
+      case Mode.CREATE_ROOM:
+        return <CreateRoom />;
+      case Mode.WAITING_ROOM:
+        return wrapInChatShell(<WaitingRoom />);
+    }
+  };
+
   return (
     <GameContext.Provider value={gameState}>
       <ConnContext.Provider value={conn}>
         <Button onClick={() => conn.push()}>{cid}</Button>
-        {mode === Mode.HOME && <Home />}
-        {mode === Mode.JOIN_ROOM && <JoinRoom />}
-        {mode === Mode.CREATE_ROOM && <CreateRoom />}
-        {mode === Mode.WAITING_ROOM && <WaitingRoom />}
+        {render()}
       </ConnContext.Provider>
     </GameContext.Provider>
   );

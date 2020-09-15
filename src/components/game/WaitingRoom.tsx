@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 
-import ChatShell from './ChatShell';
-import Lobby from './Lobby';
 import AddQuestions from './AddQuestions';
+import Lobby from './Lobby';
 
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
@@ -12,29 +11,21 @@ const WaitingRoom: React.FC = () => {
   const [addingQuestion, setAddingQuestion] = useState(false);
   const [questions, setQuestions] = useState([] as string[]);
 
-  const handleAddQuestionButton = () => {
-    setAddingQuestion(true);
-  };
-
-  const handleAddQuestionBack = () => {
-    setAddingQuestion(false);
-  };
-
   return (
-    <ChatShell>
+    <>
       {addingQuestion ? (
         <AddQuestions
           roomQuestions={questions}
           setRoomQuestions={setQuestions}
-          handleBack={handleAddQuestionBack}
+          handleBack={() => setAddingQuestion(false)}
         />
       ) : (
         <Lobby
           questions={questions}
-          handleAddQuestionButton={handleAddQuestionButton}
+          handleAddQuestionButton={() => setAddingQuestion(true)}
         />
       )}
-    </ChatShell>
+    </>
   );
 };
 
