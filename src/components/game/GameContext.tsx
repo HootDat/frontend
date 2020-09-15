@@ -1,6 +1,6 @@
 import { createContext } from 'react';
-import GameManager from './GameManager';
+import GameState, { home } from './GameState';
 
-const GameContext = createContext<GameManager>({} as GameManager);
+const GameContext = createContext<GameState>(home());
 
 export default GameContext;

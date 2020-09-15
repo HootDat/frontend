@@ -1,9 +1,10 @@
 import Connection from './Connection';
-import GameState, { Mode } from './GameState';
+import GameState, { Mode, home } from '../GameState';
 
 const noOp = () => {};
 
-class GameManager {
+// Processes and sends updates to and from the server.
+class ConnManager {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
   roomId: string | null;
   cid: string;
@@ -15,12 +16,15 @@ class GameManager {
 
   constructor() {
     // placeholders
-    this.mode = Mode.HOME;
+    const { mode, participants, cid, roomId, hostCid } = home();
     this.conn = new Connection();
-    this.participants = {};
-    this.cid = '123';
-    this.roomId = null;
-    this.hostCid = null;
+
+    this.mode = mode;
+    this.participants = participants;
+    this.cid = cid;
+    this.roomId = roomId;
+    this.hostCid = hostCid;
+
     this.stateUpdater = noOp;
   }
 
@@ -76,4 +80,4 @@ class GameManager {
   }
 }
 
-export default GameManager;
+export default ConnManager;

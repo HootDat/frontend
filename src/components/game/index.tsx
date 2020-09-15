@@ -1,41 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import Home from './Home';
-import GameManager from './GameManager';
-import GameState, { Mode } from './GameState';
 import { Button } from '@material-ui/core';
-import GameContext from './GameContext';
-import JoinRoom from './JoinRoom';
+
+import ConnContext from './connection/ConnContext';
+import ConnManager from './connection/ConnManager';
 import CreateRoom from './CreateRoom';
 import WaitingRoom from './WaitingRoom';
+import GameContext from './GameContext';
+import GameState, { Mode } from './GameState';
+import Home from './Home';
+import JoinRoom from './JoinRoom';
 
-const context = new GameManager();
+const conn = new ConnManager();
 
 const GameShell: React.FC = () => {
-  const [{ cid, mode, roomId, participants }, setGameState] = useState<
-    GameState
-  >(context.getGameState());
+  const [gameState, setGameState] = useState<GameState>(conn.getGameState());
+
+  const { cid, mode } = gameState;
 
   useEffect(() => {
-    context.setStateUpdater(setGameState);
-    context.connectToServer();
+    conn.setStateUpdater(setGameState);
+    conn.connectToServer();
 
     // TODO: if there is a query pin, send in connection to join room immediately
     // and all other event handlers for the game events
 
     return () => {
-      context.cleanup();
+      conn.cleanup();
     };
   }, []);
 
   return (
-    <GameContext.Provider value={context}>
-      <Button onClick={() => context.push()}>{cid}</Button>
-      {mode === Mode.HOME && <Home />}
-      {mode === Mode.JOIN_ROOM && (
-        <JoinRoom roomId={roomId} participants={participants} />
-      )}
-      {mode === Mode.CREATE_ROOM && <CreateRoom />}
-      {mode === Mode.WAITING_ROOM && <WaitingRoom />}
+    <GameContext.Provider value={gameState}>
+      <ConnContext.Provider value={conn}>
+        <Button onClick={() => conn.push()}>{cid}</Button>
+        {mode === Mode.HOME && <Home />}
+        {mode === Mode.JOIN_ROOM && <JoinRoom />}
+        {mode === Mode.CREATE_ROOM && <CreateRoom />}
+        {mode === Mode.WAITING_ROOM && <WaitingRoom />}
+      </ConnContext.Provider>
     </GameContext.Provider>
   );
 };

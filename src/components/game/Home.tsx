@@ -1,19 +1,19 @@
 import React, { useContext } from 'react';
-import { Button, Link, Typography } from '@material-ui/core';
 import { Link as RouterLink } from 'react-router-dom';
+import { Button, Link, Typography } from '@material-ui/core';
 
 import LogInOutButton from '../login/LogInOutButton';
-import GameContext from './GameContext';
+import ConnContext from './connection/ConnContext';
 import { Mode } from './GameState';
 
 const Home: React.FC = () => {
-  const context = useContext(GameContext);
+  const conn = useContext(ConnContext);
 
   const handleCreateButton = () => {
-    context.updateMode(Mode.CREATE_ROOM);
+    conn.updateMode(Mode.CREATE_ROOM);
   };
   const handleJoinButton = () => {
-    context.updateMode(Mode.JOIN_ROOM);
+    conn.updateMode(Mode.JOIN_ROOM);
   };
 
   return (

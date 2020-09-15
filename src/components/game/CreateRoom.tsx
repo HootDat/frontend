@@ -1,18 +1,19 @@
 import React, { useContext } from 'react';
+
+import ConnContext from './connection/ConnContext';
 import CreatePlayer from './CreatePlayer';
-import GameContext from './GameContext';
 import { Mode } from './GameState';
 
 const CreateRoom: React.FC = () => {
-  const context = useContext(GameContext);
+  const conn = useContext(ConnContext);
 
   const handleSubmit = (name: string, hoot: number) => {
     // TODO
-    context.createRoom(name, hoot);
+    conn.createRoom(name, hoot);
   };
 
   const handleBack = () => {
-    context.updateMode(Mode.HOME);
+    conn.updateMode(Mode.HOME);
   };
 
   return (
