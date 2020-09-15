@@ -69,7 +69,7 @@ class ConnManager {
   }
 
   createRoom(name: string, hoot: number) {
-    this.mode = Mode.HOME;
+    this.mode = Mode.WAITING_ROOM;
     this.push();
   }
 
