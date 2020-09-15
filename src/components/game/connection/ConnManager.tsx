@@ -156,6 +156,11 @@ class ConnManager {
     this.mode = Mode.GUESSING_ANSWERER;
     this.push();
   }
+
+  guessAnswerer(answerer: string) {
+    this.mode = Mode.ROUND_END;
+    this.push();
+  }
 }
 
 export default ConnManager;

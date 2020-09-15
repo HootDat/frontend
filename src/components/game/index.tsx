@@ -13,6 +13,7 @@ import Home from './Home';
 import JoinRoom from './JoinRoom';
 import AnsweringQuestion from './AnsweringQuestion';
 import WaitingForAnswer from './WaitingForAnswer';
+import GuessingAnswerer from './GuessingAnswerer';
 
 const conn = new ConnManager();
 
@@ -61,6 +62,8 @@ const GameShell: React.FC = () => {
         return wrapInChatShell(<AnsweringQuestion />);
       case Mode.WAITING_FOR_ANSWER:
         return wrapInChatShell(<WaitingForAnswer />);
+      case Mode.GUESSING_ANSWERER:
+        return wrapInChatShell(<GuessingAnswerer />);
     }
   };
 
