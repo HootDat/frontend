@@ -77,6 +77,7 @@ const Lobby: React.FC<{
     </>
   );
 
+  // need to disable if less than 3 players
   const actionButton =
     cid === hostCid ? (
       questions.length === 0 ? (

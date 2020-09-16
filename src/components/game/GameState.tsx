@@ -20,6 +20,8 @@ export default interface GameState {
   hostCid: string | null;
   currentQuestion: string | null;
   currentAnswer: string | null;
+  currentGuesses: { [key: string]: string };
+  currentAnswerer: string | null;
 }
 
 export function home(): GameState {
@@ -31,5 +33,7 @@ export function home(): GameState {
     hostCid: null,
     currentQuestion: null,
     currentAnswer: null,
+    currentGuesses: {},
+    currentAnswerer: null,
   };
 }

@@ -9,7 +9,7 @@ import {
 
 const ScoreBoard: React.FC<{
   header?: boolean;
-  hostCid: string;
+  hostCid?: string;
   participants: { [key: string]: [string, number, number] };
 }> = ({ header, hostCid, participants }) => {
   const scoreBoard = Object.entries(participants)
@@ -18,7 +18,7 @@ const ScoreBoard: React.FC<{
       return (
         <ListItem key={cid}>
           <ListItemText>
-            {hoot} - {name} - {score}
+            {hoot} - {name} - {score}PT
           </ListItemText>
         </ListItem>
       );

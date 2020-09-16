@@ -15,6 +15,8 @@ class ConnManager {
   hostCid: string | null;
   currentQuestion: string | null;
   currentAnswer: string | null;
+  currentGuesses: { [key: string]: string };
+  currentAnswerer: string | null;
 
   // this probably will be removed. placeholder for testing
   round: number;
@@ -33,6 +35,8 @@ class ConnManager {
       hostCid,
       currentQuestion,
       currentAnswer,
+      currentGuesses,
+      currentAnswerer,
     } = home();
     this.conn = new Connection();
 
@@ -43,6 +47,8 @@ class ConnManager {
     this.hostCid = hostCid;
     this.currentQuestion = currentQuestion;
     this.currentAnswer = currentAnswer;
+    this.currentGuesses = currentGuesses;
+    this.currentAnswerer = currentAnswerer;
 
     this.questions = [];
     this.round = 0;
@@ -84,6 +90,8 @@ class ConnManager {
       hostCid,
       currentQuestion,
       currentAnswer,
+      currentGuesses,
+      currentAnswerer,
     } = home();
 
     this.mode = mode;
@@ -93,6 +101,8 @@ class ConnManager {
     this.hostCid = hostCid;
     this.currentQuestion = currentQuestion;
     this.currentAnswer = currentAnswer;
+    this.currentGuesses = currentGuesses;
+    this.currentAnswerer = currentAnswerer;
   }
 
   updateMode(mode: Mode) {
@@ -158,8 +168,24 @@ class ConnManager {
   }
 
   guessAnswerer(answerer: string) {
+    this.currentAnswerer = answerer;
+    this.currentGuesses = { [this.cid]: answerer };
     this.mode = Mode.ROUND_END;
     this.push();
+  }
+
+  readyForNextRound() {
+    this.round++;
+    this.currentAnswerer = null;
+    this.currentGuesses = {};
+    this.currentAnswer = null;
+    if (this.round === this.questions.length) {
+      this.currentQuestion = null;
+      this.mode = Mode.GAME_END;
+    } else {
+      this.currentQuestion = this.questions[this.round];
+      this.mode = Mode.ANSWERING_QUESTION;
+    }
   }
 }
 

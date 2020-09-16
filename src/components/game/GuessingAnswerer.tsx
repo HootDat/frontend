@@ -6,8 +6,7 @@ import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 
 const GuessingAnswerer: React.FC = () => {
-  // TODO: Timer. Using setTimeout/setInterval does not seem to work
-  // properly. When you change tab, it stops progressing.
+  // TODO: show who has guessed already? Might not be necessary though.
 
   const [selected, setSelected] = useState<string | null>(null);
 
