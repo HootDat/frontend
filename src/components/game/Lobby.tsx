@@ -36,7 +36,6 @@ const Lobby: React.FC<{
     history.replace('/');
   };
 
-  //
   const participantCard = (
     <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
       <List dense>

@@ -103,6 +103,7 @@ class ConnManager {
     this.currentAnswer = currentAnswer;
     this.currentGuesses = currentGuesses;
     this.currentAnswerer = currentAnswerer;
+    this.round = 0;
   }
 
   updateMode(mode: Mode) {
@@ -179,13 +180,15 @@ class ConnManager {
     this.currentAnswerer = null;
     this.currentGuesses = {};
     this.currentAnswer = null;
-    if (this.round === this.questions.length) {
+    if (this.round >= this.questions.length) {
       this.currentQuestion = null;
+      this.round = 0;
       this.mode = Mode.GAME_END;
     } else {
       this.currentQuestion = this.questions[this.round];
       this.mode = Mode.ANSWERING_QUESTION;
     }
+    this.push();
   }
 }
 

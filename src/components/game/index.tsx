@@ -15,6 +15,7 @@ import Home from './Home';
 import JoinRoom from './JoinRoom';
 import WaitingForAnswer from './WaitingForAnswer';
 import RoundEnd from './RoundEnd';
+import GameEnd from './GameEnd';
 
 const conn = new ConnManager();
 
@@ -67,6 +68,8 @@ const GameShell: React.FC = () => {
         return wrapInChatShell(<GuessingAnswerer />);
       case Mode.ROUND_END:
         return wrapInChatShell(<RoundEnd />);
+      case Mode.GAME_END:
+        return wrapInChatShell(<GameEnd />);
     }
   };
 

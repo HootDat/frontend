@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import AddQuestions from './AddQuestions';
 import Lobby from './Lobby';
+import GameContext from './GameContext';
 
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
@@ -9,7 +10,9 @@ import Lobby from './Lobby';
 // Users have finished a game and pressed play again
 const WaitingRoom: React.FC = () => {
   const [addingQuestion, setAddingQuestion] = useState(false);
-  const [questions, setQuestions] = useState([] as string[]);
+
+  const { questions: existingQuestions } = useContext(GameContext);
+  const [questions, setQuestions] = useState(existingQuestions);
 
   return (
     <>

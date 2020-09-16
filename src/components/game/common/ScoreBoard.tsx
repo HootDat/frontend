@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Box,
   ListItem,
   ListItemText,
   Paper,
@@ -9,16 +10,34 @@ import {
 
 const ScoreBoard: React.FC<{
   header?: boolean;
+  winning?: boolean;
   hostCid?: string;
   participants: { [key: string]: [string, number, number] };
-}> = ({ header, hostCid, participants }) => {
+}> = ({ header, winning, hostCid, participants }) => {
+  const defaultSort = (
+    a: [string, [string, number, number]],
+    b: [string, [string, number, number]]
+  ) => (a[0] === hostCid ? -1 : a[0].localeCompare(b[0]));
+
+  const winningSort = (
+    a: [string, [string, number, number]],
+    b: [string, [string, number, number]]
+  ) => b[1][2] - a[1][2];
+
   const scoreBoard = Object.entries(participants)
-    .sort((a, b) => (a[0] === hostCid ? -1 : a[0].localeCompare(b[0])))
-    .map(([cid, [name, hoot, score]]) => {
+    .sort(winning ? winningSort : defaultSort)
+    .map(([cid, [name, hoot, score]], index) => {
       return (
         <ListItem key={cid}>
           <ListItemText>
-            {hoot} - {name} - {score}PT
+            {hoot} -{' '}
+            <Box
+              fontWeight={winning && index === 0 ? 'fontWeightBold' : undefined}
+              display="inline"
+            >
+              {name}
+            </Box>{' '}
+            - {score}PT
           </ListItemText>
         </ListItem>
       );
