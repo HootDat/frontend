@@ -1,7 +1,9 @@
 import React, { useState, useContext } from 'react';
-import GameContext from './GameContext';
 import { Paper, Typography, Button } from '@material-ui/core';
+
+import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
+import GameContext from './GameContext';
 
 const GuessingAnswerer: React.FC = () => {
   // TODO: Timer. Using setTimeout/setInterval does not seem to work
@@ -38,6 +40,7 @@ const GuessingAnswerer: React.FC = () => {
 
   return (
     <>
+      <ProgressBarCountdownTimer countdownSeconds={120} />
       <Paper>
         <Typography color="primary" variant="h5">
           Question

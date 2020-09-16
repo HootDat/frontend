@@ -8,6 +8,7 @@ import {
   ListItemText,
 } from '@material-ui/core';
 
+import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import GameContext from './GameContext';
 
 const WaitingForAnswer: React.FC = () => {
@@ -27,6 +28,7 @@ const WaitingForAnswer: React.FC = () => {
 
   return (
     <>
+      <ProgressBarCountdownTimer countdownSeconds={60} />
       <Typography variant="h3">Waiting for hoot to answer...</Typography>
       <Paper elevation={1}>
         <List subheader={<ListSubheader>Current scoreboard</ListSubheader>}>

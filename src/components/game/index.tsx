@@ -4,16 +4,16 @@ import { Button } from '@material-ui/core';
 
 import ConnContext from './connection/ConnContext';
 import ConnManager from './connection/ConnManager';
+import AnsweringQuestion from './AnsweringQuestion';
 import ChatShell from './ChatShell';
 import CreateRoom from './CreateRoom';
 import WaitingRoom from './WaitingRoom';
 import GameContext from './GameContext';
 import GameState, { Mode } from './GameState';
+import GuessingAnswerer from './GuessingAnswerer';
 import Home from './Home';
 import JoinRoom from './JoinRoom';
-import AnsweringQuestion from './AnsweringQuestion';
 import WaitingForAnswer from './WaitingForAnswer';
-import GuessingAnswerer from './GuessingAnswerer';
 
 const conn = new ConnManager();
 

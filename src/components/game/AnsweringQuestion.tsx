@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { Typography, Paper, TextField, Button } from '@material-ui/core';
 
-import GameContext from './GameContext';
+import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
+import GameContext from './GameContext';
 
 // TODO: Do we need a timer here? Kinda makes sense, but if they don't
 // answer then that's another state we need to account for :/
@@ -26,6 +27,7 @@ const AnsweringQuestion: React.FC = () => {
 
   return (
     <>
+      <ProgressBarCountdownTimer countdownSeconds={60} />
       <Typography variant="h3">What is your answer?</Typography>
       <Paper elevation={1}>
         <Typography variant="body1">{currentQuestion}</Typography>
