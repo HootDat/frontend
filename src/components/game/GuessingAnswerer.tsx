@@ -18,9 +18,8 @@ const GuessingAnswerer: React.FC = () => {
   const conn = useContext(ConnContext);
 
   const handleGuess = () => {
-    if (selected === null) return;
-    // TODO: should show snackbar that you must select someone first
-    conn.guessAnswerer(selected);
+    // guaranteed non null as it only triggers if someone has been selected
+    conn.guessAnswerer(selected!);
   };
 
   const choices = Object.entries(participants)
@@ -53,7 +52,12 @@ const GuessingAnswerer: React.FC = () => {
       </Paper>
       <Typography variant="h3">Guess hoot dat</Typography>
       {choices}
-      <Button variant="contained" color="primary" onClick={handleGuess}>
+      <Button
+        variant="contained"
+        color="primary"
+        disabled={selected === null}
+        onClick={handleGuess}
+      >
         GUESS
       </Button>
     </>
