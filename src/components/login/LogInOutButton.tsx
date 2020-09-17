@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@material-ui/core';
 import AuthContext from './AuthContext';
+import localStorage from '../utils/localStorage';
 
 const LogInOutButton: React.FC = () => {
   const authState = useContext(AuthContext);
@@ -15,7 +16,7 @@ const LogInOutButton: React.FC = () => {
   // TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
   const handleLogOut = () => {
     // TODO: tell server log out
-    // TODO remove access token from local storage
+    localStorage.removeAccessToken();
     authState.setAuthState({ ...authState, access_token: null });
   };
 
