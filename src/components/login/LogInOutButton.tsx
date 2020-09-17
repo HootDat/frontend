@@ -1,24 +1,31 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@material-ui/core';
+import AuthContext from './AuthContext';
 
-// TODO: Change the button depending on auth state
-// TODO: Allow for updating of auth state
-// TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
 const LogInOutButton: React.FC = () => {
+  const authState = useContext(AuthContext);
+
   const LogInButton = (
     <Link color="primary" component={RouterLink} to="/login">
       LOG IN
     </Link>
   );
 
+  // TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
+  const handleLogOut = () => {
+    // TODO: tell server log out
+    // TODO remove access token from local storage
+    authState.setAuthState({ ...authState, access_token: null });
+  };
+
   const LogOutButton = (
-    <Link color="primary" component={RouterLink} to="/">
+    <Link color="primary" onClick={handleLogOut}>
       LOG OUT
     </Link>
   );
 
-  return true ? LogInButton : LogOutButton;
+  return authState.access_token === null ? LogInButton : LogOutButton;
 };
 
 export default LogInOutButton;
