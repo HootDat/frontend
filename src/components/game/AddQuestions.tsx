@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Typography, Button, TextField } from '@material-ui/core';
-import { Add, Clear } from '@material-ui/icons';
+import { Typography, Button } from '@material-ui/core';
+import EditQuestionsList from '../packs/EditQuestionsList';
 
 const AddQuestions: React.FC<{
   roomQuestions: string[];
@@ -8,24 +8,6 @@ const AddQuestions: React.FC<{
   handleBack: () => void;
 }> = ({ roomQuestions, setRoomQuestions, handleBack }) => {
   const [questions, setQuestions] = useState([...roomQuestions]);
-
-  const handleChange = (questionIndex: number) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      questions[questionIndex] = e.target.value;
-      setQuestions([...questions]);
-    };
-  };
-
-  const handleDelete = (questionIndex: number) => {
-    return () => {
-      questions.splice(questionIndex, 1);
-      setQuestions([...questions]);
-    };
-  };
-
-  const handleNew = () => {
-    setQuestions([...questions, '']);
-  };
 
   const handleAdd = () => {
     const trimmed = questions.map(s => s.trim());
@@ -38,28 +20,6 @@ const AddQuestions: React.FC<{
     // TODO
   };
 
-  // would be good to auto focus on new
-  const questionList = questions.map((question, index) => {
-    return (
-      <div key={index}>
-        <Typography variant="body1">Qn{index + 1}</Typography>
-        <Button size="small" onClick={handleDelete(index)}>
-          <Clear />
-        </Button>
-        <TextField
-          error={question.trim() === ''}
-          onChange={handleChange(index)}
-          value={question}
-          helperText={
-            question.trim() === ''
-              ? 'Your question cannot be blank!'
-              : undefined
-          }
-        />
-      </div>
-    );
-  });
-
   return (
     <>
       <Typography variant="h3">Add questions</Typography>
@@ -71,18 +31,9 @@ const AddQuestions: React.FC<{
       >
         ADD FROM PACK
       </Button>
-      {questionList}
-      <Button
-        size="small"
-        variant="outlined"
-        color="primary"
-        onClick={handleNew}
-      >
-        <Add fontSize="small" />
-        NEW QUESTION
-      </Button>
+      <EditQuestionsList questions={questions} setQuestions={setQuestions} />
       <Button variant="contained" color="primary" onClick={handleAdd}>
-        ADD QUESTIONS
+        SAVE QUESTIONS
       </Button>
       <Button color="primary" onClick={handleBack}>
         BACK
