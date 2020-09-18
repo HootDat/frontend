@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
-import localStorage from '../utils/localStorage';
+import localStorage from '../../utils/localStorage';
 
 const Packs: React.FC = () => {
   const history = useHistory();

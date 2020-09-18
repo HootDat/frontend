@@ -5,7 +5,7 @@ import NotFound from './NotFound';
 import Login from './login';
 import Packs from './packs';
 import CreatePack from './packs/CreatePack';
-import localStorage from './utils/localStorage';
+import localStorage from '../utils/localStorage';
 
 const AppRouter: React.FC = () => {
   return (

@@ -3,7 +3,7 @@ import { Button, Link, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { Facebook } from '@material-ui/icons';
 import AuthContext from './AuthContext';
-import localStorage from '../utils/localStorage';
+import localStorage from '../../utils/localStorage';
 
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);

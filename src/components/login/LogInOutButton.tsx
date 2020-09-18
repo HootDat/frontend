@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@material-ui/core';
 import AuthContext from './AuthContext';
-import localStorage from '../utils/localStorage';
+import localStorage from '../../utils/localStorage';
 
 const LogInOutButton: React.FC = () => {
   const authState = useContext(AuthContext);
