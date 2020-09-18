@@ -16,7 +16,7 @@ const Packs: React.FC = () => {
         color="primary"
         variant="contained"
         disabled={!localStorage.isAvailable()}
-        onClick={() => history.push('/packs/create')}
+        onClick={() => history.push('/packs/new')}
       >
         <Add /> CREATE QUESTION PACK
       </Button>

@@ -4,7 +4,7 @@ import GameShell from './game';
 import NotFound from './NotFound';
 import Login from './login';
 import Packs from './packs';
-import CreatePack from './packs/CreatePack';
+import NewPack from './packs/NewPack';
 import localStorage from '../utils/localStorage';
 
 const AppRouter: React.FC = () => {
@@ -16,7 +16,7 @@ const AppRouter: React.FC = () => {
 
         <Route exact path="/packs" component={Packs} />
         {localStorage.isAvailable() ? (
-          <Route exact path="/packs/create" component={CreatePack} />
+          <Route exact path="/packs/new" component={NewPack} />
         ) : undefined}
 
         <Route component={NotFound} />
