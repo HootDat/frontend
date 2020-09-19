@@ -1,6 +1,6 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { ApiErrorResponse } from '../types/api';
-import localStorage from '../utils/localStorage';
+import store from '../utils/store';
 
 const client = axios.create({
   baseURL: process.env.BACKEND_URL,
@@ -41,7 +41,7 @@ class BaseAPI {
 // TODO fix this to send the actual token instead
 function getConfig() {
   return {
-    headers: localStorage.getAccessToken(),
+    headers: store.getAccessToken(),
   };
 }
 

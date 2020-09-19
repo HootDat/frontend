@@ -13,3 +13,20 @@ export type QuestionPackPostData = {
   questions: string[];
   public: boolean;
 };
+
+// none   - packs that were synced from server, and no changes were made
+// new    - packs created locally, but have not been pushed to server
+// edit   - packs that have been edited after syncing from server
+// delete - packs that have been deleted locally, but have not been synced to server
+export type LocalQuestionPack = QuestionPack & {
+  action: 'none' | 'new' | 'edit' | 'delete';
+};
+
+// strictly local just QuestionPackPostData with an invalid id (uuid)
+// if id is invalid, dont need to track changes
+
+// if id is valid, then need to track changes
+// with change and updated_at
+
+// on logout, delete all local packs
+// on login, download all owned packs and store locally

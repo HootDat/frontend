@@ -3,7 +3,7 @@ import { Button, Link, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { Facebook } from '@material-ui/icons';
 import AuthContext from './AuthContext';
-import localStorage from '../../utils/localStorage';
+import store from '../../utils/store';
 
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
     if (response.status === 'connected') {
       // TODO forward authResponse.accessToken to server (server gets userId from fb)
       // send api request to server to get access token
-      localStorage.setAccessToken('access_token');
+      store.setAccessToken('access_token');
       authState.setAuthState({ ...authState, access_token: 'access_token' });
       // TODO notificiaton
       history.replace('/');

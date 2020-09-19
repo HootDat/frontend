@@ -24,6 +24,7 @@ const EditQuestionsList: React.FC<{
     setQuestions([...questions, '']);
   };
 
+  // TODO would be good to ensure questions are all unique
   // would be good to auto focus on new
   const questionList = questions.map((question, index) => {
     return (

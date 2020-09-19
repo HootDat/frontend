@@ -5,7 +5,7 @@ import NotFound from './NotFound';
 import Login from './login';
 import Packs from './packs';
 import NewPack from './packs/NewPack';
-import localStorage from '../utils/localStorage';
+import store from '../utils/store';
 
 const AppRouter: React.FC = () => {
   return (
@@ -15,7 +15,7 @@ const AppRouter: React.FC = () => {
         <Route exact path="/login" component={Login} />
 
         <Route exact path="/packs" component={Packs} />
-        {localStorage.isAvailable() ? (
+        {store.isAvailable() ? (
           <Route exact path="/packs/new" component={NewPack} />
         ) : undefined}
 
