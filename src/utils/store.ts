@@ -1,8 +1,4 @@
-import {
-  QuestionPack,
-  LocalQuestionPack,
-  QuestionPackPostData,
-} from '../types/questionPack';
+import { QuestionPack, LocalQuestionPack } from '../types/questionPack';
 
 const ACCESS_TOKEN = 'access_token';
 const LOCAL_PACKS = 'packs';
@@ -124,25 +120,32 @@ class Store {
       return [];
     }
 
-    return Object.values(this.getPacks());
+    return Object.values(this.getPacks()).filter(
+      pack => pack.action !== 'delete'
+    );
   }
 
-  newLocalPack(pack: QuestionPackPostData, name: string) {
+  // Assumes localStorage is present.
+  getLocalPack(id: number): LocalQuestionPack {
+    return this.getPacks()[id];
+  }
+
+  newLocalPack(pack: LocalQuestionPack, name: string) {
     if (!this.isAvailable()) {
       return;
     }
 
-    const newPack: LocalQuestionPack = {
+    const PackNew: LocalQuestionPack = {
       ...pack,
       id: this.genRandomLocalId(),
       owner: {
         id: 0, // placeholder, since the server will overwrite this
-        name: name,
+        name: name, // only meaningful if user is logged in
       },
       action: 'new',
       updated_at: new Date().toISOString(),
     };
-    this.setPack(newPack);
+    this.setPack(PackNew);
   }
 
   editLocalPack(pack: LocalQuestionPack) {

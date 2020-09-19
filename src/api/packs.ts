@@ -12,11 +12,11 @@ const packsAPI = {
     return base.getData(`/packs`, { limit, offset, scope, categories });
   },
 
-  newPack: (pack: QuestionPackPostData): Promise<QuestionPack> => {
+  PackNew: (pack: QuestionPackPostData): Promise<QuestionPack> => {
     return base.postData('/packs', { ...pack });
   },
 
-  editPack: (pack: QuestionPackPostData): Promise<QuestionPack> => {
+  PackEdit: (pack: QuestionPackPostData): Promise<QuestionPack> => {
     return base.putData(`/packs/${pack.id}`, { ...pack });
   },
 

@@ -9,25 +9,31 @@ import {
 import { Autocomplete } from '@material-ui/lab';
 import EditQuestionsList from './EditQuestionsList';
 import { useHistory } from 'react-router-dom';
-import { QuestionPackPostData } from '../../types/questionPack';
+import { LocalQuestionPack } from '../../types/questionPack';
 import { Category } from '../../types/category';
 
+const INVALID_ID = 0;
+
 const QuestionPackForm: React.FC<{
-  handleSubmit: (pack: QuestionPackPostData) => void;
-  editPack?: QuestionPackPostData;
+  handleSubmit: (pack: LocalQuestionPack) => void;
+  editPack?: LocalQuestionPack;
   categories: Category[]; // should be fetched in parent
 }> = ({
   handleSubmit,
   editPack = {
-    id: 0, // invalid id for new pack
     name: '',
     questions: [''],
     categories: [],
     public: false,
-  } as QuestionPackPostData,
+    action: 'new',
+    // these are placeholders, which will be overwritten in local storage
+    id: INVALID_ID,
+    updated_at: '',
+    owner: { id: INVALID_ID, name: '' },
+  } as LocalQuestionPack,
   categories,
 }) => {
-  const [pack, setPack] = useState<QuestionPackPostData>(editPack);
+  const [pack, setPack] = useState<LocalQuestionPack>(editPack);
 
   const history = useHistory();
 
@@ -100,7 +106,7 @@ const QuestionPackForm: React.FC<{
         disabled={pack.questions.length === 0}
         onClick={() => handleSubmit(pack)}
       >
-        CREATE PACK
+        {pack.id === INVALID_ID ? 'CREATE PACK' : 'SAVE PACK'}
       </Button>
       <Button color="primary" onClick={() => history.push('/packs')}>
         BACK

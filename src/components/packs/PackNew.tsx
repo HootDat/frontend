@@ -2,12 +2,12 @@ import React, { useContext } from 'react';
 import { Typography } from '@material-ui/core';
 
 import QuestionPackForm from './QuestionPackForm';
-import { QuestionPackPostData } from '../../types/questionPack';
+import { LocalQuestionPack } from '../../types/questionPack';
 import store from '../../utils/store';
 import AuthContext from '../login/AuthContext';
 import { useHistory } from 'react-router-dom';
 
-const NewPack: React.FC = () => {
+const PackNew: React.FC = () => {
   const { name } = useContext(AuthContext);
   const history = useHistory();
   // fetch categories on load
@@ -16,7 +16,7 @@ const NewPack: React.FC = () => {
   // queue a request to send the questions to server if logged in
   // so that it is synced on the cloud
   // add an option to specify whether it is seen in public
-  const handleSubmit = (pack: QuestionPackPostData) => {
+  const handleSubmit = (pack: LocalQuestionPack) => {
     // TODO figure out how service workers work. We should try
     // to push the changes here, and resort to service workers if
     // it fails? idk. will figure this out next.
@@ -28,10 +28,10 @@ const NewPack: React.FC = () => {
 
   return (
     <>
-      <Typography variant="h3">Create question pack</Typography>
+      <Typography variant="h3">New question pack</Typography>
       <QuestionPackForm categories={categories} handleSubmit={handleSubmit} />
     </>
   );
 };
 
-export default NewPack;
+export default PackNew;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Typography, Button } from '@material-ui/core';
 import EditQuestionsList from '../packs/EditQuestionsList';
+import QuestionPackList from '../packs/QuestionPackList';
 
 const AddQuestions: React.FC<{
   roomQuestions: string[];
@@ -8,6 +9,7 @@ const AddQuestions: React.FC<{
   handleBack: () => void;
 }> = ({ roomQuestions, setRoomQuestions, handleBack }) => {
   const [questions, setQuestions] = useState([...roomQuestions]);
+  const [addingFromPack, setAddingFromPack] = useState(false);
 
   const handleAdd = () => {
     const trimmed = questions.map(s => s.trim());
@@ -16,18 +18,25 @@ const AddQuestions: React.FC<{
     handleBack();
   };
 
-  const handleAddFromPack = () => {
-    // TODO
+  const handleAddFromPack = (packQuestions: string[]) => {
+    setQuestions([...questions, ...packQuestions]);
+    setAddingFromPack(false);
   };
 
-  return (
+  return addingFromPack ? (
+    <QuestionPackList
+      inRoom
+      handleAdd={handleAddFromPack}
+      handleBack={() => setAddingFromPack(false)}
+    />
+  ) : (
     <>
       <Typography variant="h3">Add questions</Typography>
       <Button
         size="small"
         variant="contained"
         color="secondary"
-        onClick={handleAddFromPack}
+        onClick={() => setAddingFromPack(true)}
       >
         ADD FROM PACK
       </Button>

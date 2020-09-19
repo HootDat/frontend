@@ -1,11 +1,14 @@
 import { User } from './user';
 import { Category } from './category';
 
-export type QuestionPack = QuestionPackPostData & {
+export type QuestionPack = CommunityQuestionPack | LocalQuestionPack;
+
+export type CommunityQuestionPack = QuestionPackPostData & {
   owner: User;
   updated_at: string;
 };
 
+// for an owned pack that is not synced to the server, id is negative.
 export type QuestionPackPostData = {
   id: number;
   name: string;
@@ -18,7 +21,7 @@ export type QuestionPackPostData = {
 // new    - packs created locally, but have not been pushed to server
 // edit   - packs that have been edited after syncing from server
 // delete - packs that have been deleted locally, but have not been synced to server
-export type LocalQuestionPack = QuestionPack & {
+export type LocalQuestionPack = CommunityQuestionPack & {
   action: 'none' | 'new' | 'edit' | 'delete';
 };
 

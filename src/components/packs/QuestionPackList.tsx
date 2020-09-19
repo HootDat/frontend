@@ -14,9 +14,15 @@ import {
 import { Edit, ExpandMore, Delete } from '@material-ui/icons';
 import { TabContext, TabPanel, TabList } from '@material-ui/lab';
 
-import { QuestionPack, QuestionPackPostData } from '../../types/questionPack';
+import {
+  CommunityQuestionPack,
+  QuestionPackPostData,
+  LocalQuestionPack,
+  QuestionPack,
+} from '../../types/questionPack';
 import { Category } from '../../types/category';
 import store from '../../utils/store';
+import { useHistory } from 'react-router-dom';
 
 type Filter = {
   name: string;
@@ -24,7 +30,17 @@ type Filter = {
   tab: 'mine' | 'community';
 };
 
-const QuestionPackList: React.FC = () => {
+type Props = {
+  inRoom?: boolean;
+  handleAdd?: (questions: string[]) => void;
+  handleBack?: () => void;
+};
+
+const QuestionPackList: React.FC<Props> = ({
+  inRoom,
+  handleAdd,
+  handleBack,
+}) => {
   // should fetching be done in parent?
   // will this component be swapped out? yes, when editing it can be swapped out
   // if it gets swapped out, should it fetch for results again?
@@ -34,8 +50,10 @@ const QuestionPackList: React.FC = () => {
   // when in view, also no.
   // then just fetch in this compoennt.
 
-  const [communityPacks, setCommunityPacks] = useState([] as QuestionPack[]);
-  const [myPacks, setMyPacks] = useState([] as QuestionPack[]);
+  const [communityPacks, setCommunityPacks] = useState(
+    [] as CommunityQuestionPack[]
+  );
+  const [myPacks, setMyPacks] = useState(store.getLocalPacks());
   const [categories, setCategories] = useState([] as Category[]);
   const [search, setSearch] = useState<Filter>({
     name: '',
@@ -43,6 +61,7 @@ const QuestionPackList: React.FC = () => {
     tab: 'mine', // TODO: Maybe it would be good to see community first? only see mine first if in room
   });
   const [isLoading, setIsLoading] = useState(true);
+  const history = useHistory();
 
   useEffect(() => {
     Promise.all([
@@ -63,12 +82,62 @@ const QuestionPackList: React.FC = () => {
     setSearch({ ...search, tab: tab });
   };
 
+  const handleDeletePack = (pack: LocalQuestionPack) => {
+    // TODO do other stuff as well
+    store.deleteLocalPack(pack);
+    setMyPacks(store.getLocalPacks());
+  };
+
   const filter = (pack: QuestionPackPostData) =>
     pack.name.includes(search.name) &&
     (search.categories.length === 0 ||
       pack.categories.some(search.categories.includes));
 
+  // if in room, only use add to rooom button
+  // if mine, allow for edit and delete
+  // otherwise, no buttons
   const generatePackAccordion = (pack: QuestionPack) => {
+    const localOnly = pack.id < 0;
+
+    const generateActions = () => {
+      if (inRoom) {
+        return (
+          <AccordionActions>
+            <Button size="small" onClick={() => handleAdd!(pack.questions)}>
+              Add to pack
+            </Button>
+          </AccordionActions>
+        );
+      }
+
+      if ((pack as LocalQuestionPack).action === undefined) {
+        return;
+      }
+
+      return (
+        <AccordionActions>
+          <Button
+            size="small"
+            onClick={() => handleDeletePack(pack as LocalQuestionPack)}
+          >
+            <Delete />
+            Delete
+          </Button>
+          <Button
+            size="small"
+            onClick={() =>
+              history.push(`/packs/${Math.abs(pack.id)}/edit`, {
+                localOnly: localOnly,
+              })
+            }
+          >
+            <Edit />
+            Edit
+          </Button>
+        </AccordionActions>
+      );
+    };
+
     return (
       <Accordion key={pack.id}>
         <AccordionSummary
@@ -86,16 +155,7 @@ const QuestionPackList: React.FC = () => {
             ))}
           </ol>
         </AccordionDetails>
-        <AccordionActions>
-          <Button size="small">
-            <Delete />
-            Delete
-          </Button>
-          <Button size="small">
-            <Edit />
-            Edit
-          </Button>
-        </AccordionActions>
+        {generateActions()}
       </Accordion>
     );
   };
@@ -103,7 +163,7 @@ const QuestionPackList: React.FC = () => {
   const ownedPackAccordions =
     search.tab !== 'mine'
       ? undefined
-      : store.getLocalPacks().filter(filter).map(generatePackAccordion);
+      : myPacks.filter(filter).map(generatePackAccordion);
 
   const communityPackAccordions =
     search.tab !== 'community'
@@ -114,7 +174,6 @@ const QuestionPackList: React.FC = () => {
   // or maybe if loading, shwo a skeleton instead
   return (
     <Box>
-      {/* Search */}
       <TextField
         placeholder="Search..."
         value={search.name}
@@ -134,6 +193,11 @@ const QuestionPackList: React.FC = () => {
         <TabPanel value="mine">{ownedPackAccordions}</TabPanel>
         <TabPanel value="community">{communityPackAccordions}</TabPanel>
       </TabContext>
+      {inRoom && (
+        <Button color="primary" onClick={handleBack}>
+          Back
+        </Button>
+      )}
     </Box>
   );
 };
