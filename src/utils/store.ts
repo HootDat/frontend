@@ -1,4 +1,7 @@
-import { QuestionPack, LocalQuestionPack } from '../types/questionPack';
+import {
+  CommunityQuestionPack,
+  LocalQuestionPack,
+} from '../types/questionPack';
 
 const ACCESS_TOKEN = 'access_token';
 const LOCAL_PACKS = 'packs';
@@ -94,7 +97,7 @@ class Store {
     );
   }
 
-  private deletePack(id: number) {
+  deletePack(id: number) {
     const packs = this.getPacks();
     delete packs[id];
     this.storage!.setItem(LOCAL_PACKS, JSON.stringify(packs));
@@ -180,7 +183,7 @@ class Store {
     }
   }
 
-  downloadPack(pack: QuestionPack) {
+  downloadPack(pack: CommunityQuestionPack) {
     if (!this.isAvailable()) {
       return;
     }

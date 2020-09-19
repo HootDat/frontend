@@ -1,4 +1,7 @@
-import { QuestionPack, QuestionPackPostData } from '../types/questionPack';
+import {
+  CommunityQuestionPack,
+  QuestionPackPostData,
+} from '../types/questionPack';
 import base from './base';
 import { Category } from '../types/category';
 
@@ -8,15 +11,15 @@ const packsAPI = {
     offset?: number,
     scope?: 'all' | 'private' | 'public',
     categories?: Category[]
-  ): Promise<[QuestionPack]> => {
+  ): Promise<[CommunityQuestionPack]> => {
     return base.getData(`/packs`, { limit, offset, scope, categories });
   },
 
-  PackNew: (pack: QuestionPackPostData): Promise<QuestionPack> => {
+  PackNew: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
     return base.postData('/packs', { ...pack });
   },
 
-  PackEdit: (pack: QuestionPackPostData): Promise<QuestionPack> => {
+  PackEdit: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
     return base.putData(`/packs/${pack.id}`, { ...pack });
   },
 
