@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Link, Typography, makeStyles } from '@material-ui/core';
+import { Button, Link, Typography } from '@material-ui/core';
 
 import LogInOutButton from '../login/LogInOutButton';
 import ConnContext from './connection/ConnContext';

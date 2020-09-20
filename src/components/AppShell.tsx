@@ -44,6 +44,7 @@ const AppShell: React.FC = ({ children }) => {
     if (authState.name === '' || !online) return;
 
     store.getLocalPacks().forEach(sendCachedUpdate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [online]);
 
   return (

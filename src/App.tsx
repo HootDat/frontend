@@ -6,7 +6,10 @@ import {
   createMuiTheme,
   responsiveFontSizes,
   ThemeProvider,
+  CssBaseline,
 } from '@material-ui/core';
+import bg_top from './svg/bg-top.svg';
+import bg_bot from './svg/bg-bot.svg';
 
 let theme = createMuiTheme({
   palette: {
@@ -44,6 +47,18 @@ let theme = createMuiTheme({
         borderRadius: 40,
       },
     },
+    MuiCssBaseline: {
+      '@global': {
+        body: {
+          height: '100vh',
+          width: '100vw',
+          backgroundImage: `url(${bg_top}), url(${bg_bot})`,
+          backgroundPosition: 'left top, right bottom',
+          backgroundRepeat: 'no-repeat, no-repeat',
+          backgroundSize: '100% 35%, 100% 35%',
+        },
+      },
+    },
   },
 });
 theme = responsiveFontSizes(theme);
@@ -51,6 +66,7 @@ theme = responsiveFontSizes(theme);
 function App() {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <AppShell>
         <AppRouter />
       </AppShell>

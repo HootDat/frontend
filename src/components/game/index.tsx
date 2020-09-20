@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { Button } from '@material-ui/core';
+import { Container } from '@material-ui/core';
 
 import ConnContext from './connection/ConnContext';
 import ConnManager from './connection/ConnManager';
@@ -21,7 +21,7 @@ const conn = new ConnManager();
 
 const GameShell: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(conn.getGameState());
-  const { cid, mode } = gameState;
+  const { mode } = gameState;
 
   const history = useHistory();
   const roomId = new URLSearchParams(useLocation().search).get('roomId');
@@ -76,8 +76,7 @@ const GameShell: React.FC = () => {
   return (
     <GameContext.Provider value={gameState}>
       <ConnContext.Provider value={conn}>
-        <Button onClick={() => conn.push()}>{cid}</Button>
-        {render()}
+        <Container>{render()}</Container>
       </ConnContext.Provider>
     </GameContext.Provider>
   );
