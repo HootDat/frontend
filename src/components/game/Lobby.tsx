@@ -100,7 +100,7 @@ const Lobby: React.FC<{
 
   return (
     <>
-      <Typography color="primary" variant="h4">
+      <Typography color="secondary" variant="h4">
         Room pin: {roomId}
       </Typography>
       <Share />
