@@ -51,7 +51,7 @@ const CreatePlayer: React.FC<{
       <Button size="small" onClick={() => setPage(1)} disabled={page === 1}>
         <KeyboardArrowLeft />
       </Button>
-      {page}/2
+      <Typography variant="body2">{page}/2</Typography>
       <Button size="small" onClick={() => setPage(2)} disabled={page === 2}>
         <KeyboardArrowRight />
       </Button>
@@ -70,7 +70,7 @@ const CreatePlayer: React.FC<{
 
   return (
     <>
-      <Typography variant="h3">Pick your hoot</Typography>
+      <Typography variant="h4">Pick your hoot</Typography>
       <Typography variant="body1">Hurry before they fly away</Typography>
       {HootPage}
       <TextField

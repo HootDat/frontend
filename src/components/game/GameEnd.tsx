@@ -26,7 +26,7 @@ const GameEnd: React.FC = () => {
   // TODO FACEBOOK SHARE?
   return (
     <>
-      <Typography variant="h3">Final Scoreboard</Typography>
+      <Typography variant="h4">Final Scoreboard</Typography>
       <Typography variant="body1">{"Who's the best hoot?"}</Typography>
       <ScoreBoard winning participants={participants} />
       <Button variant="contained" color="primary" onClick={handlePlayAgain}>

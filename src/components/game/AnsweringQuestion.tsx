@@ -28,7 +28,7 @@ const AnsweringQuestion: React.FC = () => {
   return (
     <>
       <ProgressBarCountdownTimer countdownSeconds={60} />
-      <Typography variant="h3">What is your answer?</Typography>
+      <Typography variant="h4">What is your answer?</Typography>
       <Paper elevation={1}>
         <Typography variant="body1">{currentQuestion}</Typography>
       </Paper>

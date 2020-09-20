@@ -32,7 +32,7 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <Typography variant="h1">Hoot Dat Community</Typography>
+      <Typography variant="h4">Hoot Dat Community</Typography>
       <Typography variant="body1">
         Log in to contribute to the question pool
       </Typography>

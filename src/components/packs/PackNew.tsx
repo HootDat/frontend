@@ -28,7 +28,7 @@ const PackNew: React.FC = () => {
 
   return (
     <>
-      <Typography variant="h3">New question pack</Typography>
+      <Typography variant="h4">New question pack</Typography>
       <QuestionPackForm categories={categories} handleSubmit={handleSubmit} />
     </>
   );

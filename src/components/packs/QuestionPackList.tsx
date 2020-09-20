@@ -145,8 +145,8 @@ const QuestionPackList: React.FC<Props> = ({
           aria-controls={`pack ${pack.id}`}
           id={`pack ${pack.id}`}
         >
-          <Typography>{pack.name}</Typography>
-          <Typography>{pack.owner.name}</Typography>
+          <Typography variant="body1">{pack.name}</Typography>
+          <Typography variant="subtitle2">{pack.owner.name}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <ol>

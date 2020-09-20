@@ -46,7 +46,9 @@ const Lobby: React.FC<{
             return (
               <ListItem key={cid}>
                 <ListItemIcon>{hoot}</ListItemIcon>
-                <ListItemText>{name}</ListItemText>
+                <ListItemText>
+                  <Typography variant="body1">{name}</Typography>
+                </ListItemText>
               </ListItem>
             );
           })}
@@ -56,7 +58,7 @@ const Lobby: React.FC<{
 
   const questionCard = (
     <>
-      <Typography variant="body1">Selected questions</Typography>
+      <Typography variant="h6">Selected questions</Typography>
       <Button size="small" onClick={handleAddQuestionButton}>
         <Edit />
       </Button>
@@ -66,7 +68,9 @@ const Lobby: React.FC<{
             return (
               <ListItem key={index}>
                 <ListItemText>
-                  Q{index + 1}: {question}
+                  <Typography variant="body2">
+                    Q{index + 1}: {question}
+                  </Typography>
                 </ListItemText>
               </ListItem>
             );
@@ -96,9 +100,11 @@ const Lobby: React.FC<{
 
   return (
     <>
-      <Typography variant="h3">Room pin: {roomId}</Typography>
+      <Typography color="primary" variant="h4">
+        Room pin: {roomId}
+      </Typography>
       <Share />
-      <Typography variant="h3">Hoot assembly ground</Typography>
+      <Typography variant="h4">Hoot assembly ground</Typography>
       <Typography variant="body1">
         Start game when all players are here
       </Typography>

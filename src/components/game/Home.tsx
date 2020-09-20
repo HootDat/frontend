@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Link, Typography } from '@material-ui/core';
+import { Button, Link, Typography, makeStyles } from '@material-ui/core';
 
 import LogInOutButton from '../login/LogInOutButton';
 import ConnContext from './connection/ConnContext';
@@ -21,9 +21,9 @@ const Home: React.FC = () => {
   return (
     <>
       <LogInOutButton />
-      <Typography variant="h1">Hoot Dat</Typography>
+      <Typography variant="h3">Hoot Dat</Typography>
       <Typography variant="body1">Guess who that answer belongs to</Typography>
-      <Typography variant="body1">3 - 12 players</Typography>
+      <Typography variant="body2">3 - 12 players</Typography>
       <Button
         variant="contained"
         color="primary"

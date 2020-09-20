@@ -11,7 +11,7 @@ const WaitingForAnswer: React.FC = () => {
   return (
     <>
       <ProgressBarCountdownTimer countdownSeconds={60} />
-      <Typography variant="h3">Waiting for hoot to answer...</Typography>
+      <Typography variant="h4">Waiting for hoot to answer...</Typography>
       <ScoreBoard header hostCid={hostCid!} participants={participants} />
     </>
   );

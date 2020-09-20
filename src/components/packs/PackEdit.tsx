@@ -34,7 +34,7 @@ const PackEdit: React.FC = () => {
 
   return (
     <>
-      <Typography variant="h3">Edit question pack</Typography>
+      <Typography variant="h4">Edit question pack</Typography>
       <QuestionPackForm
         handleSubmit={handleSubmit}
         editPack={editPack}

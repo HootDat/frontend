@@ -26,12 +26,12 @@ const RoundEnd: React.FC = () => {
 
   return (
     <>
-      <Typography variant="h3">
+      <Typography variant="h6">
         You got it
         {currentGuesses[cid] === currentAnswerer ? ' right :)' : ' wrong :('}
       </Typography>
       <ScoreBoard hostCid={hostCid!} participants={participants} />
-      <Typography variant="h3">Who answered? </Typography>
+      <Typography variant="h6">Who answered? </Typography>
       <ScoreBoard
         participants={{ [currentAnswerer!]: participants[currentAnswerer!] }}
       />

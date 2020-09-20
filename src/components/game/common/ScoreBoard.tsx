@@ -6,6 +6,7 @@ import {
   Paper,
   List,
   ListSubheader,
+  Typography,
 } from '@material-ui/core';
 
 const ScoreBoard: React.FC<{
@@ -30,14 +31,18 @@ const ScoreBoard: React.FC<{
       return (
         <ListItem key={cid}>
           <ListItemText>
-            {hoot} -{' '}
-            <Box
-              fontWeight={winning && index === 0 ? 'fontWeightBold' : undefined}
-              display="inline"
-            >
-              {name}
-            </Box>{' '}
-            - {score}PT
+            <Typography variant="body2">
+              {hoot} -{' '}
+              <Box
+                fontWeight={
+                  winning && index === 0 ? 'fontWeightBold' : undefined
+                }
+                display="inline"
+              >
+                {name}
+              </Box>{' '}
+              - {score}PT
+            </Typography>
           </ListItemText>
         </ListItem>
       );

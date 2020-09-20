@@ -16,7 +16,7 @@ const JoinRoomForm: React.FC<{
 
   return (
     <>
-      <Typography variant="h3">Enter Room PIN</Typography>
+      <Typography variant="h4">Enter Room PIN</Typography>
       <TextField placeholder="XXXX" onChange={handleChange} value={input} />
       <Button
         variant="contained"

@@ -31,7 +31,7 @@ const AddQuestions: React.FC<{
     />
   ) : (
     <>
-      <Typography variant="h3">Add questions</Typography>
+      <Typography variant="h4">Add questions</Typography>
       <Button
         size="small"
         variant="contained"

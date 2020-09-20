@@ -40,16 +40,16 @@ const GuessingAnswerer: React.FC = () => {
     <>
       <ProgressBarCountdownTimer countdownSeconds={120} />
       <Paper>
-        <Typography color="primary" variant="h5">
+        <Typography color="primary" variant="body2">
           Question
         </Typography>
         <Typography variant="body1">{currentQuestion}</Typography>
-        <Typography color="primary" variant="h5">
+        <Typography color="primary" variant="body2">
           Answer
         </Typography>
         <Typography variant="body1">{currentAnswer}</Typography>
       </Paper>
-      <Typography variant="h3">Guess hoot dat</Typography>
+      <Typography variant="h6">Guess hoot dat</Typography>
       {choices}
       <Button
         variant="contained"
