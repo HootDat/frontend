@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Button, Link, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { Facebook } from '@material-ui/icons';
@@ -21,13 +21,13 @@ const Login: React.FC = () => {
     // otherwise do nothing, as it means not logged in
   };
 
-  useEffect(() => {
-    FB.getLoginStatus(loggedInCallback);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleFacebookLogin = () => {
-    FB.login(loggedInCallback);
+    if (typeof FB !== 'undefined') {
+      FB.login(loggedInCallback);
+    } else {
+      // TODO fix
+      console.log('FB not available. Turn off ad block / tracking protection');
+    }
   };
 
   return (
