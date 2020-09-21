@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { Container } from '@material-ui/core';
 
 import ConnContext from './connection/ConnContext';
 import ConnManager from './connection/ConnManager';
@@ -75,9 +74,7 @@ const GameShell: React.FC = () => {
 
   return (
     <GameContext.Provider value={gameState}>
-      <ConnContext.Provider value={conn}>
-        <Container>{render()}</Container>
-      </ConnContext.Provider>
+      <ConnContext.Provider value={conn}>{render()}</ConnContext.Provider>
     </GameContext.Provider>
   );
 };

@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@material-ui/core';
+import { TextField, Button, Typography, styled } from '@material-ui/core';
+
+const PinField = styled(TextField)({
+  letterSpacing: '1rem',
+  outline: 'none',
+  width: '13rem',
+  '& input': {
+    textAlign: 'center',
+    fontSize: '3rem',
+  },
+});
 
 // load form if room in state is empty. otherwise load character.
 const JoinRoomForm: React.FC<{
@@ -17,7 +27,12 @@ const JoinRoomForm: React.FC<{
   return (
     <>
       <Typography variant="h4">Enter Room PIN</Typography>
-      <TextField placeholder="XXXX" onChange={handleChange} value={input} />
+      <PinField
+        placeholder="XXXX"
+        onChange={handleChange}
+        value={input}
+        autoFocus
+      />
       <Button
         variant="contained"
         color="primary"

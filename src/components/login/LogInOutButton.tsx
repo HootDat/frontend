@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Link } from '@material-ui/core';
+import { Link, Button } from '@material-ui/core';
 import AuthContext from './AuthContext';
 import store from '../../utils/store';
 
@@ -8,9 +8,9 @@ const LogInOutButton: React.FC = () => {
   const authState = useContext(AuthContext);
 
   const LogInButton = (
-    <Link color="primary" component={RouterLink} to="/login">
+    <Button color="primary" component={RouterLink} to="/login">
       LOG IN
-    </Link>
+    </Button>
   );
 
   // TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
@@ -21,9 +21,9 @@ const LogInOutButton: React.FC = () => {
   };
 
   const LogOutButton = (
-    <Link color="primary" onClick={handleLogOut}>
+    <Button color="primary" component={Link} onClick={handleLogOut}>
       LOG OUT
-    </Link>
+    </Button>
   );
 
   return authState.access_token === null ? LogInButton : LogOutButton;

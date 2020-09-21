@@ -42,11 +42,6 @@ let theme = createMuiTheme({
     },
   },
   overrides: {
-    MuiButton: {
-      contained: {
-        borderRadius: 40,
-      },
-    },
     MuiCssBaseline: {
       '@global': {
         body: {
