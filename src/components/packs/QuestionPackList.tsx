@@ -24,6 +24,7 @@ import {
 import { Category } from '../../types/category';
 import store from '../../utils/store';
 import { useHistory } from 'react-router-dom';
+import BackButton from '../common/BackButton';
 
 type Filter = {
   name: string;
@@ -202,11 +203,7 @@ const QuestionPackList: React.FC<Props> = ({
         <TabPanel value="mine">{ownedPackAccordions}</TabPanel>
         <TabPanel value="community">{communityPackAccordions}</TabPanel>
       </TabContext>
-      {inRoom && (
-        <Button color="primary" onClick={handleBack}>
-          Back
-        </Button>
-      )}
+      {inRoom && <BackButton handleBack={handleBack!} />}
     </Box>
   );
 };

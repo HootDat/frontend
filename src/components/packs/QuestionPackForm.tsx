@@ -11,6 +11,7 @@ import EditQuestionsList from './EditQuestionsList';
 import { useHistory } from 'react-router-dom';
 import { LocalQuestionPack } from '../../types/questionPack';
 import { Category } from '../../types/category';
+import BackButton from '../common/BackButton';
 
 const INVALID_ID = 0;
 
@@ -108,9 +109,7 @@ const QuestionPackForm: React.FC<{
       >
         {pack.id === INVALID_ID ? 'CREATE PACK' : 'SAVE PACK'}
       </Button>
-      <Button color="primary" onClick={() => history.push('/packs')}>
-        BACK
-      </Button>
+      <BackButton handleBack={() => history.push('/packs')} />
     </>
   );
 };

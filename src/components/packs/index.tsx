@@ -4,6 +4,7 @@ import { Button } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import store from '../../utils/store';
 import QuestionPackList from './QuestionPackList';
+import BackButton from '../common/BackButton';
 
 const Packs: React.FC = () => {
   const history = useHistory();
@@ -22,9 +23,7 @@ const Packs: React.FC = () => {
       >
         <Add /> CREATE QUESTION PACK
       </Button>
-      <Button color="primary" onClick={() => history.push('/')}>
-        BACK
-      </Button>
+      <BackButton handleBack={() => history.push('/')} />
     </>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, styled } from '@material-ui/core';
+import BackButton from '../common/BackButton';
 
 const PinField = styled(TextField)({
   letterSpacing: '1rem',
@@ -41,9 +42,7 @@ const JoinRoomForm: React.FC<{
       >
         Join Room
       </Button>
-      <Button color="primary" onClick={handleBack}>
-        Back
-      </Button>
+      <BackButton handleBack={handleBack} />
     </>
   );
 };

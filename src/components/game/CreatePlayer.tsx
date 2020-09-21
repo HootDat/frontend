@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Typography, TextField, Button, ButtonGroup } from '@material-ui/core';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
+import BackButton from '../common/BackButton';
 
 const CreatePlayer: React.FC<{
   handleCreate: (name: string, hoot: number) => void;
@@ -86,7 +87,7 @@ const CreatePlayer: React.FC<{
       >
         CREATE HOOT
       </Button>
-      <Button onClick={handleBack}>BACK</Button>
+      <BackButton handleBack={handleBack} />
     </>
   );
 };

@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
-import { Button, Typography, makeStyles, Grid } from '@material-ui/core';
+import { Typography, makeStyles, Grid } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { Facebook } from '@material-ui/icons';
 import AuthContext from './AuthContext';
 import store from '../../utils/store';
 import ActionButton from '../common/ActionButton';
 import hoot from '../../svg/hoot0.svg';
+import BackButton from '../common/BackButton';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -77,9 +78,7 @@ const Login: React.FC = () => {
           </ActionButton>
         </Grid>
         <Grid item xs={12}>
-          <Button color="primary" onClick={() => history.push('/')}>
-            BACK
-          </Button>
+          <BackButton handleBack={() => history.push('/')} />
         </Grid>
       </Grid>
     </Grid>

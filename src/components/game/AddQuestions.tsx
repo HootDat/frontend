@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Typography, Button } from '@material-ui/core';
 import EditQuestionsList from '../packs/EditQuestionsList';
 import QuestionPackList from '../packs/QuestionPackList';
+import BackButton from '../common/BackButton';
 
 const AddQuestions: React.FC<{
   roomQuestions: string[];
@@ -44,9 +45,7 @@ const AddQuestions: React.FC<{
       <Button variant="contained" color="primary" onClick={handleAdd}>
         SAVE QUESTIONS
       </Button>
-      <Button color="primary" onClick={handleBack}>
-        BACK
-      </Button>
+      <BackButton handleBack={handleBack} />
     </>
   );
 };
