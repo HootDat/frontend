@@ -7,10 +7,12 @@ import Packs from './packs';
 import PackNew from './packs/PackNew';
 import store from '../utils/store';
 import PackEdit from './packs/PackEdit';
+import GoogleAnalytics from './GoogleAnalytics';
 
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
+      <GoogleAnalytics />
       <Switch>
         <Route exact path="/" component={GameShell} />
         <Route exact path="/login" component={Login} />
