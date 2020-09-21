@@ -10,17 +10,11 @@ import ActionButton from '../common/ActionButton';
 import hoot from '../../svg/hoot0.svg';
 
 const useStyles = makeStyles(theme => ({
-  rootContainer: {
+  root: {
     height: '100%',
-    padding: theme.spacing(2),
   },
-  header: {
-    textAlign: 'right',
-    width: '100%',
-  },
-  mainContainer: {
+  container: {
     textAlign: 'center',
-    height: 'calc(100% - 36.5px)',
     maxWidth: '600px',
   },
   hoot: {
@@ -43,23 +37,15 @@ const Home: React.FC = () => {
   };
 
   return (
-    <Grid
-      container
-      direction="column"
-      alignItems="center"
-      className={classes.rootContainer}
-    >
-      <Grid item className={classes.header}>
-        <LogInOutButton />
-      </Grid>
+    <>
+      <LogInOutButton />
       <Grid
-        item
         container
         alignItems="center"
         justify="center"
-        className={classes.mainContainer}
+        className={classes.root}
       >
-        <Grid item container xs={12} spacing={2}>
+        <Grid item container xs={12} spacing={2} className={classes.container}>
           <Grid item xs={12}>
             <img src={hoot} className={classes.hoot} alt="hootdat mascot" />
           </Grid>
@@ -97,7 +83,7 @@ const Home: React.FC = () => {
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

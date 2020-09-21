@@ -15,12 +15,22 @@ import JoinRoom from './JoinRoom';
 import WaitingForAnswer from './WaitingForAnswer';
 import RoundEnd from './RoundEnd';
 import GameEnd from './GameEnd';
+import { makeStyles } from '@material-ui/core';
 
 const conn = new ConnManager();
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    height: '100%',
+    padding: theme.spacing(2),
+  },
+}));
 
 const GameShell: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(conn.getGameState());
   const { mode } = gameState;
+
+  const classes = useStyles();
 
   const history = useHistory();
   const roomId = new URLSearchParams(useLocation().search).get('roomId');
@@ -74,7 +84,9 @@ const GameShell: React.FC = () => {
 
   return (
     <GameContext.Provider value={gameState}>
-      <ConnContext.Provider value={conn}>{render()}</ConnContext.Provider>
+      <ConnContext.Provider value={conn}>
+        <div className={classes.root}>{render()}</div>
+      </ConnContext.Provider>
     </GameContext.Provider>
   );
 };

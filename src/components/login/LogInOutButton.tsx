@@ -1,14 +1,28 @@
 import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Link, Button } from '@material-ui/core';
+import { Button, makeStyles } from '@material-ui/core';
 import AuthContext from './AuthContext';
 import store from '../../utils/store';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    position: 'absolute',
+    right: theme.spacing(2),
+  },
+}));
 
 const LogInOutButton: React.FC = () => {
   const authState = useContext(AuthContext);
 
+  const classes = useStyles();
+
   const LogInButton = (
-    <Button color="primary" component={RouterLink} to="/login">
+    <Button
+      color="primary"
+      component={RouterLink}
+      to="/login"
+      className={classes.root}
+    >
       LOG IN
     </Button>
   );
@@ -21,7 +35,7 @@ const LogInOutButton: React.FC = () => {
   };
 
   const LogOutButton = (
-    <Button color="primary" component={Link} onClick={handleLogOut}>
+    <Button color="primary" onClick={handleLogOut} className={classes.root}>
       LOG OUT
     </Button>
   );

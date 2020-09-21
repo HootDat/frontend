@@ -10,7 +10,6 @@ import {
   AccordionSummary,
   Typography,
   AccordionDetails,
-  makeStyles,
   InputAdornment,
 } from '@material-ui/core';
 import { Edit, ExpandMore, Delete, Search } from '@material-ui/icons';
@@ -25,12 +24,6 @@ import {
 import { Category } from '../../types/category';
 import store from '../../utils/store';
 import { useHistory } from 'react-router-dom';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-  },
-}));
 
 type Filter = {
   name: string;
@@ -58,24 +51,18 @@ const QuestionPackList: React.FC<Props> = ({
   // when in view, also no.
   // then just fetch in this compoennt.
 
-  // eslint-disable-next-line
   const [communityPacks, setCommunityPacks] = useState(
     [] as CommunityQuestionPack[]
   );
   const [myPacks, setMyPacks] = useState(store.getLocalPacks());
-  // eslint-disable-next-line
   const [categories, setCategories] = useState([] as Category[]);
   const [search, setSearch] = useState<Filter>({
     name: '',
     categories: [],
     tab: 'mine', // TODO: Maybe it would be good to see community first? only see mine first if in room
   });
-  // eslint-disable-next-line
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
-
-  // eslint-disable-next-line
-  const classes = useStyles();
 
   useEffect(() => {
     Promise.all([
