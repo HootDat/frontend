@@ -7,16 +7,11 @@ import store from '../../utils/store';
 import ActionButton from '../common/ActionButton';
 import hoot from '../../svg/hoot0.svg';
 import BackButton from '../common/BackButton';
+import CenteredInnerGrid from '../common/CenteredInnerGrid';
+import OuterGrid from '../common/OuterGrid';
+import PaddedDiv from '../common/PaddedDiv';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100%',
-    padding: theme.spacing(2),
-  },
-  container: {
-    textAlign: 'center',
-    maxWidth: '600px',
-  },
   hoot: {
     height: '100px',
     width: '100px',
@@ -49,39 +44,36 @@ const Login: React.FC = () => {
   };
 
   return (
-    <Grid
-      container
-      alignItems="center"
-      justify="center"
-      className={classes.root}
-    >
-      <Grid item container xs={12} spacing={2} className={classes.container}>
-        <Grid item xs={12}>
-          <img src={hoot} className={classes.hoot} alt="hootdat mascot" />
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h4">Hoot Dat Community</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1">
-            Log in to contribute to the question pool
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <ActionButton
-            variant="contained"
-            color="primary"
-            onClick={handleFacebookLogin}
-          >
-            <Facebook />
-            Log in with Facebook
-          </ActionButton>
-        </Grid>
-        <Grid item xs={12}>
-          <BackButton handleBack={() => history.push('/')} />
-        </Grid>
-      </Grid>
-    </Grid>
+    <PaddedDiv>
+      <OuterGrid>
+        <CenteredInnerGrid>
+          <Grid item xs={12}>
+            <img src={hoot} className={classes.hoot} alt="hootdat mascot" />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h4">Hoot Dat Community</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              Log in to contribute to the question pool
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <ActionButton
+              variant="contained"
+              color="primary"
+              onClick={handleFacebookLogin}
+            >
+              <Facebook />
+              Log in with Facebook
+            </ActionButton>
+          </Grid>
+          <Grid item xs={12}>
+            <BackButton handleBack={() => history.push('/')} />
+          </Grid>
+        </CenteredInnerGrid>
+      </OuterGrid>
+    </PaddedDiv>
   );
 };
 

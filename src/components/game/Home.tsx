@@ -8,6 +8,8 @@ import { Mode } from './GameState';
 import useOnlineStatus from '../../utils/useOnlineStatus';
 import ActionButton from '../common/ActionButton';
 import hoot from '../../svg/hoot0.svg';
+import OuterGrid from '../common/OuterGrid';
+import CenteredInnerGrid from '../common/CenteredInnerGrid';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -39,13 +41,8 @@ const Home: React.FC = () => {
   return (
     <>
       <LogInOutButton />
-      <Grid
-        container
-        alignItems="center"
-        justify="center"
-        className={classes.root}
-      >
-        <Grid item container xs={12} spacing={2} className={classes.container}>
+      <OuterGrid>
+        <CenteredInnerGrid>
           <Grid item xs={12}>
             <img src={hoot} className={classes.hoot} alt="hootdat mascot" />
           </Grid>
@@ -81,8 +78,8 @@ const Home: React.FC = () => {
               QUESTION PACKS
             </Button>
           </Grid>
-        </Grid>
-      </Grid>
+        </CenteredInnerGrid>
+      </OuterGrid>
     </>
   );
 };

@@ -14,17 +14,20 @@ import bg_bot from './svg/bg-bot.svg';
 let theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#8dc2e9',
+      main: '#6fa1d6',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#f99f49',
+      main: '#f99f1e',
       contrastText: '#ffffff',
     },
   },
   typography: {
     fontFamily: '"Mukta", sans-serif',
     fontWeightBold: 600,
+    allVariants: {
+      color: '#304b6d',
+    },
     h3: {
       fontWeight: 600,
     },

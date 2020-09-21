@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import ConnContext from './connection/ConnContext';
 import CreatePlayer from './CreatePlayer';
 import { Mode } from './GameState';
+import OuterGrid from '../common/OuterGrid';
 
 const CreateRoom: React.FC = () => {
   const conn = useContext(ConnContext);
@@ -21,13 +22,13 @@ const CreateRoom: React.FC = () => {
   };
 
   return (
-    <>
+    <OuterGrid>
       <CreatePlayer
         handleCreate={handleSubmit}
         handleBack={handleBack}
         participants={{}}
       />
-    </>
+    </OuterGrid>
   );
 };
 

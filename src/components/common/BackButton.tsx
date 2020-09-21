@@ -1,9 +1,13 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import { Button, ButtonProps } from '@material-ui/core';
 
-const BackButton: React.FC<{ handleBack: () => void }> = ({ handleBack }) => {
+type Props = ButtonProps & {
+  handleBack: () => void;
+};
+
+const BackButton: React.FC<Props> = ({ handleBack, ...props }) => {
   return (
-    <Button color="primary" onClick={handleBack}>
+    <Button color="primary" onClick={handleBack} {...props}>
       Back
     </Button>
   );

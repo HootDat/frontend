@@ -6,6 +6,7 @@ import GameContext from './GameContext';
 import { Mode } from './GameState';
 import JoinRoomForm from './JoinRoomForm';
 import { useHistory } from 'react-router-dom';
+import OuterGrid from '../common/OuterGrid';
 
 // load form if room in state is empty. otherwise load player
 const JoinRoom: React.FC = () => {
@@ -33,7 +34,7 @@ const JoinRoom: React.FC = () => {
   };
 
   return (
-    <>
+    <OuterGrid>
       {roomId === null ? (
         <JoinRoomForm handleJoin={handleJoin} handleBack={handleBack} />
       ) : (
@@ -43,7 +44,7 @@ const JoinRoom: React.FC = () => {
           participants={participants}
         />
       )}
-    </>
+    </OuterGrid>
   );
 };
 

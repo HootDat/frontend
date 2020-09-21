@@ -1,7 +1,22 @@
 import React, { useState } from 'react';
-import { Typography, TextField, Button, ButtonGroup } from '@material-ui/core';
+import {
+  Typography,
+  TextField,
+  Button,
+  ButtonGroup,
+  Grid,
+  makeStyles,
+} from '@material-ui/core';
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
 import BackButton from '../common/BackButton';
+import CenteredInnerGrid from '../common/CenteredInnerGrid';
+import ActionButton from '../common/ActionButton';
+
+const useStyles = makeStyles(theme => ({
+  pageSelector: {
+    padding: theme.spacing(2),
+  },
+}));
 
 const CreatePlayer: React.FC<{
   handleCreate: (name: string, hoot: number) => void;
@@ -13,6 +28,7 @@ const CreatePlayer: React.FC<{
   // 1 or 2
   const [page, setPage] = useState(1);
   const [name, setName] = useState('');
+  const classes = useStyles();
 
   const occupiedNumbers = Object.values(participants).map(arr => arr[1]);
 
@@ -49,46 +65,79 @@ const CreatePlayer: React.FC<{
 
   const PageSelector = (
     <>
-      <Button size="small" onClick={() => setPage(1)} disabled={page === 1}>
-        <KeyboardArrowLeft />
-      </Button>
-      <Typography variant="body2">{page}/2</Typography>
-      <Button size="small" onClick={() => setPage(2)} disabled={page === 2}>
-        <KeyboardArrowRight />
-      </Button>
+      <Grid item>
+        <Button size="small" onClick={() => setPage(1)} disabled={page === 1}>
+          <KeyboardArrowLeft />
+        </Button>
+      </Grid>
+      <Grid item>
+        <Typography variant="body2">{page}/2</Typography>
+      </Grid>
+      <Grid item>
+        <Button size="small" onClick={() => setPage(2)} disabled={page === 2}>
+          <KeyboardArrowRight />
+        </Button>
+      </Grid>
     </>
   );
 
   const HootPage = (
     <>
-      <ButtonGroup orientation="vertical" aria-label="hoot choices">
-        {makeHootRow(page === 1 ? 0 : 6)}
-        {makeHootRow(page === 1 ? 3 : 9)}
-      </ButtonGroup>
-      {PageSelector}
+      <Grid item xs={12}>
+        <ButtonGroup orientation="vertical" aria-label="hoot choices">
+          {makeHootRow(page === 1 ? 0 : 6)}
+          {makeHootRow(page === 1 ? 3 : 9)}
+        </ButtonGroup>
+      </Grid>
+      <Grid
+        item
+        container
+        justify="center"
+        alignItems="center"
+        spacing={2}
+        xs={12}
+        className={classes.pageSelector}
+      >
+        {PageSelector}
+      </Grid>
     </>
   );
 
   return (
-    <>
-      <Typography variant="h4">Pick your hoot</Typography>
-      <Typography variant="body1">Hurry before they fly away</Typography>
-      {HootPage}
-      <TextField
-        placeholder="Your name"
-        onChange={handleNameChange}
-        value={name}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={hoot === -1 || name === ''}
-        onClick={() => handleCreate(name, hoot)}
-      >
-        CREATE HOOT
-      </Button>
-      <BackButton handleBack={handleBack} />
-    </>
+    <CenteredInnerGrid>
+      <Grid item xs={12}>
+        <Typography variant="h4">Pick your hoot</Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Typography variant="body1">Hurry before they fly away</Typography>
+      </Grid>
+      <Grid item container xs={12}>
+        {HootPage}
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          placeholder="Your name"
+          label="Name"
+          variant="outlined"
+          fullWidth
+          onChange={handleNameChange}
+          value={name}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <ActionButton
+          variant="contained"
+          color="primary"
+          disabled={hoot === -1 || name === ''}
+          onClick={() => handleCreate(name, hoot)}
+        >
+          CREATE HOOT
+        </ActionButton>
+      </Grid>
+      <Grid item xs={12}>
+        <BackButton handleBack={handleBack} />
+      </Grid>
+    </CenteredInnerGrid>
   );
 };
 
