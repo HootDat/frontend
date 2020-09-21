@@ -45,7 +45,7 @@ let theme = createMuiTheme({
     MuiCssBaseline: {
       '@global': {
         body: {
-          height: '100vh',
+          height: 'calc(var(--vh, 1vh) * 100)',
           width: '100vw',
           backgroundImage: `url(${bg_top}), url(${bg_bot})`,
           backgroundPosition: 'left top, right bottom',

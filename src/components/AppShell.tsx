@@ -4,15 +4,6 @@ import AuthState from './login/AuthState';
 import store from '../utils/store';
 import useOnlineStatus from '../utils/useOnlineStatus';
 import { LocalQuestionPack } from '../types/questionPack';
-import { makeStyles } from '@material-ui/core';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100vh',
-    width: '100vw',
-    padding: theme.spacing(2),
-  },
-}));
 
 const AppShell: React.FC = ({ children }) => {
   // background of app, and other app wide stuff should go here
@@ -25,7 +16,6 @@ const AppShell: React.FC = ({ children }) => {
     setAuthState: () => {},
   });
   const online = useOnlineStatus();
-  const classes = useStyles();
 
   useEffect(() => {
     setAuthState({
@@ -58,9 +48,7 @@ const AppShell: React.FC = ({ children }) => {
   }, [online]);
 
   return (
-    <AuthContext.Provider value={authState}>
-      <div className={classes.root}>{children}</div>
-    </AuthContext.Provider>
+    <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>
   );
 };
 

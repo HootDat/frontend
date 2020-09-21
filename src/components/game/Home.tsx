@@ -9,9 +9,10 @@ import useOnlineStatus from '../../utils/useOnlineStatus';
 import ActionButton from '../common/ActionButton';
 import hoot from '../../svg/hoot0.svg';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   rootContainer: {
     height: '100%',
+    padding: theme.spacing(2),
   },
   header: {
     textAlign: 'right',
@@ -26,7 +27,7 @@ const useStyles = makeStyles({
     width: '100px',
     height: '100px',
   },
-});
+}));
 
 const Home: React.FC = () => {
   const conn = useContext(ConnContext);
