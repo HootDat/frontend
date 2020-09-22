@@ -1,26 +1,19 @@
 import React, { useContext } from 'react';
-import { Typography, makeStyles, Grid } from '@material-ui/core';
+import { Typography, Grid } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { Facebook } from '@material-ui/icons';
 import AuthContext from './AuthContext';
 import store from '../../utils/store';
 import ActionButton from '../common/ActionButton';
-import hoot from '../../svg/hootimages/bluehoot.svg';
 import BackButton from '../common/BackButton';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
 import OuterGrid from '../common/OuterGrid';
 import PaddedDiv from '../common/PaddedDiv';
+import HootAvatar from '../common/HootAvatar';
 
-const useStyles = makeStyles(theme => ({
-  hoot: {
-    height: '100px',
-    width: '100px',
-  },
-}));
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);
   const history = useHistory();
-  const classes = useStyles();
 
   const loggedInCallback = (response: fb.StatusResponse) => {
     if (response.status === 'connected') {
@@ -51,7 +44,7 @@ const Login: React.FC = () => {
       <OuterGrid>
         <CenteredInnerGrid>
           <Grid item xs={12}>
-            <img src={hoot} className={classes.hoot} alt="hootdat mascot" />
+            <HootAvatar size="large" />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h4">Hoot Dat Community</Typography>

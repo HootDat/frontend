@@ -1,35 +1,19 @@
 import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Typography, Grid, makeStyles } from '@material-ui/core';
+import { Button, Typography, Grid } from '@material-ui/core';
 
 import LogInOutButton from '../login/LogInOutButton';
 import ConnContext from './connection/ConnContext';
 import { Mode } from './GameState';
 import useOnlineStatus from '../../utils/useOnlineStatus';
 import ActionButton from '../common/ActionButton';
-import hoot from '../../svg/hootimages/bluehoot.svg';
 import OuterGrid from '../common/OuterGrid';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100%',
-  },
-  container: {
-    textAlign: 'center',
-    maxWidth: '600px',
-  },
-  hoot: {
-    width: '100px',
-    height: '100px',
-  },
-}));
+import HootAvatar from '../common/HootAvatar';
 
 const Home: React.FC = () => {
   const conn = useContext(ConnContext);
   const online = useOnlineStatus();
-
-  const classes = useStyles();
 
   const handleCreateButton = () => {
     conn.updateMode(Mode.CREATE_ROOM);
@@ -44,7 +28,7 @@ const Home: React.FC = () => {
       <OuterGrid>
         <CenteredInnerGrid>
           <Grid item xs={12}>
-            <img src={hoot} className={classes.hoot} alt="hootdat mascot" />
+            <HootAvatar size="large" />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h3">Hoot Dat</Typography>

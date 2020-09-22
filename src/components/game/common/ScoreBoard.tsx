@@ -33,7 +33,7 @@ const ScoreBoard: React.FC<{
         <ListItem key={cid}>
           <ListItemText>
             <Typography variant="body2">
-              <HootAvatar number={hoot} size="small" />
+              <HootAvatar number={hoot} size="xsmall" />
               <Box
                 fontWeight={
                   winning && index === 0 ? 'fontWeightBold' : undefined

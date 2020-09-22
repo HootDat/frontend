@@ -18,9 +18,17 @@ const useStyles = makeStyles({
     height: '50px',
     width: '50px',
   },
-  small: {
+  xsmall: {
     height: '20px',
     width: '20px',
+  },
+  small: {
+    height: '40px',
+    width: '40px',
+  },
+  large: {
+    height: '100px',
+    width: '100px',
   },
   disabled: {
     mixBlendMode: 'luminosity',
@@ -29,11 +37,11 @@ const useStyles = makeStyles({
 });
 
 const HootAvatar: React.FC<{
-  number: number;
-  size?: 'small' | 'normal';
+  number?: number;
+  size?: 'xsmall' | 'small' | 'normal' | 'large';
   disabled?: boolean;
   onClick?: () => void;
-}> = ({ number, size = 'normal', disabled, onClick = () => {} }) => {
+}> = ({ number = 1, size = 'normal', disabled, onClick = () => {} }) => {
   const classes = useStyles();
 
   function whichHoot() {
@@ -65,13 +73,24 @@ const HootAvatar: React.FC<{
     }
   }
 
+  const sizeClass = () => {
+    switch (size) {
+      case 'xsmall':
+        return classes.xsmall;
+      case 'small':
+        return classes.small;
+      case 'normal':
+        return classes.normal;
+      case 'large':
+        return classes.large;
+    }
+  };
+
   return (
     <img
       src={whichHoot()}
       alt={`hoot${number} avatar`}
-      className={`${size === 'small' ? classes.small : classes.normal} ${
-        disabled ? classes.disabled : ''
-      }`}
+      className={`${sizeClass()} ${disabled ? classes.disabled : ''}`}
       onClick={disabled ? undefined : onClick}
     />
   );

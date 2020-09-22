@@ -32,7 +32,7 @@ const GuessingAnswerer: React.FC = () => {
           color={selected === cid ? 'primary' : undefined}
           onClick={() => setSelected(cid)}
         >
-          <HootAvatar number={hoot} size="small" /> {name}
+          <HootAvatar number={hoot} size="xsmall" /> {name}
         </Button>
       );
     });

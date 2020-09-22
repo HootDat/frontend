@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
-import {
-  TextField,
-  Typography,
-  styled,
-  makeStyles,
-  Grid,
-} from '@material-ui/core';
+import { TextField, Typography, styled, Grid } from '@material-ui/core';
 import BackButton from '../common/BackButton';
-import hoot from '../../svg/hootimages/bluehoot.svg';
 import ActionButton from '../common/ActionButton';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
+import HootAvatar from '../common/HootAvatar';
 
 const PinField = styled(TextField)({
   letterSpacing: '1rem',
@@ -21,24 +15,12 @@ const PinField = styled(TextField)({
   },
 });
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    textAlign: 'center',
-    maxWidth: '600px',
-  },
-  hoot: {
-    width: '100px',
-    height: '100px',
-  },
-}));
-
 // load form if room in state is empty. otherwise load character.
 const JoinRoomForm: React.FC<{
   handleJoin: (roomId: string) => void;
   handleBack: () => void;
 }> = ({ handleJoin, handleBack }) => {
   const [input, setInput] = useState('');
-  const classes = useStyles();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const re = /^[0-9\b]{0,4}$/;
@@ -49,7 +31,7 @@ const JoinRoomForm: React.FC<{
   return (
     <CenteredInnerGrid>
       <Grid item xs={12}>
-        <img src={hoot} className={classes.hoot} alt="hootdat mascot" />
+        <HootAvatar size="large" />
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h4">Enter Room PIN</Typography>

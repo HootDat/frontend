@@ -47,7 +47,7 @@ const Lobby: React.FC<{
             return (
               <ListItem key={cid}>
                 <ListItemIcon>
-                  <HootAvatar number={hoot} size="small" />
+                  <HootAvatar number={hoot} size="xsmall" />
                 </ListItemIcon>
                 <ListItemText>
                   <Typography variant="body1">{name}</Typography>

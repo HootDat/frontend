@@ -3,6 +3,7 @@ import { Typography, Button } from '@material-ui/core';
 import EditQuestionsList from '../packs/EditQuestionsList';
 import QuestionPackList from '../packs/QuestionPackList';
 import BackButton from '../common/BackButton';
+import HootAvatar from '../common/HootAvatar';
 
 const AddQuestions: React.FC<{
   roomQuestions: string[];
@@ -24,28 +25,36 @@ const AddQuestions: React.FC<{
     setAddingFromPack(false);
   };
 
-  return addingFromPack ? (
-    <QuestionPackList
-      inRoom
-      handleAdd={handleAddFromPack}
-      handleBack={() => setAddingFromPack(false)}
-    />
-  ) : (
+  return (
     <>
+      <HootAvatar size="small" />
       <Typography variant="h4">Add questions</Typography>
-      <Button
-        size="small"
-        variant="contained"
-        color="secondary"
-        onClick={() => setAddingFromPack(true)}
-      >
-        ADD FROM PACK
-      </Button>
-      <EditQuestionsList questions={questions} setQuestions={setQuestions} />
-      <Button variant="contained" color="primary" onClick={handleAdd}>
-        SAVE QUESTIONS
-      </Button>
-      <BackButton handleBack={handleBack} />
+      {addingFromPack ? (
+        <QuestionPackList
+          inRoom
+          handleAdd={handleAddFromPack}
+          handleBack={() => setAddingFromPack(false)}
+        />
+      ) : (
+        <>
+          <Button
+            size="small"
+            variant="contained"
+            color="secondary"
+            onClick={() => setAddingFromPack(true)}
+          >
+            ADD FROM PACK
+          </Button>
+          <EditQuestionsList
+            questions={questions}
+            setQuestions={setQuestions}
+          />
+          <Button variant="contained" color="primary" onClick={handleAdd}>
+            SAVE QUESTIONS
+          </Button>
+          <BackButton handleBack={handleBack} />
+        </>
+      )}
     </>
   );
 };
