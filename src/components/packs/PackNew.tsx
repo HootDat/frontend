@@ -18,29 +18,35 @@ const PackNew: React.FC = () => {
   const online = useOnlineStatus();
 
   const handleSubmit = (pack: LocalQuestionPack) => {
-    if (name === '' || !online) {
+    let promise;
+    if (name === null || !online) {
       // not logged in, so just store locally
-      store.newLocalPack(pack, name);
-      history.push('/packs');
+      store.newLocalPack(pack, name === null ? '' : name);
+      promise = Promise.resolve();
     } else {
       // logged in, so attempt to send request. If fail,
       // then store locally
-      packsAPI
-        .newPack({ ...pack })
-        .then(
-          newPack => store.downloadPack(newPack),
-          () => store.newLocalPack(pack, name)
-        )
-        .then(() => history.push('/packs'));
+      promise = packsAPI.newPack({ ...pack, id: 0 }).then(
+        newPack => store.downloadPack(newPack),
+        () => store.newLocalPack(pack, name)
+      );
     }
+    promise.finally(() => history.push('/packs'));
   };
 
   useEffect(() => {
-    if (online) {
-      categoriesAPI.getCategories().then(setCategories);
-    } else {
-      setCategories(store.getCategories());
+    const setLocalCategories = () => setCategories(store.getCategories());
+    if (!online) {
+      setLocalCategories();
+      return;
     }
+
+    categoriesAPI
+      .getCategories()
+      .then(
+        categories => setCategories([...categories, ...store.getCategories()]),
+        setLocalCategories
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -28,6 +28,7 @@ import BackButton from '../common/BackButton';
 import useOnlineStatus from '../../utils/useOnlineStatus';
 import AuthContext from '../login/AuthContext';
 import packsAPI from '../../api/packs';
+import categoriesAPI from '../../api/categories';
 
 type Filter = {
   name: string;
@@ -67,16 +68,26 @@ const QuestionPackList: React.FC<Props> = ({
     categories: [],
     tab: 'mine', // TODO: Maybe it would be good to see community first? only see mine first if in room
   });
-  const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
   const online = useOnlineStatus();
 
   useEffect(() => {
-    Promise.all([
-      // packsAPI.getPacks().then(setPacks),
-      // categoriesAPI.getCategories().then(setCategories),
-      // when we fetch, we filter my own ones and merge with local store as necessary
-    ]).finally(() => setIsLoading(false));
+    const setLocalCategories = () => setCategories(store.getCategories());
+    if (!online) {
+      setLocalCategories();
+      return;
+    }
+
+    // TODO add pagination
+    packsAPI.getPacks().then(setCommunityPacks, () => {});
+    categoriesAPI
+      .getCategories()
+      .then(
+        categories => setCategories([...categories, ...store.getCategories()]),
+        setLocalCategories
+      );
+    // TODO when we fetch, we filter my own ones and merge with local store as necessary
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleNameSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,7 +103,7 @@ const QuestionPackList: React.FC<Props> = ({
 
   const handleDeletePack = (pack: LocalQuestionPack) => {
     // TODO use a modal to invoke this function
-    if (name === '' || !online) {
+    if (name === null || !online) {
       store.deleteLocalPack(pack);
       setMyPacks(store.getLocalPacks());
     } else {

@@ -33,26 +33,41 @@ const PackEdit: React.FC = () => {
   const editPack = store.getLocalPack(location.state.localOnly ? -id : id);
 
   const handleSubmit = (pack: LocalQuestionPack) => {
-    if (name === '' || !online) {
+    let promise;
+    if (name === null || !online) {
       store.editLocalPack(pack);
-      history.push('/packs');
+      promise = Promise.resolve();
+    } else if (pack.action === 'new') {
+      // pack is new and not synced with server
+      promise = packsAPI.newPack({ ...pack, id: 0 }).then(
+        newPack => {
+          store.deletePack(pack.id);
+          store.downloadPack(newPack);
+        },
+        () => store.editLocalPack(pack)
+      );
     } else {
-      packsAPI
-        .editPack({ ...pack })
-        .then(
-          editedPack => store.downloadPack(editedPack),
-          () => store.editLocalPack(pack)
-        )
-        .then(() => history.push('/packs'));
+      promise = packsAPI.editPack({ ...pack }).then(
+        editedPack => store.downloadPack(editedPack),
+        () => store.editLocalPack(pack)
+      );
     }
+    promise.finally(() => history.push('/packs'));
   };
 
   useEffect(() => {
-    if (online) {
-      categoriesAPI.getCategories().then(setCategories);
-    } else {
-      setCategories(store.getCategories());
+    const setLocalCategories = () => setCategories(store.getCategories());
+    if (!online) {
+      setLocalCategories();
+      return;
     }
+
+    categoriesAPI
+      .getCategories()
+      .then(
+        categories => setCategories([...categories, ...store.getCategories()]),
+        setLocalCategories
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
