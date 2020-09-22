@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Hootdat",
+  "name": "Hootdat- Guess who's that!",
   "icons": [
     {
       "src": "favicon.ico",
@@ -17,9 +17,9 @@
       "type": "image/png",
       "sizes": "512x512"
     }
-  ],
+      ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#D7DFE5",
+  "background_color": "#FFFFFF"
 }
