@@ -13,7 +13,13 @@ import {
   InputAdornment,
 } from '@material-ui/core';
 import { Edit, ExpandMore, Delete, Search } from '@material-ui/icons';
-import { TabContext, TabPanel, TabList } from '@material-ui/lab';
+import {
+  TabContext,
+  TabPanel,
+  TabList,
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@material-ui/lab';
 
 import {
   CommunityQuestionPack,
@@ -98,7 +104,9 @@ const QuestionPackList: React.FC<Props> = ({
     e: React.ChangeEvent<{}>,
     tab: 'mine' | 'community'
   ) => {
-    setSearch({ ...search, tab: tab });
+    if (tab !== null) {
+      setSearch({ ...search, tab: tab });
+    }
   };
 
   const handleDeletePack = (pack: LocalQuestionPack) => {
@@ -223,20 +231,21 @@ const QuestionPackList: React.FC<Props> = ({
           ),
         }}
       />
-      <TabContext value={search.tab}>
-        <AppBar position="static">
-          <TabList
-            variant="fullWidth"
-            aria-label="packs tab"
-            onChange={handleTabChange}
-          >
-            <Tab label="Mine" value="mine" />
-            <Tab label="Community" value="community" />
-          </TabList>
-        </AppBar>
-        <TabPanel value="mine">{ownedPackAccordions}</TabPanel>
-        <TabPanel value="community">{communityPackAccordions}</TabPanel>
-      </TabContext>
+      <ToggleButtonGroup
+        exclusive
+        value={search.tab}
+        onChange={handleTabChange}
+        aria-label="pack tab"
+      >
+        <ToggleButton value="mine" aria-label="mine">
+          Mine
+        </ToggleButton>
+        <ToggleButton value="community" aria-label="community">
+          Community
+        </ToggleButton>
+      </ToggleButtonGroup>
+      {search.tab === 'mine' && ownedPackAccordions}
+      {search.tab === 'community' && communityPackAccordions}
       {inRoom && <BackButton handleBack={handleBack!} />}
     </Box>
   );
