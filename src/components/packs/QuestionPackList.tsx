@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Box,
   Tab,
@@ -25,6 +25,9 @@ import { Category } from '../../types/category';
 import store from '../../utils/store';
 import { useHistory } from 'react-router-dom';
 import BackButton from '../common/BackButton';
+import useOnlineStatus from '../../utils/useOnlineStatus';
+import AuthContext from '../login/AuthContext';
+import packsAPI from '../../api/packs';
 
 type Filter = {
   name: string;
@@ -52,6 +55,8 @@ const QuestionPackList: React.FC<Props> = ({
   // when in view, also no.
   // then just fetch in this compoennt.
 
+  const { name } = useContext(AuthContext);
+
   const [communityPacks, setCommunityPacks] = useState(
     [] as CommunityQuestionPack[]
   );
@@ -64,6 +69,7 @@ const QuestionPackList: React.FC<Props> = ({
   });
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
+  const online = useOnlineStatus();
 
   useEffect(() => {
     Promise.all([
@@ -85,9 +91,26 @@ const QuestionPackList: React.FC<Props> = ({
   };
 
   const handleDeletePack = (pack: LocalQuestionPack) => {
-    // TODO do other stuff as well
-    store.deleteLocalPack(pack);
-    setMyPacks(store.getLocalPacks());
+    // TODO use a modal to invoke this function
+    if (name === '' || !online) {
+      store.deleteLocalPack(pack);
+      setMyPacks(store.getLocalPacks());
+    } else {
+      packsAPI
+        .deletePack(pack.id)
+        .then(
+          success => store.deletePack(pack.id),
+          failure => {
+            if (failure.code === 400) {
+              // probably deleted already, so pack
+              // does not exist
+              store.deletePack(pack.id);
+            }
+            // otherwise, network issue? try again later
+          }
+        )
+        .then(() => setMyPacks(store.getLocalPacks()));
+    }
   };
 
   const filter = (pack: QuestionPackPostData) =>

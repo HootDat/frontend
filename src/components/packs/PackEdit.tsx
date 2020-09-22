@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useLocation, useParams, useHistory } from 'react-router-dom';
 import store from '../../utils/store';
 import QuestionPackForm from './QuestionPackForm';
 import { LocalQuestionPack } from '../../types/questionPack';
 import { Typography } from '@material-ui/core';
+import { Category } from '../../types/category';
+import useOnlineStatus from '../../utils/useOnlineStatus';
+import categoriesAPI from '../../api/categories';
+import AuthContext from '../login/AuthContext';
+import packsAPI from '../../api/packs';
 
 type Params = {
   id: string;
@@ -17,20 +22,39 @@ type LocationState = {
 const PackEdit: React.FC = () => {
   const params = useParams<Params>();
   const location = useLocation<LocationState>();
+  const { name } = useContext(AuthContext);
   const history = useHistory();
   const id = parseInt(params.id, 10);
 
-  // fetch exisiting categories
+  const [categories, setCategories] = useState([] as Category[]);
+  const online = useOnlineStatus();
 
   // if it is a local pack that is unsynced, use a negative id instead.
   const editPack = store.getLocalPack(location.state.localOnly ? -id : id);
 
-  const categories = ['fun', 'bla', 'meh'];
-
   const handleSubmit = (pack: LocalQuestionPack) => {
-    store.editLocalPack(pack);
-    history.push('/packs');
+    if (name === '' || !online) {
+      store.editLocalPack(pack);
+      history.push('/packs');
+    } else {
+      packsAPI
+        .editPack({ ...pack })
+        .then(
+          editedPack => store.downloadPack(editedPack),
+          () => store.editLocalPack(pack)
+        )
+        .then(() => history.push('/packs'));
+    }
   };
+
+  useEffect(() => {
+    if (online) {
+      categoriesAPI.getCategories().then(setCategories);
+    } else {
+      setCategories(store.getCategories());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

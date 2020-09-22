@@ -13,7 +13,7 @@ const AppShell: React.FC = ({ children }) => {
   // TODO fill in name
   const [authState, setAuthState] = useState<AuthState>({
     access_token: store.getAccessToken(true),
-    name: '',
+    name: 'test',
     setAuthState: () => {},
   });
   const online = useOnlineStatus();

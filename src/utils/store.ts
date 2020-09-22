@@ -184,6 +184,8 @@ class Store {
     }
   }
 
+  // replaces the pack with the same id in
+  // storage
   downloadPack(pack: CommunityQuestionPack) {
     if (!this.isAvailable()) {
       return;

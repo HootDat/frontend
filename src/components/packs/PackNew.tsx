@@ -18,14 +18,14 @@ const PackNew: React.FC = () => {
   const online = useOnlineStatus();
 
   const handleSubmit = (pack: LocalQuestionPack) => {
-    if (name === '') {
+    if (name === '' || !online) {
       // not logged in, so just store locally
       store.newLocalPack(pack, name);
       history.push('/packs');
     } else {
       // logged in, so attempt to send request. If fail,
       // then store locally
-      return packsAPI
+      packsAPI
         .newPack({ ...pack })
         .then(
           newPack => store.downloadPack(newPack),
@@ -41,6 +41,7 @@ const PackNew: React.FC = () => {
     } else {
       setCategories(store.getCategories());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
