@@ -28,6 +28,9 @@ const Login: React.FC = () => {
       // send api request to server to get access token
       store.setAccessToken('access_token');
       authState.setAuthState({ ...authState, access_token: 'access_token' });
+      // remove packs with different owner id
+      // fetch my packs and merge
+      // appshell will send the remaining requests for new packs
       // TODO notificiaton
       history.replace('/');
     }

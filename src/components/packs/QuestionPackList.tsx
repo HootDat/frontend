@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Box,
   Tab,
@@ -13,7 +13,13 @@ import {
   InputAdornment,
 } from '@material-ui/core';
 import { Edit, ExpandMore, Delete, Search } from '@material-ui/icons';
-import { TabContext, TabPanel, TabList } from '@material-ui/lab';
+import {
+  TabContext,
+  TabPanel,
+  TabList,
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@material-ui/lab';
 
 import {
   CommunityQuestionPack,
@@ -25,6 +31,10 @@ import { Category } from '../../types/category';
 import store from '../../utils/store';
 import { useHistory } from 'react-router-dom';
 import BackButton from '../common/BackButton';
+import useOnlineStatus from '../../utils/useOnlineStatus';
+import AuthContext from '../login/AuthContext';
+import packsAPI from '../../api/packs';
+import categoriesAPI from '../../api/categories';
 
 type Filter = {
   name: string;
@@ -52,6 +62,8 @@ const QuestionPackList: React.FC<Props> = ({
   // when in view, also no.
   // then just fetch in this compoennt.
 
+  const { name } = useContext(AuthContext);
+
   const [communityPacks, setCommunityPacks] = useState(
     [] as CommunityQuestionPack[]
   );
@@ -62,15 +74,26 @@ const QuestionPackList: React.FC<Props> = ({
     categories: [],
     tab: 'mine', // TODO: Maybe it would be good to see community first? only see mine first if in room
   });
-  const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
+  const online = useOnlineStatus();
 
   useEffect(() => {
-    Promise.all([
-      // packsAPI.getPacks().then(setPacks),
-      // categoriesAPI.getCategories().then(setCategories),
-      // when we fetch, we filter my own ones and merge with local store as necessary
-    ]).finally(() => setIsLoading(false));
+    const setLocalCategories = () => setCategories(store.getCategories());
+    if (!online) {
+      setLocalCategories();
+      return;
+    }
+
+    // TODO add pagination
+    packsAPI.getPacks().then(setCommunityPacks, () => {});
+    categoriesAPI
+      .getCategories()
+      .then(
+        categories => setCategories([...categories, ...store.getCategories()]),
+        setLocalCategories
+      );
+    // TODO when we fetch, we filter my own ones and merge with local store as necessary
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleNameSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,13 +104,32 @@ const QuestionPackList: React.FC<Props> = ({
     e: React.ChangeEvent<{}>,
     tab: 'mine' | 'community'
   ) => {
-    setSearch({ ...search, tab: tab });
+    if (tab !== null) {
+      setSearch({ ...search, tab: tab });
+    }
   };
 
   const handleDeletePack = (pack: LocalQuestionPack) => {
-    // TODO do other stuff as well
-    store.deleteLocalPack(pack);
-    setMyPacks(store.getLocalPacks());
+    // TODO use a modal to invoke this function
+    if (name === null || !online) {
+      store.deleteLocalPack(pack);
+      setMyPacks(store.getLocalPacks());
+    } else {
+      packsAPI
+        .deletePack(pack.id)
+        .then(
+          success => store.deletePack(pack.id),
+          failure => {
+            if (failure.code === 400) {
+              // probably deleted already, so pack
+              // does not exist
+              store.deletePack(pack.id);
+            }
+            // otherwise, network issue? try again later
+          }
+        )
+        .then(() => setMyPacks(store.getLocalPacks()));
+    }
   };
 
   const filter = (pack: QuestionPackPostData) =>
@@ -189,20 +231,21 @@ const QuestionPackList: React.FC<Props> = ({
           ),
         }}
       />
-      <TabContext value={search.tab}>
-        <AppBar position="static">
-          <TabList
-            variant="fullWidth"
-            aria-label="packs tab"
-            onChange={handleTabChange}
-          >
-            <Tab label="Mine" value="mine" />
-            <Tab label="Community" value="community" />
-          </TabList>
-        </AppBar>
-        <TabPanel value="mine">{ownedPackAccordions}</TabPanel>
-        <TabPanel value="community">{communityPackAccordions}</TabPanel>
-      </TabContext>
+      <ToggleButtonGroup
+        exclusive
+        value={search.tab}
+        onChange={handleTabChange}
+        aria-label="pack tab"
+      >
+        <ToggleButton value="mine" aria-label="mine">
+          Mine
+        </ToggleButton>
+        <ToggleButton value="community" aria-label="community">
+          Community
+        </ToggleButton>
+      </ToggleButtonGroup>
+      {search.tab === 'mine' && ownedPackAccordions}
+      {search.tab === 'community' && communityPackAccordions}
       {inRoom && <BackButton handleBack={handleBack!} />}
     </Box>
   );
