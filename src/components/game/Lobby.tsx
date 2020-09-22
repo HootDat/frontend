@@ -13,6 +13,7 @@ import { useHistory } from 'react-router-dom';
 
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
+import HootAvatar from '../common/HootAvatar';
 
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
@@ -45,7 +46,9 @@ const Lobby: React.FC<{
           .map(([cid, [name, hoot, _]]) => {
             return (
               <ListItem key={cid}>
-                <ListItemIcon>{hoot}</ListItemIcon>
+                <ListItemIcon>
+                  <HootAvatar number={hoot} size="small" />
+                </ListItemIcon>
                 <ListItemText>
                   <Typography variant="body1">{name}</Typography>
                 </ListItemText>

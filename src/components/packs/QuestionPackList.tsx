@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Box,
-  Tab,
   TextField,
-  AppBar,
   Accordion,
   AccordionActions,
   Button,
@@ -13,13 +11,7 @@ import {
   InputAdornment,
 } from '@material-ui/core';
 import { Edit, ExpandMore, Delete, Search } from '@material-ui/icons';
-import {
-  TabContext,
-  TabPanel,
-  TabList,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@material-ui/lab';
+import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 import {
   CommunityQuestionPack,

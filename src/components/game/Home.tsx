@@ -7,7 +7,7 @@ import ConnContext from './connection/ConnContext';
 import { Mode } from './GameState';
 import useOnlineStatus from '../../utils/useOnlineStatus';
 import ActionButton from '../common/ActionButton';
-import hoot from '../../svg/hoot0.svg';
+import hoot from '../../svg/hootimages/bluehoot.svg';
 import OuterGrid from '../common/OuterGrid';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
 

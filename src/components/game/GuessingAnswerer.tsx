@@ -4,6 +4,7 @@ import { Paper, Typography, Button } from '@material-ui/core';
 import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
+import HootAvatar from '../common/HootAvatar';
 
 const GuessingAnswerer: React.FC = () => {
   // TODO: show who has guessed already? Might not be necessary though.
@@ -31,7 +32,7 @@ const GuessingAnswerer: React.FC = () => {
           color={selected === cid ? 'primary' : undefined}
           onClick={() => setSelected(cid)}
         >
-          {hoot} - {name}
+          <HootAvatar number={hoot} size="small" /> {name}
         </Button>
       );
     });

@@ -7,7 +7,7 @@ import {
   Grid,
 } from '@material-ui/core';
 import BackButton from '../common/BackButton';
-import hoot from '../../svg/hoot0.svg';
+import hoot from '../../svg/hootimages/bluehoot.svg';
 import ActionButton from '../common/ActionButton';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
 

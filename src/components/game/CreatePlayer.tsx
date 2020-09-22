@@ -3,7 +3,6 @@ import {
   Typography,
   TextField,
   Button,
-  ButtonGroup,
   Grid,
   makeStyles,
 } from '@material-ui/core';
@@ -11,10 +10,22 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
 import BackButton from '../common/BackButton';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
 import ActionButton from '../common/ActionButton';
+import HootAvatar from '../common/HootAvatar';
 
 const useStyles = makeStyles(theme => ({
   pageSelector: {
     padding: theme.spacing(2),
+  },
+  hootButton: {
+    textAlign: 'center',
+    display: 'inline-block',
+    height: '60px',
+    width: '60px',
+    paddingTop: '5px',
+  },
+  selected: {
+    backgroundColor: '#fdd9b6',
+    borderRadius: '50%',
   },
 }));
 
@@ -38,28 +49,31 @@ const CreatePlayer: React.FC<{
 
   const makeHootRow = (firstHootId: number) => {
     return (
-      <ButtonGroup aria-label="hoot row">
+      <Grid item container justify="center" alignItems="center" spacing={1}>
         {makeHootButton(firstHootId)}
         {makeHootButton(firstHootId + 1)}
         {makeHootButton(firstHootId + 2)}
-      </ButtonGroup>
+      </Grid>
     );
   };
 
   const makeHootButton = (hootNumber: number) => {
     // temporarily mark selected using button color, ideally this should
     // be done with CSS.
-    const variant = hoot === hootNumber ? 'contained' : undefined;
     return (
-      <Button
-        variant={variant}
-        color="primary"
-        id={hootNumber.toString()}
-        disabled={occupiedNumbers.includes(hootNumber)}
-        onClick={() => setHoot(hootNumber)}
-      >
-        {hootNumber}
-      </Button>
+      <Grid item>
+        <span
+          className={`${classes.hootButton} ${
+            hoot === hootNumber ? classes.selected : ''
+          }`}
+        >
+          <HootAvatar
+            number={hootNumber}
+            disabled={occupiedNumbers.includes(hootNumber)}
+            onClick={() => setHoot(hootNumber)}
+          />
+        </span>
+      </Grid>
     );
   };
 
@@ -83,11 +97,9 @@ const CreatePlayer: React.FC<{
 
   const HootPage = (
     <>
-      <Grid item xs={12}>
-        <ButtonGroup orientation="vertical" aria-label="hoot choices">
-          {makeHootRow(page === 1 ? 0 : 6)}
-          {makeHootRow(page === 1 ? 3 : 9)}
-        </ButtonGroup>
+      <Grid item container direction="column" spacing={1} xs={12}>
+        {makeHootRow(page === 1 ? 0 : 6)}
+        {makeHootRow(page === 1 ? 3 : 9)}
       </Grid>
       <Grid
         item

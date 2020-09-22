@@ -5,7 +5,7 @@ import { Facebook } from '@material-ui/icons';
 import AuthContext from './AuthContext';
 import store from '../../utils/store';
 import ActionButton from '../common/ActionButton';
-import hoot from '../../svg/hoot0.svg';
+import hoot from '../../svg/hootimages/bluehoot.svg';
 import BackButton from '../common/BackButton';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
 import OuterGrid from '../common/OuterGrid';

@@ -8,6 +8,7 @@ import {
   ListSubheader,
   Typography,
 } from '@material-ui/core';
+import HootAvatar from '../../common/HootAvatar';
 
 const ScoreBoard: React.FC<{
   header?: boolean;
@@ -32,7 +33,7 @@ const ScoreBoard: React.FC<{
         <ListItem key={cid}>
           <ListItemText>
             <Typography variant="body2">
-              {hoot} -{' '}
+              <HootAvatar number={hoot} size="small" />
               <Box
                 fontWeight={
                   winning && index === 0 ? 'fontWeightBold' : undefined
