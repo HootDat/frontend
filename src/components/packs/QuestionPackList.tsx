@@ -42,7 +42,7 @@ import categoriesAPI from '../../api/categories';
 
 type Filter = {
   name: string;
-  categories: string[]; // any match
+  categories: Set<string>; // any match
   tab: 'mine' | 'community';
 };
 
@@ -77,7 +77,7 @@ const QuestionPackList: React.FC<Props> = ({
   const online = useOnlineStatus();
   const [search, setSearch] = useState<Filter>({
     name: '',
-    categories: [],
+    categories: new Set(),
     tab: online ? 'community' : 'mine',
   });
   const history = useHistory();
@@ -114,8 +114,6 @@ const QuestionPackList: React.FC<Props> = ({
     }
   };
 
-  console.log(myPacks);
-
   const handleDeletePack = (pack: LocalQuestionPack) => {
     // TODO use a modal to invoke this function
     if (name === null || !online) {
@@ -140,22 +138,24 @@ const QuestionPackList: React.FC<Props> = ({
   };
 
   const handleClearCategoryFilter = () => {
-    setSearch({ ...search, categories: [] });
+    setSearch({ ...search, categories: new Set() });
   };
 
   const filter = (pack: QuestionPackPostData) =>
     pack.name.includes(search.name) &&
-    (search.categories.length === 0 ||
-      pack.categories.some(category => search.categories.includes(category)));
+    (search.categories.size === 0 ||
+      pack.categories.some(category => search.categories.has(category)));
 
   const handleEditCategoryFilter = (category: string) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    let categories = search.categories;
+    let categories;
     if (event.target.checked) {
-      categories = [...categories, category];
+      categories = new Set(search.categories);
+      categories.add(category);
     } else {
-      categories = categories.filter(category1 => category1 !== category);
+      categories = new Set(search.categories);
+      categories.delete(category);
     }
     setSearch({ ...search, categories: categories });
   };
@@ -174,7 +174,7 @@ const QuestionPackList: React.FC<Props> = ({
         <ListItem key={category}>
           <Checkbox
             color="primary"
-            checked={search.categories.includes(category)}
+            checked={search.categories.has(category)}
             value={category}
             onChange={handleEditCategoryFilter(category)}
             inputProps={{
