@@ -4,6 +4,7 @@ import AuthState from './login/AuthState';
 import store from '../utils/store';
 import useOnlineStatus from '../utils/useOnlineStatus';
 import { LocalQuestionPack } from '../types/questionPack';
+import packsAPI from '../api/packs';
 
 const AppShell: React.FC = ({ children }) => {
   // background of app, and other app wide stuff should go here
@@ -30,11 +31,18 @@ const AppShell: React.FC = ({ children }) => {
     // the data
     switch (pack.action) {
       case 'new':
+        packsAPI.newPack({ ...pack }).then(newPack => {
+          store.deletePack(pack.id);
+          store.downloadPack(newPack);
+        });
         return;
       case 'edit':
+        packsAPI
+          .editPack({ ...pack })
+          .then(editedPack => store.downloadPack(editedPack));
         return;
       case 'delete':
-        store.deletePack(pack.id);
+        packsAPI.deletePack(pack.id).then(success => store.deletePack(pack.id));
         return;
     }
   };

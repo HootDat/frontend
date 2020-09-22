@@ -2,6 +2,7 @@ import {
   CommunityQuestionPack,
   LocalQuestionPack,
 } from '../types/questionPack';
+import { Category } from '../types/category';
 
 const ACCESS_TOKEN = 'access_token';
 const LOCAL_PACKS = 'packs';
@@ -201,6 +202,17 @@ class Store {
     }
 
     this.storage!.removeItem(LOCAL_PACKS);
+  }
+
+  getCategories(): Category[] {
+    if (!this.isAvailable()) {
+      return [];
+    }
+
+    const categories = this.getLocalPacks()
+      .map(pack => pack.categories)
+      .flat();
+    return Array.from(new Set(categories));
   }
 
   // logged out with storage

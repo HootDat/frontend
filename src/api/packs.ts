@@ -5,6 +5,13 @@ import {
 import base from './base';
 import { Category } from '../types/category';
 
+// we remove unwrap and extract the name for categories and title for questions
+const transformToSimplifiedFormat = (packObj: any) => ({
+  ...packObj,
+  categories: packObj.categories.map((categories: any) => categories.name),
+  questions: packObj.questions.map((question: any) => question.title),
+});
+
 const packsAPI = {
   getPacks: (
     limit?: number,
@@ -12,15 +19,21 @@ const packsAPI = {
     scope?: 'all' | 'private' | 'public',
     categories?: Category[]
   ): Promise<[CommunityQuestionPack]> => {
-    return base.getData(`/packs`, { limit, offset, scope, categories });
+    return base
+      .getData(`/packs`, { limit, offset, scope, categories })
+      .then(packObjs => packObjs.map(transformToSimplifiedFormat));
   },
 
-  PackNew: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
-    return base.postData('/packs', { ...pack });
+  newPack: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
+    return base
+      .postData('/packs', { ...pack })
+      .then(transformToSimplifiedFormat);
   },
 
-  PackEdit: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
-    return base.putData(`/packs/${pack.id}`, { ...pack });
+  editPack: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
+    return base
+      .putData(`/packs/${pack.id}`, { ...pack })
+      .then(transformToSimplifiedFormat);
   },
 
   deletePack: (packId: number): Promise<{}> => {

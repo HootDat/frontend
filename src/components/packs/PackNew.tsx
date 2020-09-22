@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Typography } from '@material-ui/core';
 
 import QuestionPackForm from './QuestionPackForm';
@@ -6,25 +6,42 @@ import { LocalQuestionPack } from '../../types/questionPack';
 import store from '../../utils/store';
 import AuthContext from '../login/AuthContext';
 import { useHistory } from 'react-router-dom';
+import categoriesAPI from '../../api/categories';
+import { Category } from '../../types/category';
+import packsAPI from '../../api/packs';
+import useOnlineStatus from '../../utils/useOnlineStatus';
 
 const PackNew: React.FC = () => {
+  const [categories, setCategories] = useState([] as Category[]);
   const { name } = useContext(AuthContext);
   const history = useHistory();
-  // fetch categories on load
+  const online = useOnlineStatus();
 
-  // TODO dump into local storage
-  // queue a request to send the questions to server if logged in
-  // so that it is synced on the cloud
-  // add an option to specify whether it is seen in public
   const handleSubmit = (pack: LocalQuestionPack) => {
-    // TODO figure out how service workers work. We should try
-    // to push the changes here, and resort to service workers if
-    // it fails? idk. will figure this out next.
-    store.newLocalPack(pack, name);
-    history.push('/packs');
+    if (name === '') {
+      // not logged in, so just store locally
+      store.newLocalPack(pack, name);
+      history.push('/packs');
+    } else {
+      // logged in, so attempt to send request. If fail,
+      // then store locally
+      return packsAPI
+        .newPack({ ...pack })
+        .then(
+          newPack => store.downloadPack(newPack),
+          () => store.newLocalPack(pack, name)
+        )
+        .then(() => history.push('/packs'));
+    }
   };
 
-  const categories = ['fun', 'party', 'random'];
+  useEffect(() => {
+    if (online) {
+      categoriesAPI.getCategories().then(setCategories);
+    } else {
+      setCategories(store.getCategories());
+    }
+  }, []);
 
   return (
     <>

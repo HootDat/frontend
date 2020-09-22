@@ -148,7 +148,7 @@ const QuestionPackList: React.FC<Props> = ({
           id={`pack ${pack.id}`}
         >
           <Typography variant="body1">{pack.name}</Typography>
-          <Typography variant="subtitle2">{pack.owner.name}</Typography>
+          {/*TODO <Typography variant="subtitle2">{pack.owner.name}</Typography>*/}
         </AccordionSummary>
         <AccordionDetails>
           <ol>
