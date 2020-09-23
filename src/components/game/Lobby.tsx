@@ -34,10 +34,14 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
     top: '2px',
   },
-  buttons: {
+  buttonGroup: {
     position: 'absolute',
     width: '100%',
     bottom: '0px',
+  },
+  button: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
   },
   cardListings: {
     height: '120px',
@@ -49,6 +53,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+// TODO SHARE BUTTON
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
 // User joined room via gameCode, and chose a character already.
@@ -130,6 +135,7 @@ const Lobby: React.FC<{
           variant="contained"
           color="primary"
           onClick={handleAddQuestionButton}
+          className={classes.button}
         >
           ADD QUESTIONS
         </ActionButton>
@@ -139,6 +145,7 @@ const Lobby: React.FC<{
           color="primary"
           disabled={Object.keys(players).length < 3}
           onClick={handleStart}
+          className={classes.button}
         >
           START GAME
         </ActionButton>
@@ -171,20 +178,12 @@ const Lobby: React.FC<{
           {cId === host && questions.length !== 0 ? questionCard : undefined}
         </Grid>
       </Grid>
-      <Grid
-        container
-        direction="column"
-        spacing={1}
-        alignItems="stretch"
-        className={classes.buttons}
-      >
-        <Grid item>{actionButton}</Grid>
-        <Grid item>
-          <Button color="primary" onClick={handleQuit}>
-            Quit
-          </Button>
-        </Grid>
-      </Grid>
+      <div className={classes.buttonGroup}>
+        {actionButton}
+        <Button color="primary" onClick={handleQuit} className={classes.button}>
+          Quit
+        </Button>
+      </div>
     </div>
   );
 };

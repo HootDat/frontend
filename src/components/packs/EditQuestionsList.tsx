@@ -5,12 +5,15 @@ import {
   TextField,
   Grid,
   makeStyles,
+  IconButton,
 } from '@material-ui/core';
 import { Add, Clear } from '@material-ui/icons';
 
 const useStyles = makeStyles(theme => ({
-  questionFill: {
-    width: '100%',
+  smallButton: {
+    borderRadius: 40,
+    width: 'auto',
+    marginTop: theme.spacing(1),
   },
 }));
 
@@ -42,31 +45,37 @@ const EditQuestionsList: React.FC<{
   // would be good to auto focus on new
   const questionList = questions.map((question, index) => {
     return (
-      <div key={index}>
-        <Grid item xs={12}>
-          <Typography variant="body1">Qn {index + 1}</Typography>
-          <Button size="small" onClick={handleDelete(index)}>
-            <Clear />
-          </Button>
+      <Grid item xs={12} key={index}>
+        <Grid container item xs={12}>
+          <Grid item xs={6} style={{ textAlign: 'left' }}>
+            <Typography variant="body1">Qn {index + 1}</Typography>
+          </Grid>
+          <Grid item xs={6} style={{ textAlign: 'right' }}>
+            <IconButton size="small" onClick={handleDelete(index)}>
+              <Clear />
+            </IconButton>
+          </Grid>
         </Grid>
-        <TextField
-          error={question.trim() === ''}
-          onChange={handleChange(index)}
-          value={question}
-          helperText={
-            question.trim() === ''
-              ? 'Your question cannot be blank!'
-              : undefined
-          }
-          className={classes.questionFill}
-        />
-      </div>
+        <Grid item xs={12}>
+          <TextField
+            error={question.trim() === ''}
+            onChange={handleChange(index)}
+            value={question}
+            fullWidth
+            helperText={
+              question.trim() === ''
+                ? 'Your question cannot be blank!'
+                : undefined
+            }
+          />
+        </Grid>
+      </Grid>
     );
   });
 
   return (
     <>
-      <Grid item xs={12}>
+      <Grid container spacing={1} style={{ width: '100%' }}>
         {questionList}
       </Grid>
       <Button
@@ -74,7 +83,7 @@ const EditQuestionsList: React.FC<{
         variant="outlined"
         color="primary"
         onClick={handleNew}
-        style={{ borderRadius: 40, width: 'auto' }}
+        className={classes.smallButton}
       >
         <Add fontSize="small" />
         NEW QUESTION
