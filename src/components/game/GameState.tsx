@@ -58,6 +58,6 @@ export function getCurrentAnswerer(state: SocketGameState) {
     player => player.answers[qnNum].type === 'answer'
   );
   return answerer
-    ? { cid: answerer.cId, answer: answerer.answers[qnNum] }
+    ? { cid: answerer.cId, answer: answerer.answers[qnNum].content }
     : null;
 }

@@ -1,4 +1,5 @@
 import GameState, { Mode, home, SocketGameState } from '../GameState';
+import io from 'socket.io-client';
 
 const noOp = () => {};
 
