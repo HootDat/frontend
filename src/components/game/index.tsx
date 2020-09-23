@@ -18,6 +18,10 @@ import GameEnd from './GameEnd';
 import PaddedDiv from '../common/PaddedDiv';
 import LoggedInElsewhere from './LoggedInElsewhere';
 
+import {
+  Grid
+} from '@material-ui/core';
+
 const conn = new ConnManager();
 
 const GameShell: React.FC = () => {
@@ -49,7 +53,11 @@ const GameShell: React.FC = () => {
 
   const render = () => {
     const wrapInChatShell = (element: JSX.Element) => (
-      <ChatShell>{element}</ChatShell>
+        <ChatShell>
+            <Grid item xs={12}>
+              {element}
+            </Grid>
+        </ChatShell>
     );
 
     switch (mode) {

@@ -7,13 +7,18 @@ import {
   ListItemText,
   ListItemIcon,
   ListItem,
+  Grid
 } from '@material-ui/core';
-import { Share, Edit } from '@material-ui/icons';
+import { Share, Edit} from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 import HootAvatar from '../common/HootAvatar';
+
+import ActionButton from '../common/ActionButton';
+import OuterGrid from '../common/OuterGrid';
+import CenteredInnerGrid from '../common/CenteredInnerGrid';
 
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
@@ -87,36 +92,54 @@ const Lobby: React.FC<{
   const actionButton =
     cid === hostCid ? (
       questions.length === 0 ? (
-        <Button
+        <ActionButton
           variant="contained"
           color="primary"
           onClick={handleAddQuestionButton}
         >
           ADD QUESTIONS
-        </Button>
+        </ActionButton>
       ) : (
-        <Button variant="contained" color="primary" onClick={handleStart}>
+        <ActionButton variant="contained" color="primary" onClick={handleStart}>
           START GAME
-        </Button>
+        </ActionButton>
       )
     ) : undefined;
 
   return (
     <>
-      <Typography color="secondary" variant="h4">
-        Room pin: {roomId}
-      </Typography>
-      <Share />
-      <Typography variant="h4">Hoot assembly ground</Typography>
-      <Typography variant="body1">
-        Start game when all players are here
-      </Typography>
-      {participantCard}
-      {cid === hostCid && questions.length !== 0 ? questionCard : undefined}
-      {actionButton}
-      <Button color="primary" onClick={handleQuit}>
-        Quit
-      </Button>
+      <OuterGrid>
+        <CenteredInnerGrid>
+          <Grid item xs={12}>
+            <Typography color="secondary" variant="h4">
+              Room pin: {roomId}
+              <Share />
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h4">Hoot assembly ground</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              Start game when all players are here
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            {participantCard}
+          </Grid>
+          <Grid item xs={12}>
+            {cid === hostCid && questions.length !== 0 ? questionCard : undefined}
+          </Grid>
+          <Grid item xs={12}>
+            {actionButton}
+          </Grid>
+          <Grid item xs={12}>
+            <Button color="primary" onClick={handleQuit}>
+              Quit
+            </Button>
+          </Grid>
+        </CenteredInnerGrid>
+      </OuterGrid>
     </>
   );
 };
