@@ -3,7 +3,7 @@ import { ApiErrorResponse } from '../types/api';
 import store from '../utils/store';
 
 const client = axios.create({
-  baseURL: process.env.BACKEND_URL,
+  baseURL: process.env.REACT_APP_BACKEND_URL,
 });
 
 class BaseAPI {
@@ -38,11 +38,13 @@ class BaseAPI {
 }
 
 function getConfig() {
-  return {
-    headers: {
-      authorization: store.getAccessToken(),
-    },
-  };
+  return store.getAccessToken()
+    ? {
+        headers: {
+          authorization: store.getAccessToken(),
+        },
+      }
+    : {};
 }
 
 function processRequest<T>(

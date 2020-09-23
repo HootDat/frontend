@@ -56,11 +56,11 @@ class Store {
     if (!this.isAvailable()) {
       // generate new token whenever called (should only be called once
       // on each load)
-      return null;
+      return undefined;
     }
 
     const access_token = this.storage!.getItem(ACCESS_TOKEN);
-    if (access_token === null) return null;
+    if (access_token === null) return undefined;
     return access_token;
   }
 
@@ -147,7 +147,7 @@ class Store {
   }
 
   // Assumes localStorage is present.
-  getLocalPack(id: number): LocalQuestionPack {
+  getLocalPack(id: number): LocalQuestionPack | undefined {
     return this.getPacks()[id];
   }
 
@@ -202,10 +202,21 @@ class Store {
   }
 
   // replaces the pack with the same id in
-  // storage
+  // storage if updated_at is later
   downloadPack(pack: CommunityQuestionPack) {
     if (!this.isAvailable()) {
       return;
+    }
+
+    const maybeLocalPack = this.getLocalPack(pack.id);
+
+    if (maybeLocalPack !== undefined) {
+      const localUpdateTime = new Date(maybeLocalPack.updated_at);
+      const serverUpdateTime = new Date(pack.updated_at);
+      if (localUpdateTime > serverUpdateTime) {
+        // use local copy
+        return;
+      }
     }
 
     const localPack: LocalQuestionPack = {

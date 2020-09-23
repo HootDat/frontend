@@ -11,6 +11,7 @@ import OuterGrid from '../common/OuterGrid';
 import PaddedDiv from '../common/PaddedDiv';
 import HootAvatar from '../common/HootAvatar';
 import authAPI from '../../api/auth';
+import packsAPI from '../../api/packs';
 
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);
@@ -18,20 +19,38 @@ const Login: React.FC = () => {
 
   const loggedInCallback = (response: fb.StatusResponse) => {
     if (response.status === 'connected') {
-      // TODO forward authResponse.accessToken to server (server gets userId from fb)
       // send api request to server to get access token
-      authAPI
-        .postLogin(response.authResponse.accessToken)
-        .then(user => {
-          authState.setAuthState({ ...authState, user: user });
-          store.setCurrentUser(user);
+      try {
+        authAPI
+          .postLogin(response.authResponse.accessToken)
+          .then(async user => {
+            authState.setAuthState({ ...authState, user: user });
+            store.setCurrentUser(user);
 
-          // remove packs with different owner id
-          // fetch my packs and merge
-          // appshell will send the remaining requests for new packs
-        })
-        .finally(() => history.replace('/'));
-      // TODO notificiaton
+            // remove packs with different owner id
+            // fetch my packs and merge
+            // appshell will send the remaining requests for new packs
+            const myPacks = await packsAPI.getPacks(
+              undefined,
+              undefined,
+              'own'
+            );
+
+            // store will choose whether to use server or local copy
+            myPacks.forEach(pack => store.downloadPack(pack));
+
+            history.replace('/');
+          });
+        // TODO notificiaton to inform user that we are syncing
+      } catch (err) {
+        switch (err.code) {
+          // TODO notify user that auth failed
+          case 400:
+          case 401:
+          case 403:
+          default:
+        }
+      }
     }
   };
 

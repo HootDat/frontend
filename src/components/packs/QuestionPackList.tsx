@@ -65,7 +65,7 @@ const QuestionPackList: React.FC<Props> = ({
   // when in view, also no.
   // then just fetch in this compoennt.
 
-  const { user } = useContext(AuthContext);
+  const authState = useContext(AuthContext);
 
   const [communityPacks, setCommunityPacks] = useState(
     [] as CommunityQuestionPack[]
@@ -77,7 +77,7 @@ const QuestionPackList: React.FC<Props> = ({
   const [search, setSearch] = useState<Filter>({
     name: '',
     categories: new Set(),
-    tab: online ? 'community' : 'mine',
+    tab: 'mine',
   });
   const history = useHistory();
 
@@ -115,7 +115,7 @@ const QuestionPackList: React.FC<Props> = ({
 
   const handleDeletePack = (pack: LocalQuestionPack) => {
     // TODO use a modal to invoke this function
-    if (user === null || !online) {
+    if (authState.user === null || !online) {
       store.deleteLocalPack(pack);
       setMyPacks(store.getLocalPacks());
     } else {
@@ -128,8 +128,12 @@ const QuestionPackList: React.FC<Props> = ({
               // probably deleted already, so pack
               // does not exist
               store.deletePack(pack.id);
+            } else if (failure.code === 401) {
+              store.removeLoginState();
+              authState.setAuthState({ ...authState, user: null });
+              // TODO notify user expired, logout
+              // otherwise, network issue? try again later
             }
-            // otherwise, network issue? try again later
           }
         )
         .then(() => setMyPacks(store.getLocalPacks()));

@@ -7,12 +7,10 @@ import { AxiosResponse } from 'axios';
 const authAPI = {
   postLogin: async (accessToken: string): Promise<User> => {
     try {
-      const res = await base.postData('/auth/login/facebook', { accessToken });
-      console.log(res);
+      const res = await base.post('/auth/login/facebook', { accessToken });
 
       const token = extractTokenFromResponse(res);
-      // TODO const user = res.data;
-      const user = { name: 'Jon', id: 1 };
+      const user = res.data;
 
       store.setAccessToken(token);
 
@@ -25,8 +23,13 @@ const authAPI = {
   },
 };
 
-// TODO fix
-const extractTokenFromResponse = (res: AxiosResponse): string =>
-  (res as unknown) as string;
+// TODO
+const extractTokenFromResponse = (res: AxiosResponse): string => {
+  const token = res.headers.authorization;
+  if (!token) {
+    throw Error('invalid token');
+  }
+  return token;
+};
 
 export default authAPI;

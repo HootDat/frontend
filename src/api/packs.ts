@@ -13,10 +13,10 @@ const transformToSimplifiedFormat = (packObj: any) => ({
 });
 
 const packsAPI = {
-  getPacks: (
+  getPacks: async (
     limit?: number,
     offset?: number,
-    scope?: 'all' | 'private' | 'public',
+    scope?: 'all' | 'own' | 'community',
     categories?: Category[]
   ): Promise<[CommunityQuestionPack]> => {
     return base
@@ -24,19 +24,23 @@ const packsAPI = {
       .then(packObjs => packObjs.map(transformToSimplifiedFormat));
   },
 
-  newPack: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
+  newPack: async (
+    pack: QuestionPackPostData
+  ): Promise<CommunityQuestionPack> => {
     return base
       .postData('/packs', { ...pack })
       .then(transformToSimplifiedFormat);
   },
 
-  editPack: (pack: QuestionPackPostData): Promise<CommunityQuestionPack> => {
+  editPack: async (
+    pack: QuestionPackPostData
+  ): Promise<CommunityQuestionPack> => {
     return base
       .putData(`/packs/${pack.id}`, { ...pack })
       .then(transformToSimplifiedFormat);
   },
 
-  deletePack: (packId: number): Promise<{}> => {
+  deletePack: async (packId: number): Promise<{}> => {
     return base.delete(`/packs/${packId}`);
   },
 };
