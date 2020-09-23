@@ -1,4 +1,5 @@
 export enum Mode {
+  LOGGED_IN_ELSEWHERE,
   HOME,
   JOIN_ROOM,
   CREATE_ROOM,

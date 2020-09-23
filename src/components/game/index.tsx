@@ -16,6 +16,7 @@ import WaitingForAnswer from './WaitingForAnswer';
 import RoundEnd from './RoundEnd';
 import GameEnd from './GameEnd';
 import PaddedDiv from '../common/PaddedDiv';
+import LoggedInElsewhere from './LoggedInElsewhere';
 
 const conn = new ConnManager();
 
@@ -52,6 +53,8 @@ const GameShell: React.FC = () => {
     );
 
     switch (mode) {
+      case Mode.LOGGED_IN_ELSEWHERE:
+        return <LoggedInElsewhere />;
       case Mode.HOME:
         return <Home />;
       case Mode.JOIN_ROOM:
@@ -70,6 +73,8 @@ const GameShell: React.FC = () => {
         return wrapInChatShell(<RoundEnd />);
       case Mode.GAME_END:
         return wrapInChatShell(<GameEnd />);
+      default:
+        return <></>;
     }
   };
 
