@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { Typography, Paper, TextField, Button, Grid} from '@material-ui/core';
+import { Typography, Paper, TextField, Grid } from '@material-ui/core';
 
 import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
-
 
 import OuterGrid from '../common/OuterGrid';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
@@ -56,7 +55,11 @@ const AnsweringQuestion: React.FC = () => {
             </Paper>
           </Grid>
           <Grid item xs={12}>
-            <ActionButton variant="contained" color="primary" onClick={handleAnswer}>
+            <ActionButton
+              variant="contained"
+              color="primary"
+              onClick={handleAnswer}
+            >
               SUBMIT
             </ActionButton>
           </Grid>

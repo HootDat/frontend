@@ -11,7 +11,7 @@ import CenteredInnerGrid from '../common/CenteredInnerGrid';
 
 const useStyles = makeStyles(theme => ({
   smallButton: {
-    borderRadius:40,
+    borderRadius: 40,
   },
 }));
 
@@ -40,56 +40,59 @@ const AddQuestions: React.FC<{
   return (
     <>
       <OuterGrid>
-          <CenteredInnerGrid>
+        <CenteredInnerGrid>
           <Grid item xs={12}>
             <HootAvatar size="small" />
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h4">Add questions</Typography>
           </Grid>
-      {addingFromPack ? (
-        <QuestionPackList
-          inRoom
-          handleAdd={handleAddFromPack}
-          handleBack={() => setAddingFromPack(false)}
-        />
-      ) : (
-        <>
-          <Grid item xs={12}>
-            <Button
-              size="small"
-              variant="contained"
-              color="secondary"
-              onClick={() => setAddingFromPack(true)}
-              className = {classes.smallButton}
-              // style={
-              //     {borderRadius:40,
-              //     width: 'auto'
-              //     }
-              // }
-              >
-              ADD FROM PACK
-            </Button>
-          </Grid>
-
-          <Grid item xs={12}>
-            <EditQuestionsList
-              questions={questions}
-              setQuestions={setQuestions}
+          {addingFromPack ? (
+            <QuestionPackList
+              inRoom
+              handleAdd={handleAddFromPack}
+              handleBack={() => setAddingFromPack(false)}
             />
-          </Grid>
-          <Grid item xs={12}>
-            <ActionButton variant="contained" color="primary" onClick={handleAdd}>
-              SAVE QUESTIONS
-            </ActionButton>
-          </Grid>
-          <Grid item xs={12}>
-            <BackButton handleBack={handleBack} />
-          </Grid>
+          ) : (
+            <>
+              <Grid item xs={12}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => setAddingFromPack(true)}
+                  className={classes.smallButton}
+                  // style={
+                  //     {borderRadius:40,
+                  //     width: 'auto'
+                  //     }
+                  // }
+                >
+                  ADD FROM PACK
+                </Button>
+              </Grid>
 
-        </>
-      )}
-          </CenteredInnerGrid>
+              <Grid item xs={12}>
+                <EditQuestionsList
+                  questions={questions}
+                  setQuestions={setQuestions}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <ActionButton
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAdd}
+                >
+                  SAVE QUESTIONS
+                </ActionButton>
+              </Grid>
+              <Grid item xs={12}>
+                <BackButton handleBack={handleBack} />
+              </Grid>
+            </>
+          )}
+        </CenteredInnerGrid>
       </OuterGrid>
     </>
   );

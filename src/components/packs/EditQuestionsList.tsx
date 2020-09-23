@@ -1,13 +1,18 @@
 import React from 'react';
-import { Button, Typography, TextField, Grid, makeStyles } from '@material-ui/core';
+import {
+  Button,
+  Typography,
+  TextField,
+  Grid,
+  makeStyles,
+} from '@material-ui/core';
 import { Add, Clear } from '@material-ui/icons';
 
 const useStyles = makeStyles(theme => ({
   questionFill: {
-    width:'100%',
+    width: '100%',
   },
 }));
-
 
 const EditQuestionsList: React.FC<{
   questions: string[];
@@ -53,7 +58,7 @@ const EditQuestionsList: React.FC<{
               ? 'Your question cannot be blank!'
               : undefined
           }
-          className = {classes.questionFill}
+          className={classes.questionFill}
         />
       </div>
     );
@@ -69,11 +74,7 @@ const EditQuestionsList: React.FC<{
         variant="outlined"
         color="primary"
         onClick={handleNew}
-        style={
-          {borderRadius:40,
-            width: 'auto'
-          }
-        }
+        style={{ borderRadius: 40, width: 'auto' }}
       >
         <Add fontSize="small" />
         NEW QUESTION

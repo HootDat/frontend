@@ -7,9 +7,9 @@ import {
   ListItemText,
   ListItemIcon,
   ListItem,
-  Grid
+  Grid,
 } from '@material-ui/core';
-import { Share, Edit} from '@material-ui/icons';
+import { Share, Edit } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 
 import ConnContext from './connection/ConnContext';
@@ -128,7 +128,9 @@ const Lobby: React.FC<{
             {participantCard}
           </Grid>
           <Grid item xs={12}>
-            {cid === hostCid && questions.length !== 0 ? questionCard : undefined}
+            {cid === hostCid && questions.length !== 0
+              ? questionCard
+              : undefined}
           </Grid>
           <Grid item xs={12}>
             {actionButton}
