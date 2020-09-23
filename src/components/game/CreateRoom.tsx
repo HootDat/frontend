@@ -13,8 +13,8 @@ const CreateRoom: React.FC = () => {
 
   const handleSubmit = (name: string, hoot: number) => {
     // TODO
-    const roomId = conn.createRoom(name, hoot);
-    history.replace(`/?roomId=${roomId}`);
+    const gameCode = conn.createRoom(name, hoot);
+    history.replace(`/?gameCode=${gameCode}`);
   };
 
   const handleBack = () => {
@@ -23,11 +23,7 @@ const CreateRoom: React.FC = () => {
 
   return (
     <OuterGrid>
-      <CreatePlayer
-        handleCreate={handleSubmit}
-        handleBack={handleBack}
-        participants={{}}
-      />
+      <CreatePlayer handleCreate={handleSubmit} handleBack={handleBack} />
     </OuterGrid>
   );
 };

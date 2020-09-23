@@ -27,19 +27,18 @@ const GameShell: React.FC = () => {
   const { mode } = gameState;
 
   const history = useHistory();
-  const roomId = new URLSearchParams(useLocation().search).get('roomId');
+  const gameCode = new URLSearchParams(useLocation().search).get('gameCode');
 
   useEffect(() => {
     conn.setStateUpdater(setGameState);
     conn.connectToServer();
 
     // we only want to auto join a room on load, so don't depend
-    // on history and roomid
+    // on history and gamecode
     const re = /^[0-9]{4}$/;
-    if (roomId !== null && re.test(roomId)) {
+    if (gameCode !== null && re.test(gameCode)) {
       conn.updateMode(Mode.JOIN_ROOM);
-      conn.joinRoom(roomId);
-    } else if (roomId !== null) {
+    } else if (gameCode !== null) {
       history.replace('/');
     }
 

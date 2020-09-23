@@ -13,7 +13,11 @@ import ActionButton from '../common/ActionButton';
 const AnsweringQuestion: React.FC = () => {
   const [answer, setAnswer] = useState('');
 
-  const { currentQuestion } = useContext(GameContext);
+  const { state } = useContext(GameContext);
+
+  // TODO what if state is null, should never happen.
+  const { questions, qnNum } = state!;
+
   const conn = useContext(ConnContext);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +42,7 @@ const AnsweringQuestion: React.FC = () => {
           </Grid>
           <Grid item xs={12}>
             <Paper elevation={6}>
-              <Typography variant="body1">{currentQuestion}</Typography>
+              <Typography variant="body1">{questions[qnNum]}</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12}>

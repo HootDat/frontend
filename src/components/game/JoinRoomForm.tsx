@@ -17,7 +17,7 @@ const PinField = styled(TextField)({
 
 // load form if room in state is empty. otherwise load character.
 const JoinRoomForm: React.FC<{
-  handleJoin: (roomId: string) => void;
+  handleJoin: (gameCode: string) => void;
   handleBack: () => void;
 }> = ({ handleJoin, handleBack }) => {
   const [input, setInput] = useState('');

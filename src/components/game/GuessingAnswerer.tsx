@@ -5,15 +5,15 @@ import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 import HootAvatar from '../common/HootAvatar';
+import { getCurrentAnswerer } from './GameState';
 
 const GuessingAnswerer: React.FC = () => {
   // TODO: show who has guessed already? Might not be necessary though.
 
   const [selected, setSelected] = useState<string | null>(null);
 
-  const { currentQuestion, currentAnswer, participants, hostCid } = useContext(
-    GameContext
-  );
+  const { state } = useContext(GameContext);
+  const { qnNum, questions, players, host } = state!;
 
   const conn = useContext(ConnContext);
 
@@ -22,9 +22,9 @@ const GuessingAnswerer: React.FC = () => {
     conn.guessAnswerer(selected!);
   };
 
-  const choices = Object.entries(participants)
-    .sort((a, b) => (a[0] === hostCid ? -1 : a[0].localeCompare(b[0])))
-    .map(([cid, [name, hoot, _]]) => {
+  const choices = Object.entries(players)
+    .sort((a, b) => (a[0] === host ? -1 : a[0].localeCompare(b[0])))
+    .map(([cid, player]) => {
       return (
         <Button
           key={cid}
@@ -32,11 +32,13 @@ const GuessingAnswerer: React.FC = () => {
           color={selected === cid ? 'primary' : undefined}
           onClick={() => setSelected(cid)}
         >
-          <HootAvatar number={hoot} size="xsmall" /> {name}
+          <HootAvatar number={player.iconNum} size="xsmall" /> {player.name}
         </Button>
       );
     });
 
+  const { answer } = getCurrentAnswerer(state!)!;
+  // TODO answerer should not guess
   return (
     <>
       <ProgressBarCountdownTimer countdownSeconds={120} />
@@ -44,11 +46,11 @@ const GuessingAnswerer: React.FC = () => {
         <Typography color="primary" variant="body2">
           Question
         </Typography>
-        <Typography variant="body1">{currentQuestion}</Typography>
+        <Typography variant="body1">{questions[qnNum]}</Typography>
         <Typography color="primary" variant="body2">
           Answer
         </Typography>
-        <Typography variant="body1">{currentAnswer}</Typography>
+        <Typography variant="body1">{answer}</Typography>
       </Paper>
       <Typography variant="h6">Guess hoot dat</Typography>
       {choices}

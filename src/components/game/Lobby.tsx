@@ -22,14 +22,15 @@ import CenteredInnerGrid from '../common/CenteredInnerGrid';
 
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
-// User joined room via roomId, and chose a character already.
+// User joined room via gameCode, and chose a character already.
 // Users have finished a game and pressed play again
 const Lobby: React.FC<{
   questions: string[];
   handleAddQuestionButton: () => void;
 }> = ({ questions, handleAddQuestionButton }) => {
   const conn = useContext(ConnContext);
-  const { cid, hostCid, roomId, participants } = useContext(GameContext);
+  const { cid, state } = useContext(GameContext);
+  const { host, gameCode, players } = state!;
 
   const history = useHistory();
 
@@ -45,17 +46,17 @@ const Lobby: React.FC<{
   const participantCard = (
     <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
       <List dense>
-        {Object.entries(participants)
+        {Object.entries(players)
           // sort to ensure everyone sees the same order, host is first.
-          .sort((a, b) => (a[0] === hostCid ? -1 : a[0].localeCompare(b[0])))
-          .map(([cid, [name, hoot, _]]) => {
+          .sort((a, b) => (a[0] === host ? -1 : a[0].localeCompare(b[0])))
+          .map(([cid, player]) => {
             return (
               <ListItem key={cid}>
                 <ListItemIcon>
-                  <HootAvatar number={hoot} size="xsmall" />
+                  <HootAvatar number={player.iconNum} size="xsmall" />
                 </ListItemIcon>
                 <ListItemText>
-                  <Typography variant="body1">{name}</Typography>
+                  <Typography variant="body1">{player.name}</Typography>
                 </ListItemText>
               </ListItem>
             );
@@ -88,9 +89,9 @@ const Lobby: React.FC<{
     </>
   );
 
-  // need to disable if less than 3 players
+  // TODO need to disable if less than 3 players
   const actionButton =
-    cid === hostCid ? (
+    cid === host ? (
       questions.length === 0 ? (
         <ActionButton
           variant="contained"
@@ -112,7 +113,7 @@ const Lobby: React.FC<{
         <CenteredInnerGrid>
           <Grid item xs={12}>
             <Typography color="secondary" variant="h4">
-              Room pin: {roomId}
+              Room pin: {gameCode}
               <Share />
             </Typography>
           </Grid>
@@ -128,9 +129,7 @@ const Lobby: React.FC<{
             {participantCard}
           </Grid>
           <Grid item xs={12}>
-            {cid === hostCid && questions.length !== 0
-              ? questionCard
-              : undefined}
+            {cid === host && questions.length !== 0 ? questionCard : undefined}
           </Grid>
           <Grid item xs={12}>
             {actionButton}

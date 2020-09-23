@@ -32,16 +32,13 @@ const useStyles = makeStyles(theme => ({
 const CreatePlayer: React.FC<{
   handleCreate: (name: string, hoot: number) => void;
   handleBack: () => void;
-  participants: { [key: string]: [string, number, number] };
-}> = ({ handleCreate, handleBack, participants }) => {
+}> = ({ handleCreate, handleBack }) => {
   // 0 to 11, inclusive
   const [hoot, setHoot] = useState(-1);
   // 1 or 2
   const [page, setPage] = useState(1);
   const [name, setName] = useState('');
   const classes = useStyles();
-
-  const occupiedNumbers = Object.values(participants).map(arr => arr[1]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -67,11 +64,7 @@ const CreatePlayer: React.FC<{
             hoot === hootNumber ? classes.selected : ''
           }`}
         >
-          <HootAvatar
-            number={hootNumber}
-            disabled={occupiedNumbers.includes(hootNumber)}
-            onClick={() => setHoot(hootNumber)}
-          />
+          <HootAvatar number={hootNumber} onClick={() => setHoot(hootNumber)} />
         </span>
       </Grid>
     );

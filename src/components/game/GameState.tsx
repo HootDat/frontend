@@ -14,29 +14,50 @@ export enum Mode {
 export default interface GameState {
   mode: Mode /* determines the screen the client is on */;
   cid: string /* id to uniquely identify the client */;
-  roomId: string | null;
-  participants: {
-    [key: string]: [string, number, number];
-  } /* cid, [name, hoot, score] */;
-  hostCid: string | null;
-  questions: string[] /* only populated for host? */;
-  currentQuestion: string | null;
-  currentAnswer: string | null;
-  currentGuesses: { [key: string]: string };
-  currentAnswerer: string | null;
+
+  state: SocketGameState | null;
 }
+
+export type Answer = {
+  type: 'answer' | 'guess';
+  content: string;
+};
+
+export type Player = {
+  cId: string;
+  name: string;
+  iconNum: number;
+  online: boolean;
+  answers: Answer[];
+  score: number;
+};
+
+export type SocketGameState = {
+  gameCode: string;
+  host: string;
+  phase: string;
+  qnNum: number;
+  questions: string[];
+  players: {
+    [cid: string]: Player;
+  };
+  yourRole: 'guesser' | 'answerer' | '';
+};
 
 export function home(): GameState {
   return {
     mode: Mode.HOME,
     cid: 'cid1',
-    roomId: null,
-    participants: {},
-    hostCid: null,
-    questions: [],
-    currentQuestion: null,
-    currentAnswer: null,
-    currentGuesses: {},
-    currentAnswerer: null,
+    state: null,
   };
+}
+
+export function getCurrentAnswerer(state: SocketGameState) {
+  const qnNum = state.qnNum;
+  const answerer = Object.values(state.players).find(
+    player => player.answers[qnNum].type === 'answer'
+  );
+  return answerer
+    ? { cid: answerer.cId, answer: answerer.answers[qnNum] }
+    : null;
 }

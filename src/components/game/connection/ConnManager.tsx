@@ -1,72 +1,66 @@
-import Connection from './Connection';
-import GameState, { Mode, home } from '../GameState';
+import GameState, { Mode, home, SocketGameState } from '../GameState';
 
 const noOp = () => {};
 
 // Processes and sends updates to and from the server.
 class ConnManager {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
-  cid: string;
+  cid: string; // TODO put cid in local storage
 
-  roomId: string | null;
-  participants: {
-    [key: string]: [string, number, number];
-  } /* cid, [name, icon, score] */;
-  hostCid: string | null;
-  currentQuestion: string | null;
-  currentAnswer: string | null;
-  currentGuesses: { [key: string]: string };
-  currentAnswerer: string | null;
-
-  // this probably will be removed. placeholder for testing
-  round: number;
-  questions: string[];
-
-  conn: Connection;
+  socket: SocketIOClient.Socket;
   stateUpdater: (mode: GameState) => void;
+  state: SocketGameState | null;
 
   constructor() {
     // placeholders
-    const {
-      mode,
-      participants,
-      cid,
-      roomId,
-      hostCid,
-      currentQuestion,
-      currentAnswer,
-      currentGuesses,
-      currentAnswerer,
-    } = home();
-    this.conn = new Connection();
+    const { mode, cid, state } = home();
+    this.socket = io({ autoConnect: false });
+    this.addReconnectors();
 
     this.mode = mode;
-    this.participants = participants;
     this.cid = cid;
-    this.roomId = roomId;
-    this.hostCid = hostCid;
-    this.currentQuestion = currentQuestion;
-    this.currentAnswer = currentAnswer;
-    this.currentGuesses = currentGuesses;
-    this.currentAnswerer = currentAnswerer;
-
-    this.questions = [];
-    this.round = 0;
+    this.state = state;
 
     this.stateUpdater = noOp;
   }
 
+  addReconnectors() {
+    this.socket.on('reconnecting', () => {
+      // TODO: on reconnecting, display disconencted, reconnecting banner
+      console.log('failed to connect to server, reconnecting');
+    });
+
+    this.socket.on('disconnect', () => {
+      // TODO: on disconnect, display disconnected, reconnecting banner
+      console.log('server disconnected, reconnecting');
+    });
+
+    this.socket.on('reconnect', () => {
+      // TODO: on reconnect, display reconnected banner
+      console.log('reconnected!');
+    });
+  }
+
   isConnected() {
-    return this.conn.isConnected();
+    return this.socket.connected;
   }
 
   connectToServer() {
-    this.conn.init();
+    this.socket.open();
   }
 
   cleanup() {
     this.stateUpdater = noOp;
-    this.conn.cleanup();
+    this.socket.close();
+  }
+
+  addMetaEventHandlers() {
+    this.socket.on('auth.loggedInElsewhere', () => {
+      this.mode = Mode.LOGGED_IN_ELSEWHERE;
+      this.push();
+    });
+
+    // this.socket.on('game.join', game);
   }
 
   getGameState(): GameState {
@@ -82,28 +76,12 @@ class ConnManager {
   }
 
   resetAttributes() {
-    const {
-      mode,
-      participants,
-      cid,
-      roomId,
-      hostCid,
-      currentQuestion,
-      currentAnswer,
-      currentGuesses,
-      currentAnswerer,
-    } = home();
+    const { mode, cid, state } = home();
 
     this.mode = mode;
-    this.participants = participants;
     this.cid = cid;
-    this.roomId = roomId;
-    this.hostCid = hostCid;
-    this.currentQuestion = currentQuestion;
-    this.currentAnswer = currentAnswer;
-    this.currentGuesses = currentGuesses;
-    this.currentAnswerer = currentAnswerer;
-    this.round = 0;
+
+    this.state = state;
   }
 
   updateMode(mode: Mode) {
@@ -119,33 +97,65 @@ class ConnManager {
   // until it gets the actual state update from the server?
   createRoom(name: string, hoot: number) {
     this.mode = Mode.WAITING_ROOM;
-    this.roomId = '1234';
-    this.hostCid = this.cid;
-    this.participants = { [this.cid]: [name, hoot, 0] };
-    this.questions = [];
-    this.push();
-    return this.roomId;
-  }
-
-  joinRoom(roomId: string) {
-    this.roomId = roomId;
-    this.hostCid = 'cid2'; // someone else
-    this.participants = {
-      cid2: ['hostisme', 0, 0],
-      cid3: ['player2', 5, 2],
+    this.state = {
+      gameCode: '1234',
+      host: this.cid,
+      players: {
+        [this.cid]: {
+          cId: this.cid,
+          name: name,
+          iconNum: hoot,
+          answers: [],
+          score: 0,
+          online: true,
+        },
+      },
+      questions: [],
+      qnNum: 0,
+      phase: '',
+      yourRole: '',
     };
-    this.questions = [
-      'How long do you sleep?',
-      'What is the first thing you do when you wake up',
-      'I need better questions.',
-    ];
-    // TODO actually send to server
     this.push();
+    return this.state?.gameCode;
   }
 
-  createPlayer(name: string, hoot: number) {
-    this.participants = { ...this.participants, cid1: [name, hoot, 0] };
+  joinRoom(gameCode: string, name: string, iconNum: number) {
+    this.state = {
+      gameCode: gameCode,
+      host: 'cid2',
+      players: {
+        cid2: {
+          cId: 'cid2',
+          name: 'hostisme',
+          iconNum: 0,
+          answers: [],
+          score: 0,
+          online: true,
+        },
+        cid3: {
+          cId: 'cid3',
+          name: 'player2',
+          iconNum: 5,
+          answers: [],
+          score: 2,
+          online: true,
+        },
+        [this.cid]: {
+          cId: this.cid,
+          name: name,
+          iconNum: iconNum,
+          answers: [],
+          score: 0,
+          online: true,
+        },
+      },
+      questions: [],
+      qnNum: 0,
+      phase: '',
+      yourRole: '',
+    };
     this.mode = Mode.WAITING_ROOM;
+    // TODO actually send to server
     this.push();
   }
 
@@ -156,36 +166,38 @@ class ConnManager {
   }
 
   startGame(questions: string[]) {
-    this.questions = questions;
+    this.state = { ...this.state!, questions: questions };
     this.mode = Mode.ANSWERING_QUESTION;
-    this.currentQuestion = this.questions[this.round];
     this.push();
   }
 
   sendAnswer(answer: string) {
-    this.currentAnswer = answer;
+    this.state = { ...this.state! };
+    this.state.players[this.cid].answers.push({
+      type: 'answer',
+      content: answer,
+    });
     this.mode = Mode.GUESSING_ANSWERER;
     this.push();
   }
 
   guessAnswerer(answerer: string) {
-    this.currentAnswerer = answerer;
-    this.currentGuesses = { [this.cid]: answerer };
+    this.state = { ...this.state! };
+    this.state.players[this.cid].answers.push({
+      type: 'guess',
+      content: answerer,
+    });
     this.mode = Mode.ROUND_END;
     this.push();
   }
 
   readyForNextRound() {
-    this.round++;
-    this.currentAnswerer = null;
-    this.currentGuesses = {};
-    this.currentAnswer = null;
-    if (this.round >= this.questions.length) {
-      this.currentQuestion = null;
-      this.round = 0;
+    this.state = { ...this.state! };
+    this.state.qnNum++;
+    if (this.state.qnNum >= this.state.questions.length) {
+      this.state.qnNum = 0;
       this.mode = Mode.GAME_END;
     } else {
-      this.currentQuestion = this.questions[this.round];
       this.mode = Mode.ANSWERING_QUESTION;
     }
     this.push();
