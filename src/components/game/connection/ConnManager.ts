@@ -6,7 +6,7 @@ const noOp = () => {};
 // Processes and sends updates to and from the server.
 class ConnManager {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
-  cid: string; // TODO put cid in local storage
+  cId: string; // TODO put cId in local storage
 
   socket: SocketIOClient.Socket;
   stateUpdater: (mode: GameState) => void;
@@ -14,12 +14,12 @@ class ConnManager {
 
   constructor() {
     // placeholders
-    const { mode, cid, state } = home();
+    const { mode, cId, state } = home();
     this.socket = io({ autoConnect: false });
     this.addReconnectors();
 
     this.mode = mode;
-    this.cid = cid;
+    this.cId = cId;
     this.state = state;
 
     this.stateUpdater = noOp;
@@ -77,10 +77,10 @@ class ConnManager {
   }
 
   resetAttributes() {
-    const { mode, cid, state } = home();
+    const { mode, cId, state } = home();
 
     this.mode = mode;
-    this.cid = cid;
+    this.cId = cId;
 
     this.state = state;
   }
@@ -99,22 +99,23 @@ class ConnManager {
   createRoom(name: string, hoot: number) {
     this.mode = Mode.WAITING_ROOM;
     this.state = {
+      yourRole: '',
       gameCode: '1234',
-      host: this.cid,
+      host: this.cId,
+      qnNum: 0,
+      phase: '',
+      questions: [],
+      curAnswer: '',
+      curAnswerer: '',
+      results: [],
       players: {
-        [this.cid]: {
-          cId: this.cid,
+        [this.cId]: {
+          cId: this.cId,
           name: name,
           iconNum: hoot,
-          answers: [],
-          score: 0,
           online: true,
         },
       },
-      questions: [],
-      qnNum: 0,
-      phase: '',
-      yourRole: '',
     };
     this.push();
     return this.state?.gameCode;
@@ -122,38 +123,35 @@ class ConnManager {
 
   joinRoom(gameCode: string, name: string, iconNum: number) {
     this.state = {
+      yourRole: '',
       gameCode: gameCode,
-      host: 'cid2',
+      host: 'cId2',
+      qnNum: 0,
+      phase: '',
+      questions: [],
+      results: [],
+      curAnswer: '',
+      curAnswerer: '',
       players: {
-        cid2: {
-          cId: 'cid2',
+        cId2: {
+          cId: 'cId2',
           name: 'hostisme',
           iconNum: 0,
-          answers: [],
-          score: 0,
           online: true,
         },
-        cid3: {
-          cId: 'cid3',
+        cId3: {
+          cId: 'cId3',
           name: 'player2',
           iconNum: 5,
-          answers: [],
-          score: 2,
           online: true,
         },
-        [this.cid]: {
-          cId: this.cid,
+        [this.cId]: {
+          cId: this.cId,
           name: name,
           iconNum: iconNum,
-          answers: [],
-          score: 0,
           online: true,
         },
       },
-      questions: [],
-      qnNum: 0,
-      phase: '',
-      yourRole: '',
     };
     this.mode = Mode.WAITING_ROOM;
     // TODO actually send to server
@@ -174,20 +172,27 @@ class ConnManager {
 
   sendAnswer(answer: string) {
     this.state = { ...this.state! };
-    this.state.players[this.cid].answers.push({
+    this.state.curAnswer = answer;
+    this.state.curAnswerer = this.cId;
+    /*
+    {
       type: 'answer',
       content: answer,
-    });
+    }
+    */
     this.mode = Mode.GUESSING_ANSWERER;
     this.push();
   }
 
   guessAnswerer(answerer: string) {
     this.state = { ...this.state! };
-    this.state.players[this.cid].answers.push({
+    this.state.results.push([
+      { cId: this.cId, score: 1, answer: answerer, role: this.state!.yourRole },
+    ]);
+    /*
       type: 'guess',
       content: answerer,
-    });
+    }*/
     this.mode = Mode.ROUND_END;
     this.push();
   }
@@ -197,6 +202,8 @@ class ConnManager {
     this.state.qnNum++;
     if (this.state.qnNum >= this.state.questions.length) {
       this.state.qnNum = 0;
+      this.state.curAnswer = '';
+      this.state.curAnswerer = '';
       this.mode = Mode.GAME_END;
     } else {
       this.mode = Mode.ANSWERING_QUESTION;

@@ -29,7 +29,7 @@ const Lobby: React.FC<{
   handleAddQuestionButton: () => void;
 }> = ({ questions, handleAddQuestionButton }) => {
   const conn = useContext(ConnContext);
-  const { cid, state } = useContext(GameContext);
+  const { cId, state } = useContext(GameContext);
   const { host, gameCode, players } = state!;
 
   const history = useHistory();
@@ -49,9 +49,9 @@ const Lobby: React.FC<{
         {Object.entries(players)
           // sort to ensure everyone sees the same order, host is first.
           .sort((a, b) => (a[0] === host ? -1 : a[0].localeCompare(b[0])))
-          .map(([cid, player]) => {
+          .map(([cId, player]) => {
             return (
-              <ListItem key={cid}>
+              <ListItem key={cId}>
                 <ListItemIcon>
                   <HootAvatar number={player.iconNum} size="xsmall" />
                 </ListItemIcon>
@@ -91,7 +91,7 @@ const Lobby: React.FC<{
 
   // TODO need to disable if less than 3 players
   const actionButton =
-    cid === host ? (
+    cId === host ? (
       questions.length === 0 ? (
         <ActionButton
           variant="contained"
@@ -129,7 +129,7 @@ const Lobby: React.FC<{
             {participantCard}
           </Grid>
           <Grid item xs={12}>
-            {cid === host && questions.length !== 0 ? questionCard : undefined}
+            {cId === host && questions.length !== 0 ? questionCard : undefined}
           </Grid>
           <Grid item xs={12}>
             {actionButton}

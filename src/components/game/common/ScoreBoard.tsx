@@ -9,37 +9,37 @@ import {
   Typography,
 } from '@material-ui/core';
 import HootAvatar from '../../common/HootAvatar';
-import { Player } from '../GameState';
+import { Player, Result } from '../GameState';
 
 const ScoreBoard: React.FC<{
   header?: boolean;
   winning?: boolean;
   host?: string;
-  players: { [cid: string]: Player };
-}> = ({ header, winning, host, players }) => {
-  const defaultSort = (a: [string, Player], b: [string, Player]) =>
-    a[0] === host ? -1 : a[0].localeCompare(b[0]);
+  results: Result[];
+  players: { [cId: string]: Player };
+}> = ({ header, winning, host, results, players }) => {
+  const defaultSort = (a: Result, b: Result) =>
+    a.cId === host ? -1 : a.cId.localeCompare(b.cId);
 
-  const winningSort = (a: [string, Player], b: [string, Player]) =>
-    b[1].score - a[1].score;
+  const winningSort = (a: Result, b: Result) => b.score - a.score;
 
-  const scoreBoard = Object.entries(players)
+  const scoreBoard = results
     .sort(winning ? winningSort : defaultSort)
-    .map(([cid, player], index) => {
+    .map((result, index) => {
       return (
-        <ListItem key={cid}>
+        <ListItem key={result.cId}>
           <ListItemText>
             <Typography variant="body2">
-              <HootAvatar number={player.iconNum} size="xsmall" />
+              <HootAvatar number={players[result.cId].iconNum} size="xsmall" />
               <Box
                 fontWeight={
                   winning && index === 0 ? 'fontWeightBold' : undefined
                 }
                 display="inline"
               >
-                {player.name}
+                {players[result.cId].name}
               </Box>{' '}
-              - {player.score}PT
+              - {result.score}PT
             </Typography>
           </ListItemText>
         </ListItem>

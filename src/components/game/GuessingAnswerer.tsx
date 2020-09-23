@@ -5,7 +5,6 @@ import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 import HootAvatar from '../common/HootAvatar';
-import { getCurrentAnswerer } from './GameState';
 
 const GuessingAnswerer: React.FC = () => {
   // TODO: show who has guessed already? Might not be necessary though.
@@ -13,7 +12,7 @@ const GuessingAnswerer: React.FC = () => {
   const [selected, setSelected] = useState<string | null>(null);
 
   const { state } = useContext(GameContext);
-  const { qnNum, questions, players, host } = state!;
+  const { curAnswer, qnNum, questions, players, host } = state!;
 
   const conn = useContext(ConnContext);
 
@@ -24,20 +23,19 @@ const GuessingAnswerer: React.FC = () => {
 
   const choices = Object.entries(players)
     .sort((a, b) => (a[0] === host ? -1 : a[0].localeCompare(b[0])))
-    .map(([cid, player]) => {
+    .map(([cId, player]) => {
       return (
         <Button
-          key={cid}
-          variant={selected === cid ? 'outlined' : undefined}
-          color={selected === cid ? 'primary' : undefined}
-          onClick={() => setSelected(cid)}
+          key={cId}
+          variant={selected === cId ? 'outlined' : undefined}
+          color={selected === cId ? 'primary' : undefined}
+          onClick={() => setSelected(cId)}
         >
           <HootAvatar number={player.iconNum} size="xsmall" /> {player.name}
         </Button>
       );
     });
 
-  const { answer } = getCurrentAnswerer(state!)!;
   // TODO answerer should not guess
   return (
     <>
@@ -50,7 +48,7 @@ const GuessingAnswerer: React.FC = () => {
         <Typography color="primary" variant="body2">
           Answer
         </Typography>
-        <Typography variant="body1">{answer}</Typography>
+        <Typography variant="body1">{curAnswer}</Typography>
       </Paper>
       <Typography variant="h6">Guess hoot dat</Typography>
       {choices}

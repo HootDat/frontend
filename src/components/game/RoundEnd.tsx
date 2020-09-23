@@ -4,15 +4,15 @@ import { Typography, Button } from '@material-ui/core';
 import ScoreBoard from './common/ScoreBoard';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
-import { getCurrentAnswerer } from './GameState';
 
 // TODO: Show who actually got it correct among everyone?
 const RoundEnd: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
   // participants should be updated with the updated scores already
-  const { cid, state } = useContext(GameContext);
+  const { cId, state } = useContext(GameContext);
 
-  const { host, players, qnNum } = state!;
+  const { curAnswerer, host, players, qnNum, results: fullResults } = state!;
+  const results = fullResults[qnNum];
 
   const conn = useContext(ConnContext);
 
@@ -21,18 +21,19 @@ const RoundEnd: React.FC = () => {
     conn.readyForNextRound();
   };
 
-  const { cid: answerer } = getCurrentAnswerer(state!)!;
-  const myGuess = players[cid].answers[qnNum].content;
+  const myResult = results.find(result => result.cId === cId)!;
 
+  // TODO since answerer shouldnt answer, they should not see who got it right
+  // or wrong
   return (
     <>
       <Typography variant="h6">
         You got it
-        {myGuess === answerer! ? ' right :)' : ' wrong :('}
+        {myResult?.answer === curAnswerer! ? ' right :)' : ' wrong :('}
       </Typography>
-      <ScoreBoard host={host!} players={players} />
+      <ScoreBoard host={host!} results={results} players={players} />
       <Typography variant="h6">Who answered? </Typography>
-      <ScoreBoard players={{ [answerer!]: players[answerer!] }} />
+      <ScoreBoard players={players} results={[myResult]} />
       <Button
         variant="contained"
         color="primary"

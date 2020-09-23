@@ -13,7 +13,7 @@ export enum Mode {
 
 export default interface GameState {
   mode: Mode /* determines the screen the client is on */;
-  cid: string /* id to uniquely identify the client */;
+  cId: string /* id to uniquely identify the client */;
 
   state: SocketGameState | null;
 }
@@ -28,36 +28,36 @@ export type Player = {
   name: string;
   iconNum: number;
   online: boolean;
-  answers: Answer[];
+};
+
+export type Role = 'guesser' | 'answerer' | '';
+
+export type Result = {
+  cId: string;
   score: number;
+  answer: string;
+  role: Role;
 };
 
 export type SocketGameState = {
+  yourRole: Role;
   gameCode: string;
   host: string;
-  phase: string;
   qnNum: number;
+  phase: string;
   questions: string[];
+  curAnswer: string;
+  curAnswerer: string;
+  results: Result[][];
   players: {
-    [cid: string]: Player;
+    [cId: string]: Player;
   };
-  yourRole: 'guesser' | 'answerer' | '';
 };
 
 export function home(): GameState {
   return {
     mode: Mode.HOME,
-    cid: 'cid1',
+    cId: 'cId1',
     state: null,
   };
-}
-
-export function getCurrentAnswerer(state: SocketGameState) {
-  const qnNum = state.qnNum;
-  const answerer = Object.values(state.players).find(
-    player => player.answers[qnNum].type === 'answer'
-  );
-  return answerer
-    ? { cid: answerer.cId, answer: answerer.answers[qnNum].content }
-    : null;
 }
