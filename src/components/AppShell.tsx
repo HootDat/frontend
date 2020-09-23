@@ -14,9 +14,7 @@ const AppShell: React.FC = ({ children }) => {
   // getAccessToken will verify and return a proper token if it exists.
   // TODO fill in name
   const [authState, setAuthState] = useState<AuthState>({
-    access_token: store.getAccessToken(true),
-    name: 'test',
-    id: 0,
+    user: store.getCurrentUser(),
     setAuthState: () => {},
   });
   const online = useOnlineStatus();
@@ -70,14 +68,14 @@ const AppShell: React.FC = ({ children }) => {
 
   useEffect(() => {
     // if not logged in, dont do anything
-    if (authState.name === null || !online) return;
+    if (authState.user === null || !online) return;
 
     // if logged in, attempt to verify, only permit to continue if
     // valid jwt
 
     // TODO add a banner to notify user that we are syncing
     store.getLocalPacks().forEach(sendCachedUpdate);
-  }, [authState.name, online]);
+  }, [authState.user, online]);
 
   return (
     <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>

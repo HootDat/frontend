@@ -10,6 +10,7 @@ import CenteredInnerGrid from '../common/CenteredInnerGrid';
 import OuterGrid from '../common/OuterGrid';
 import PaddedDiv from '../common/PaddedDiv';
 import HootAvatar from '../common/HootAvatar';
+import authAPI from '../../api/auth';
 
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);
@@ -19,15 +20,19 @@ const Login: React.FC = () => {
     if (response.status === 'connected') {
       // TODO forward authResponse.accessToken to server (server gets userId from fb)
       // send api request to server to get access token
-      store.setAccessToken('access_token');
-      authState.setAuthState({ ...authState, access_token: 'access_token' });
-      // remove packs with different owner id
-      // fetch my packs and merge
-      // appshell will send the remaining requests for new packs
+      authAPI
+        .postLogin(response.authResponse.accessToken)
+        .then(user => {
+          authState.setAuthState({ ...authState, user: user });
+          store.setCurrentUser(user);
+
+          // remove packs with different owner id
+          // fetch my packs and merge
+          // appshell will send the remaining requests for new packs
+        })
+        .finally(() => history.replace('/'));
       // TODO notificiaton
-      history.replace('/');
     }
-    // otherwise do nothing, as it means not logged in
   };
 
   const handleFacebookLogin = () => {

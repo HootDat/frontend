@@ -46,6 +46,7 @@ const QuestionPackForm: React.FC<{
     setPack({ ...pack, questions: questions });
   };
 
+  // TODO if enter is not pressed in categories, the input won't get captured
   const handleCategoriesChange = (
     e: React.ChangeEvent<{}>,
     categories: string[],

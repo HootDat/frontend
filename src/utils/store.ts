@@ -3,9 +3,11 @@ import {
   LocalQuestionPack,
 } from '../types/questionPack';
 import { Category } from '../types/category';
+import { User } from '../types/user';
 
 const ACCESS_TOKEN = 'access_token';
 const LOCAL_PACKS = 'packs';
+const CURRENT_USER = 'user';
 
 // currently does not handle the case where quota is exceeded
 // throughout the app, we don't care whether local storage is available for now
@@ -50,19 +52,15 @@ class Store {
   }
 
   // TODO api requests
-  getAccessToken(verify?: boolean) {
+  getAccessToken() {
     if (!this.isAvailable()) {
       // generate new token whenever called (should only be called once
       // on each load)
       return null;
     }
 
-    let access_token = this.storage!.getItem(ACCESS_TOKEN);
+    const access_token = this.storage!.getItem(ACCESS_TOKEN);
     if (access_token === null) return null;
-    if (verify) {
-      // send api request to verify authenticity / generate new token
-      // replace as necessary
-    }
     return access_token;
   }
 
@@ -73,11 +71,30 @@ class Store {
     this.storage!.setItem(ACCESS_TOKEN, access_token);
   }
 
-  removeAccessToken() {
+  getCurrentUser(): User | null {
+    if (!this.isAvailable()) {
+      return null;
+    }
+
+    const user = this.storage!.getItem(CURRENT_USER);
+    if (user === null) return null;
+    return JSON.parse(user);
+  }
+
+  setCurrentUser(user: User) {
     if (!this.isAvailable()) {
       return;
     }
 
+    this.storage!.setItem(CURRENT_USER, JSON.stringify(user));
+  }
+
+  removeLoginState() {
+    if (!this.isAvailable()) {
+      return;
+    }
+
+    this.storage!.removeItem(CURRENT_USER);
     this.storage!.removeItem(ACCESS_TOKEN);
   }
 

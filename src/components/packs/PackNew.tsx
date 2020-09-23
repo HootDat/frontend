@@ -13,22 +13,22 @@ import useOnlineStatus from '../../utils/useOnlineStatus';
 
 const PackNew: React.FC = () => {
   const [categories, setCategories] = useState([] as Category[]);
-  const { name } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const history = useHistory();
   const online = useOnlineStatus();
 
   const handleSubmit = (pack: LocalQuestionPack) => {
     let promise;
-    if (name === null || !online) {
+    if (user === null || !online) {
       // not logged in, so just store locally
-      store.newLocalPack(pack, name === null ? '' : name);
+      store.newLocalPack(pack, user === null ? '' : user.name);
       promise = Promise.resolve();
     } else {
       // logged in, so attempt to send request. If fail,
       // then store locally
       promise = packsAPI.newPack({ ...pack, id: 0 }).then(
         newPack => store.downloadPack(newPack),
-        () => store.newLocalPack(pack, name)
+        () => store.newLocalPack(pack, user.name)
       );
     }
     promise.finally(() => history.push('/packs'));

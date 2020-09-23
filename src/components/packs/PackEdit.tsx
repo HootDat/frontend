@@ -22,7 +22,7 @@ type LocationState = {
 const PackEdit: React.FC = () => {
   const params = useParams<Params>();
   const location = useLocation<LocationState>();
-  const { name } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const history = useHistory();
   const id = parseInt(params.id, 10);
 
@@ -34,7 +34,7 @@ const PackEdit: React.FC = () => {
 
   const handleSubmit = (pack: LocalQuestionPack) => {
     let promise;
-    if (name === null || !online) {
+    if (user === null || !online) {
       store.editLocalPack(pack);
       promise = Promise.resolve();
     } else if (pack.action === 'new') {

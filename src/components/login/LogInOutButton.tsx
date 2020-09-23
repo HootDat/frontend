@@ -30,8 +30,8 @@ const LogInOutButton: React.FC = () => {
   // TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
   const handleLogOut = () => {
     // TODO: tell server log out
-    store.removeAccessToken();
-    authState.setAuthState({ ...authState, access_token: null });
+    store.removeLoginState();
+    authState.setAuthState({ ...authState, user: null });
   };
 
   const LogOutButton = (
@@ -40,7 +40,7 @@ const LogInOutButton: React.FC = () => {
     </Button>
   );
 
-  return authState.access_token === null ? LogInButton : LogOutButton;
+  return authState.user === null ? LogInButton : LogOutButton;
 };
 
 export default LogInOutButton;

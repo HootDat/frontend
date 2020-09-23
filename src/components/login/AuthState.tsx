@@ -1,6 +1,6 @@
+import { User } from '../../types/user';
+
 export default interface AuthState {
-  access_token: string | null;
-  name: string | null;
-  id: number | null;
+  user: User | null;
   setAuthState: (state: AuthState) => void;
 }

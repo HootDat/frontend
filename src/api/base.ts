@@ -37,11 +37,11 @@ class BaseAPI {
   }
 }
 
-// attach access token for request if necessary
-// TODO fix this to send the actual token instead
 function getConfig() {
   return {
-    headers: store.getAccessToken(),
+    headers: {
+      authorization: store.getAccessToken(),
+    },
   };
 }
 

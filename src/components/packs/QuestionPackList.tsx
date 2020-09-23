@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
-  Box,
   Accordion,
   AccordionActions,
   Button,
@@ -66,7 +65,7 @@ const QuestionPackList: React.FC<Props> = ({
   // when in view, also no.
   // then just fetch in this compoennt.
 
-  const { name } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const [communityPacks, setCommunityPacks] = useState(
     [] as CommunityQuestionPack[]
@@ -116,7 +115,7 @@ const QuestionPackList: React.FC<Props> = ({
 
   const handleDeletePack = (pack: LocalQuestionPack) => {
     // TODO use a modal to invoke this function
-    if (name === null || !online) {
+    if (user === null || !online) {
       store.deleteLocalPack(pack);
       setMyPacks(store.getLocalPacks());
     } else {
@@ -250,7 +249,7 @@ const QuestionPackList: React.FC<Props> = ({
           id={`pack ${pack.id}`}
         >
           <Typography variant="body1">{pack.name}</Typography>
-          {/*TODO <Typography variant="subtitle2">{pack.owner.name}</Typography>*/}
+          <Typography variant="subtitle2">{pack.owner.name}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <ol>
@@ -266,18 +265,18 @@ const QuestionPackList: React.FC<Props> = ({
 
   const ownedPackAccordions =
     search.tab !== 'mine'
-      ? undefined
+      ? []
       : myPacks.filter(filter).map(generatePackAccordion);
 
   const communityPackAccordions =
     search.tab !== 'community'
-      ? undefined
+      ? []
       : communityPacks.filter(filter).map(generatePackAccordion);
 
   // TODO: if loading, show loading screen, otherwise show content?
   // or maybe if loading, shwo a skeleton instead
   return (
-    <Box>
+    <>
       {filterDrawer}
       <ToggleButtonGroup
         exclusive
@@ -306,10 +305,19 @@ const QuestionPackList: React.FC<Props> = ({
           <FilterList />
         </IconButton>
       </Paper>
-      {search.tab === 'community' && communityPackAccordions}
-      {search.tab === 'mine' && ownedPackAccordions}
+      {search.tab !==
+      'community' ? undefined : communityPackAccordions.length === 0 ? (
+        <Typography variant="h5">No results were found :(</Typography>
+      ) : (
+        communityPackAccordions
+      )}
+      {search.tab !== 'mine' ? undefined : ownedPackAccordions.length === 0 ? (
+        <Typography variant="h5">No results were found :(</Typography>
+      ) : (
+        ownedPackAccordions
+      )}
       {inRoom && <BackButton handleBack={handleBack!} />}
-    </Box>
+    </>
   );
 };
 
