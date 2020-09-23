@@ -3,12 +3,17 @@ import { Button, ButtonProps } from '@material-ui/core';
 
 type Props = ButtonProps & {
   handleBack: () => void;
+  text?: string;
 };
 
-const BackButton: React.FC<Props> = ({ handleBack, ...props }) => {
+const BackButton: React.FC<Props> = ({
+  handleBack,
+  text = 'Back',
+  ...props
+}) => {
   return (
     <Button color="primary" onClick={handleBack} {...props}>
-      Back
+      {text}
     </Button>
   );
 };

@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
-  Accordion,
-  AccordionActions,
   Button,
-  AccordionSummary,
   Typography,
-  AccordionDetails,
   Paper,
   InputBase,
   IconButton,
@@ -13,15 +9,11 @@ import {
   Divider,
   ListItem,
   Checkbox,
+  List,
+  ListItemText,
+  ListItemSecondaryAction,
 } from '@material-ui/core';
-import {
-  Edit,
-  ExpandMore,
-  Delete,
-  Search,
-  Filter,
-  FilterList,
-} from '@material-ui/icons';
+import { Edit, Delete, Search, Filter, FilterList } from '@material-ui/icons';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 import {
@@ -49,12 +41,16 @@ type Props = {
   inRoom?: boolean;
   handleAdd?: (questions: string[]) => void;
   handleBack?: () => void;
+  hideOutsideContent?: (hide: boolean) => void;
 };
 
+// TODO need to fetch more often. After deleting/editing/creating,
+// the community packs arent updated
 const QuestionPackList: React.FC<Props> = ({
   inRoom,
   handleAdd,
   handleBack,
+  hideOutsideContent = () => {},
 }) => {
   // should fetching be done in parent?
   // will this component be swapped out? yes, when editing it can be swapped out
@@ -79,6 +75,7 @@ const QuestionPackList: React.FC<Props> = ({
     categories: new Set(),
     tab: 'mine',
   });
+  const [viewingPack, setViewingPack] = useState<QuestionPack | null>(null);
   const history = useHistory();
 
   useEffect(() => {
@@ -136,7 +133,11 @@ const QuestionPackList: React.FC<Props> = ({
             }
           }
         )
-        .then(() => setMyPacks(store.getLocalPacks()));
+        .then(() => {
+          setMyPacks(store.getLocalPacks());
+          setViewingPack(null);
+          hideOutsideContent(false);
+        });
     }
   };
 
@@ -203,17 +204,64 @@ const QuestionPackList: React.FC<Props> = ({
   // if in room, only use add to rooom button
   // if mine, allow for edit and delete
   // otherwise, no buttons
-  const generatePackAccordion = (pack: QuestionPack) => {
-    const localOnly = pack.id < 0;
-
-    const generateActions = () => {
+  const individualPackScreen = () => {
+    if (viewingPack === null) return <></>;
+    const generateAction = () => {
       if (inRoom) {
         return (
-          <AccordionActions>
-            <Button size="small" onClick={() => handleAdd!(pack.questions)}>
-              Add to pack
-            </Button>
-          </AccordionActions>
+          <Button onClick={() => handleAdd!(viewingPack.questions)}>
+            Add to room
+          </Button>
+        );
+      }
+
+      if ((viewingPack as LocalQuestionPack).action === undefined) return;
+
+      return (
+        <IconButton>
+          <Delete
+            onClick={() => handleDeletePack(viewingPack as LocalQuestionPack)}
+          />
+        </IconButton>
+      );
+    };
+
+    return (
+      <>
+        <Typography variant="h5">{viewingPack!.name}</Typography>
+        {generateAction()}
+        <Typography variant="h6">Owner: {viewingPack!.owner.name}</Typography>
+        <Typography variant="h6">
+          Categories: {viewingPack!.categories.join(', ')}
+        </Typography>
+        <Paper>
+          <List dense>
+            {viewingPack!.questions.map((question, index) => (
+              <ListItem key={question}>
+                <ListItemText primary={`Q${index + 1}. ${question}`} />
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
+        <BackButton
+          text="Back to Packs"
+          handleBack={() => {
+            setViewingPack(null);
+            hideOutsideContent(false);
+          }}
+        />
+      </>
+    );
+  };
+
+  const packList = (packs: QuestionPack[]) => {
+    const actionButton = (pack: QuestionPack) => {
+      const localOnly = pack.id < 0;
+      if (inRoom) {
+        return (
+          <Button size="small" onClick={() => handleAdd!(pack.questions)}>
+            Add to pack
+          </Button>
         );
       }
 
@@ -222,64 +270,45 @@ const QuestionPackList: React.FC<Props> = ({
       }
 
       return (
-        <AccordionActions>
-          <Button
-            size="small"
-            onClick={() => handleDeletePack(pack as LocalQuestionPack)}
-          >
-            <Delete />
-            Delete
-          </Button>
-          <Button
-            size="small"
-            onClick={() =>
-              history.push(`/packs/${Math.abs(pack.id)}/edit`, {
-                localOnly: localOnly,
-              })
-            }
-          >
-            <Edit />
-            Edit
-          </Button>
-        </AccordionActions>
+        <Button
+          size="small"
+          onClick={() =>
+            history.push(`/packs/${Math.abs(pack.id)}/edit`, {
+              localOnly: localOnly,
+            })
+          }
+        >
+          <Edit />
+          Edit
+        </Button>
       );
     };
 
-    return (
-      <Accordion key={pack.id}>
-        <AccordionSummary
-          expandIcon={<ExpandMore />}
-          aria-controls={`pack ${pack.id}`}
-          id={`pack ${pack.id}`}
-        >
-          <Typography variant="body1">{pack.name}</Typography>
-          <Typography variant="subtitle2">{pack.owner.name}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <ol>
-            {pack.questions.map((question, index) => (
-              <li key={index}>{question}</li>
-            ))}
-          </ol>
-        </AccordionDetails>
-        {generateActions()}
-      </Accordion>
-    );
+    return packs.map(pack => (
+      <ListItem
+        key={pack.id}
+        onClick={() => {
+          setViewingPack(pack);
+          hideOutsideContent(true);
+        }}
+      >
+        <ListItemText primary={pack.name} secondary={pack.owner.name} />
+        <ListItemSecondaryAction>{actionButton(pack)}</ListItemSecondaryAction>
+      </ListItem>
+    ));
   };
 
   const ownedPackAccordions =
-    search.tab !== 'mine'
-      ? []
-      : myPacks.filter(filter).map(generatePackAccordion);
+    search.tab !== 'mine' ? [] : packList(myPacks.filter(filter));
 
   const communityPackAccordions =
-    search.tab !== 'community'
-      ? []
-      : communityPacks.filter(filter).map(generatePackAccordion);
+    search.tab !== 'community' ? [] : packList(communityPacks.filter(filter));
 
   // TODO: if loading, show loading screen, otherwise show content?
   // or maybe if loading, shwo a skeleton instead
-  return (
+  return viewingPack !== null ? (
+    individualPackScreen()
+  ) : (
     <>
       {filterDrawer}
       <ToggleButtonGroup
@@ -309,17 +338,22 @@ const QuestionPackList: React.FC<Props> = ({
           <FilterList />
         </IconButton>
       </Paper>
-      {search.tab !==
-      'community' ? undefined : communityPackAccordions.length === 0 ? (
-        <Typography variant="h5">No results were found :(</Typography>
-      ) : (
-        communityPackAccordions
-      )}
-      {search.tab !== 'mine' ? undefined : ownedPackAccordions.length === 0 ? (
-        <Typography variant="h5">No results were found :(</Typography>
-      ) : (
-        ownedPackAccordions
-      )}
+      <Paper>
+        <List dense>
+          {search.tab !==
+          'community' ? undefined : communityPackAccordions.length === 0 ? (
+            <Typography variant="h5">No results were found :(</Typography>
+          ) : (
+            communityPackAccordions
+          )}
+          {search.tab !== 'mine' ? undefined : ownedPackAccordions.length ===
+            0 ? (
+            <Typography variant="h5">No results were found :(</Typography>
+          ) : (
+            ownedPackAccordions
+          )}
+        </List>
+      </Paper>
       {inRoom && <BackButton handleBack={handleBack!} />}
     </>
   );
