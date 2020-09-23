@@ -5,9 +5,10 @@ import {
   Paper,
   List,
   ListItemText,
-  ListItemIcon,
   ListItem,
   Grid,
+  makeStyles,
+  IconButton,
 } from '@material-ui/core';
 import { Share, Edit } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
@@ -17,8 +18,36 @@ import GameContext from './GameContext';
 import HootAvatar from '../common/HootAvatar';
 
 import ActionButton from '../common/ActionButton';
-import OuterGrid from '../common/OuterGrid';
-import CenteredInnerGrid from '../common/CenteredInnerGrid';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    margin: '0 auto',
+    maxWidth: '600px',
+    position: 'relative',
+    height: '100%',
+    textAlign: 'center',
+  },
+  header: {
+    paddingTop: '20px',
+  },
+  headerText: {
+    position: 'relative',
+    top: '2px',
+  },
+  buttons: {
+    position: 'absolute',
+    width: '100%',
+    bottom: '0px',
+  },
+  cardListings: {
+    height: '120px',
+    overflow: 'auto',
+  },
+  icon: {
+    position: 'absolute',
+    right: 0,
+  },
+}));
 
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
@@ -33,6 +62,7 @@ const Lobby: React.FC<{
   const { host, gameCode, players } = state!;
 
   const history = useHistory();
+  const classes = useStyles();
 
   const handleStart = () => {
     conn.startGame(questions);
@@ -43,8 +73,8 @@ const Lobby: React.FC<{
     history.replace('/');
   };
 
-  const participantCard = (
-    <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
+  const playersCard = (
+    <Paper className={classes.cardListings}>
       <List dense>
         {Object.entries(players)
           // sort to ensure everyone sees the same order, host is first.
@@ -52,10 +82,8 @@ const Lobby: React.FC<{
           .map(([cId, player]) => {
             return (
               <ListItem key={cId}>
-                <ListItemIcon>
-                  <HootAvatar number={player.iconNum} size="xsmall" />
-                </ListItemIcon>
-                <ListItemText>
+                <HootAvatar number={player.iconNum} size="xsmall" />
+                <ListItemText style={{ marginLeft: '8px' }}>
                   <Typography variant="body1">{player.name}</Typography>
                 </ListItemText>
               </ListItem>
@@ -67,11 +95,17 @@ const Lobby: React.FC<{
 
   const questionCard = (
     <>
-      <Typography variant="h6">Selected questions</Typography>
-      <Button size="small" onClick={handleAddQuestionButton}>
-        <Edit />
-      </Button>
-      <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
+      <Typography variant="h6">
+        Selected questions
+        <IconButton
+          size="small"
+          onClick={handleAddQuestionButton}
+          className={classes.icon}
+        >
+          <Edit />
+        </IconButton>
+      </Typography>
+      <Paper className={classes.cardListings}>
         <List dense>
           {questions.map((question, index) => {
             return (
@@ -112,38 +146,46 @@ const Lobby: React.FC<{
     ) : undefined;
 
   return (
-    <OuterGrid>
-      <CenteredInnerGrid>
-        <Grid item xs={12}>
-          <Typography color="secondary" variant="h4">
-            Room pin: {gameCode}
-            <Share />
-          </Typography>
-        </Grid>
+    <div className={classes.root}>
+      <Typography className={classes.header} color="secondary" variant="h4">
+        <span className={classes.headerText}>Room pin: {gameCode}</span>
+        <IconButton>
+          <Share />
+        </IconButton>
+      </Typography>
+      <Grid container alignItems="center" justify="center" spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">Hoot assembly ground</Typography>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body1">
-            Start game when all players are here
+            {cId === host
+              ? 'Start game when all players are here'
+              : 'Waiting for host to start the game'}
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          {participantCard}
+          {playersCard}
         </Grid>
         <Grid item xs={12}>
           {cId === host && questions.length !== 0 ? questionCard : undefined}
         </Grid>
-        <Grid item xs={12}>
-          {actionButton}
-        </Grid>
-        <Grid item xs={12}>
+      </Grid>
+      <Grid
+        container
+        direction="column"
+        spacing={1}
+        alignItems="stretch"
+        className={classes.buttons}
+      >
+        <Grid item>{actionButton}</Grid>
+        <Grid item>
           <Button color="primary" onClick={handleQuit}>
             Quit
           </Button>
         </Grid>
-      </CenteredInnerGrid>
-    </OuterGrid>
+      </Grid>
+    </div>
   );
 };
 

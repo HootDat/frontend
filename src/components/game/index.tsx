@@ -18,12 +18,7 @@ import GameEnd from './GameEnd';
 import PaddedDiv from '../common/PaddedDiv';
 import LoggedInElsewhere from './LoggedInElsewhere';
 
-import {
-  Grid,
-  Backdrop,
-  CircularProgress,
-  makeStyles,
-} from '@material-ui/core';
+import { Backdrop, CircularProgress, makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
@@ -73,11 +68,7 @@ const GameShell: React.FC = () => {
   // down
   const render = () => {
     const wrapInChatShell = (element: JSX.Element) => (
-      <ChatShell>
-        <Grid item xs={12}>
-          {element}
-        </Grid>
-      </ChatShell>
+      <ChatShell>{element}</ChatShell>
     );
 
     switch (mode) {
