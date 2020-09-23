@@ -5,7 +5,6 @@ import ScoreBoard from './common/ScoreBoard';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 
-// TODO: Show who actually got it correct among everyone?
 const RoundEnd: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
   // participants should be updated with the updated scores already
@@ -13,24 +12,39 @@ const RoundEnd: React.FC = () => {
 
   const { curAnswerer, host, players, qnNum, results: fullResults } = state!;
   const results = fullResults[qnNum];
+  const isLastRound = results.length === qnNum;
+  const isAnswerer = curAnswerer === cId;
 
   const conn = useContext(ConnContext);
 
   const handleNextQuestion = () => {
     setIsReady(true);
+    // TODO probably can remove, since there will be auto advance by the server
     conn.readyForNextRound();
   };
 
   const myResult = results.find(result => result.cId === cId)!;
 
-  // TODO since answerer shouldnt answer, they should not see who got it right
-  // or wrong
-  return (
-    <>
+  const header = () => {
+    if (isAnswerer) {
+      const numRight = results.filter(
+        result => result.role === 'guesser' && result.answer === cId
+      ).length;
+
+      return <Typography variant="h6">{numRight} guessed it right!</Typography>;
+    }
+
+    return (
       <Typography variant="h6">
         You got it
         {myResult?.answer === curAnswerer! ? ' right :)' : ' wrong :('}
       </Typography>
+    );
+  };
+
+  return (
+    <>
+      {header()}
       <ScoreBoard host={host!} results={results} players={players} />
       <Typography variant="h6">Who answered? </Typography>
       <ScoreBoard players={players} results={[myResult]} />
@@ -40,7 +54,11 @@ const RoundEnd: React.FC = () => {
         disabled={isReady}
         onClick={handleNextQuestion}
       >
-        {isReady ? 'WAITING FOR OTHERS' : 'NEXT QUESTION'}
+        {isReady
+          ? 'WAITING FOR OTHERS'
+          : isLastRound
+          ? 'SUMMARY'
+          : 'NEXT QUESTION'}
       </Button>
     </>
   );

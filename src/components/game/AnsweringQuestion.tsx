@@ -12,23 +12,28 @@ import ActionButton from '../common/ActionButton';
 // answer then that's another state we need to account for :/
 const AnsweringQuestion: React.FC = () => {
   const [answer, setAnswer] = useState('');
+  const [error, setError] = useState('');
+  const [answered, setAnswered] = useState(false);
 
   const { state } = useContext(GameContext);
 
-  // TODO what if state is null, should never happen.
   const { questions, qnNum } = state!;
 
   const conn = useContext(ConnContext);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (error !== '') {
+      setError('');
+    }
     setAnswer(e.target.value);
   };
 
   const handleAnswer = () => {
     if (answer.trim() === '') {
-      return;
+      setError('Your answer cannot be blank!');
     }
 
+    setAnswered(true);
     conn.sendAnswer(answer);
   };
 
@@ -48,12 +53,11 @@ const AnsweringQuestion: React.FC = () => {
           <Grid item xs={12}>
             <Paper elevation={1} style={{ display: 'inline-block' }}>
               <TextField
-                error={answer.trim() === ''}
-                helperText={
-                  answer.trim() === '' ? 'Answer cannot be blank!' : undefined
-                }
+                error={error !== ''}
+                helperText={error}
                 placeholder="Your answer"
                 value={answer}
+                disabled={answered}
                 onChange={handleChange}
               />
             </Paper>
@@ -62,9 +66,10 @@ const AnsweringQuestion: React.FC = () => {
             <ActionButton
               variant="contained"
               color="primary"
+              disabled={answered}
               onClick={handleAnswer}
             >
-              SUBMIT
+              {answered ? 'Answer' : 'Loading'}
             </ActionButton>
           </Grid>
         </CenteredInnerGrid>

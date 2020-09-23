@@ -3,6 +3,8 @@ export enum Mode {
   HOME,
   JOIN_ROOM,
   CREATE_ROOM,
+
+  // in game states
   WAITING_ROOM,
   ANSWERING_QUESTION,
   WAITING_FOR_ANSWER,
@@ -14,7 +16,7 @@ export enum Mode {
 export default interface GameState {
   mode: Mode /* determines the screen the client is on */;
   cId: string /* id to uniquely identify the client */;
-
+  loading: boolean;
   state: SocketGameState | null;
 }
 
@@ -39,12 +41,14 @@ export type Result = {
   role: Role;
 };
 
+export type Phase = 'lobby' | 'answer' | 'guess' | 'results' | 'end';
+
 export type SocketGameState = {
   yourRole: Role;
   gameCode: string;
   host: string;
   qnNum: number;
-  phase: string;
+  phase: Phase;
   questions: string[];
   curAnswer: string;
   curAnswerer: string;
@@ -57,7 +61,8 @@ export type SocketGameState = {
 export function home(): GameState {
   return {
     mode: Mode.HOME,
-    cId: 'cId1',
+    loading: false,
+    cId: 'cId1', // TODO generate own uuid
     state: null,
   };
 }

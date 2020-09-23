@@ -89,7 +89,6 @@ const Lobby: React.FC<{
     </>
   );
 
-  // TODO need to disable if less than 3 players
   const actionButton =
     cId === host ? (
       questions.length === 0 ? (
@@ -101,47 +100,50 @@ const Lobby: React.FC<{
           ADD QUESTIONS
         </ActionButton>
       ) : (
-        <ActionButton variant="contained" color="primary" onClick={handleStart}>
+        <ActionButton
+          variant="contained"
+          color="primary"
+          disabled={Object.keys(players).length < 3}
+          onClick={handleStart}
+        >
           START GAME
         </ActionButton>
       )
     ) : undefined;
 
   return (
-    <>
-      <OuterGrid>
-        <CenteredInnerGrid>
-          <Grid item xs={12}>
-            <Typography color="secondary" variant="h4">
-              Room pin: {gameCode}
-              <Share />
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h4">Hoot assembly ground</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              Start game when all players are here
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            {participantCard}
-          </Grid>
-          <Grid item xs={12}>
-            {cId === host && questions.length !== 0 ? questionCard : undefined}
-          </Grid>
-          <Grid item xs={12}>
-            {actionButton}
-          </Grid>
-          <Grid item xs={12}>
-            <Button color="primary" onClick={handleQuit}>
-              Quit
-            </Button>
-          </Grid>
-        </CenteredInnerGrid>
-      </OuterGrid>
-    </>
+    <OuterGrid>
+      <CenteredInnerGrid>
+        <Grid item xs={12}>
+          <Typography color="secondary" variant="h4">
+            Room pin: {gameCode}
+            <Share />
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h4">Hoot assembly ground</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="body1">
+            Start game when all players are here
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          {participantCard}
+        </Grid>
+        <Grid item xs={12}>
+          {cId === host && questions.length !== 0 ? questionCard : undefined}
+        </Grid>
+        <Grid item xs={12}>
+          {actionButton}
+        </Grid>
+        <Grid item xs={12}>
+          <Button color="primary" onClick={handleQuit}>
+            Quit
+          </Button>
+        </Grid>
+      </CenteredInnerGrid>
+    </OuterGrid>
   );
 };
 

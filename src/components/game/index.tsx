@@ -18,16 +18,30 @@ import GameEnd from './GameEnd';
 import PaddedDiv from '../common/PaddedDiv';
 import LoggedInElsewhere from './LoggedInElsewhere';
 
-import { Grid } from '@material-ui/core';
+import {
+  Grid,
+  Backdrop,
+  CircularProgress,
+  makeStyles,
+} from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+}));
 
 const conn = new ConnManager();
 
 const GameShell: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(conn.getGameState());
-  const { mode } = gameState;
+  const { loading, mode, state } = gameState;
 
   const history = useHistory();
   const gameCode = new URLSearchParams(useLocation().search).get('gameCode');
+
+  const classes = useStyles();
 
   useEffect(() => {
     conn.setStateUpdater(setGameState);
@@ -48,6 +62,15 @@ const GameShell: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (state && state.gameCode) {
+      history.replace(`/?gameCode=${state.gameCode}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
+
+  // TODO we should disallow users from creating rooms when connection is
+  // down
   const render = () => {
     const wrapInChatShell = (element: JSX.Element) => (
       <ChatShell>
@@ -86,6 +109,9 @@ const GameShell: React.FC = () => {
   return (
     <GameContext.Provider value={gameState}>
       <ConnContext.Provider value={conn}>
+        <Backdrop open={loading} className={classes.backdrop}>
+          <CircularProgress />
+        </Backdrop>
         <PaddedDiv>{render()}</PaddedDiv>
       </ConnContext.Provider>
     </GameContext.Provider>

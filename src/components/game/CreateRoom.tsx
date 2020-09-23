@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { useHistory } from 'react-router-dom';
 
 import ConnContext from './connection/ConnContext';
 import CreatePlayer from './CreatePlayer';
@@ -9,12 +8,8 @@ import OuterGrid from '../common/OuterGrid';
 const CreateRoom: React.FC = () => {
   const conn = useContext(ConnContext);
 
-  const history = useHistory();
-
   const handleSubmit = (name: string, hoot: number) => {
-    // TODO
-    const gameCode = conn.createRoom(name, hoot);
-    history.replace(`/?gameCode=${gameCode}`);
+    conn.createRoom(name, hoot);
   };
 
   const handleBack = () => {

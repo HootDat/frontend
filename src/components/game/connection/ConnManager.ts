@@ -1,4 +1,4 @@
-import GameState, { Mode, home, SocketGameState } from '../GameState';
+import GameState, { Mode, home, SocketGameState, Player } from '../GameState';
 import io from 'socket.io-client';
 
 const noOp = () => {};
@@ -7,6 +7,7 @@ const noOp = () => {};
 class ConnManager {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
   cId: string; // TODO put cId in local storage
+  loading: boolean;
 
   socket: SocketIOClient.Socket;
   stateUpdater: (mode: GameState) => void;
@@ -17,10 +18,12 @@ class ConnManager {
     const { mode, cId, state } = home();
     this.socket = io({ autoConnect: false });
     this.addReconnectors();
+    this.addEventHandlers();
 
     this.mode = mode;
     this.cId = cId;
     this.state = state;
+    this.loading = false;
 
     this.stateUpdater = noOp;
   }
@@ -55,21 +58,13 @@ class ConnManager {
     this.socket.close();
   }
 
-  addMetaEventHandlers() {
-    this.socket.on('auth.loggedInElsewhere', () => {
-      this.mode = Mode.LOGGED_IN_ELSEWHERE;
-      this.push();
-    });
-
-    // this.socket.on('game.join', game);
-  }
-
   getGameState(): GameState {
     return { ...this };
   }
 
   setStateUpdater(stateUpdater: (mode: GameState) => void) {
     this.stateUpdater = stateUpdater;
+    this.push();
   }
 
   push() {
@@ -77,11 +72,11 @@ class ConnManager {
   }
 
   resetAttributes() {
-    const { mode, cId, state } = home();
+    const { loading, mode, cId, state } = home();
 
     this.mode = mode;
     this.cId = cId;
-
+    this.loading = loading;
     this.state = state;
   }
 
@@ -93,73 +88,81 @@ class ConnManager {
     this.push();
   }
 
-  // this will probably emit an event. we need to wait for the server
-  // to respond though, so might need to use a loading banner or something
-  // until it gets the actual state update from the server?
-  createRoom(name: string, hoot: number) {
-    this.mode = Mode.WAITING_ROOM;
-    this.state = {
-      yourRole: '',
-      gameCode: '1234',
-      host: this.cId,
-      qnNum: 0,
-      phase: '',
-      questions: [],
-      curAnswer: '',
-      curAnswerer: '',
-      results: [],
-      players: {
-        [this.cId]: {
-          cId: this.cId,
-          name: name,
-          iconNum: hoot,
-          online: true,
-        },
-      },
-    };
+  /** Determine the current screen to show based off the state
+   *  This is primarily for when joining in the middle of a game
+   *
+   */
+  determineMode() {
+    if (this.state === null) {
+      return Mode.HOME;
+    }
+
+    switch (this.state.phase) {
+      case 'lobby':
+        return Mode.WAITING_ROOM;
+      case 'answer':
+        return this.state.curAnswerer === this.cId
+          ? Mode.ANSWERING_QUESTION
+          : Mode.WAITING_FOR_ANSWER;
+      case 'guess':
+        return Mode.GUESSING_ANSWERER;
+      case 'results':
+        return Mode.ROUND_END;
+      case 'end':
+        return Mode.GAME_END;
+    }
+  }
+
+  addEventHandlers() {
+    this.socket.on('auth.loggedInElsewhere', () => {
+      this.state = null;
+      this.loading = false;
+      this.mode = Mode.LOGGED_IN_ELSEWHERE;
+      this.push();
+    });
+
+    this.socket.on('game.join', (gameState: SocketGameState) => {
+      this.state = gameState;
+      this.mode = this.determineMode();
+      this.loading = false;
+      this.push();
+    });
+
+    this.socket.on('game.event.join', (player: Player) => {
+      if (this.state === null) return; // error
+
+      this.state.players[player.cId] = player;
+      this.push();
+    });
+
+    this.socket.on('game.event.leave', (player: Player) => {
+      if (this.state === null) return; // error
+
+      delete this.state.players[player.cId];
+      this.push();
+    });
+  }
+
+  createRoom(name: string, iconNum: number) {
+    this.socket.emit('game.create', { name: name, iconNum: iconNum });
+    this.loading = true;
     this.push();
-    return this.state?.gameCode;
   }
 
   joinRoom(gameCode: string, name: string, iconNum: number) {
-    this.state = {
-      yourRole: '',
+    this.socket.emit('game.join', {
       gameCode: gameCode,
-      host: 'cId2',
-      qnNum: 0,
-      phase: '',
-      questions: [],
-      results: [],
-      curAnswer: '',
-      curAnswerer: '',
-      players: {
-        cId2: {
-          cId: 'cId2',
-          name: 'hostisme',
-          iconNum: 0,
-          online: true,
-        },
-        cId3: {
-          cId: 'cId3',
-          name: 'player2',
-          iconNum: 5,
-          online: true,
-        },
-        [this.cId]: {
-          cId: this.cId,
-          name: name,
-          iconNum: iconNum,
-          online: true,
-        },
-      },
-    };
-    this.mode = Mode.WAITING_ROOM;
-    // TODO actually send to server
+      name: name,
+      iconNum: iconNum,
+    });
+    this.loading = true;
     this.push();
   }
 
   leaveRoom() {
-    this.resetAttributes();
+    this.socket.emit('game.leave');
+    this.state = null;
+    this.loading = false;
     this.mode = Mode.HOME;
     this.push();
   }
@@ -167,6 +170,7 @@ class ConnManager {
   startGame(questions: string[]) {
     this.state = { ...this.state!, questions: questions };
     this.mode = Mode.ANSWERING_QUESTION;
+    this.loading = true;
     this.push();
   }
 
