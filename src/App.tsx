@@ -1,4 +1,7 @@
 import React from 'react';
+import { createStore, applyMiddleware } from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import { Provider } from 'react-redux';
 import './App.css';
 import AppShell from './components/AppShell';
 import AppRouter from './components/AppRouter';
@@ -10,6 +13,7 @@ import {
 } from '@material-ui/core';
 import bg_top from './svg/bg-top.svg';
 import bg_bot from './svg/bg-bot.svg';
+import rootReducer from './reducers';
 
 let theme = createMuiTheme({
   palette: {
@@ -61,14 +65,19 @@ let theme = createMuiTheme({
 });
 theme = responsiveFontSizes(theme);
 
+const enhancer = applyMiddleware(thunkMiddleware);
+const store = createStore(rootReducer, enhancer);
+
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppShell>
-        <AppRouter />
-      </AppShell>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppShell>
+          <AppRouter />
+        </AppShell>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

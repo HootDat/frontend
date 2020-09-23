@@ -26,7 +26,7 @@ const AppShell: React.FC = ({ children }) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  /*
   const sendCachedUpdate = (pack: LocalQuestionPack) => {
     // send api request and get response, then update local storage with
     // the data
@@ -76,6 +76,7 @@ const AppShell: React.FC = ({ children }) => {
     // TODO add a banner to notify user that we are syncing
     store.getLocalPacks().forEach(sendCachedUpdate);
   }, [authState.user, online]);
+  */
 
   return (
     <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>

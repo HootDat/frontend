@@ -1,10 +1,19 @@
 import { User } from './user';
 import { Category } from './category';
 
+export type Question = {
+  id: number;
+  title: string;
+};
+
 export type QuestionPack = CommunityQuestionPack | LocalQuestionPack;
 
-export type CommunityQuestionPack = QuestionPackPostData & {
+export type CommunityQuestionPack = {
+  id: number;
+  name: string;
   owner: User;
+  categories: Category[];
+  questions: Question[];
   updated_at: string;
 };
 
@@ -12,7 +21,7 @@ export type CommunityQuestionPack = QuestionPackPostData & {
 export type QuestionPackPostData = {
   id: number;
   name: string;
-  categories: Category[];
+  categories: string[];
   questions: string[];
   public: boolean;
 };

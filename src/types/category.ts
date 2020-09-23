@@ -1,1 +1,4 @@
-export type Category = string;
+export type Category = {
+  id: number;
+  name: string;
+};
