@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LinearProgress } from '@material-ui/core';
+import { LinearProgress, LinearProgressProps } from '@material-ui/core';
 
-const ProgressBarCountdownTimer: React.FC<{
+type Props = LinearProgressProps & {
   countdownSeconds: number;
-}> = ({ countdownSeconds }) => {
+};
+const ProgressBarCountdownTimer: React.FC<Props> = ({
+  countdownSeconds,
+  ...props
+}) => {
   const startTime = useRef(Date.now());
   const frame = useRef(0);
   const [progress, setProgress] = useState(0);
@@ -26,11 +30,7 @@ const ProgressBarCountdownTimer: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <>
-      <LinearProgress variant="determinate" value={progress} />
-    </>
-  );
+  return <LinearProgress variant="determinate" value={progress} {...props} />;
 };
 
 export default ProgressBarCountdownTimer;

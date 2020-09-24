@@ -1,5 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { Typography, Paper, TextField, Grid } from '@material-ui/core';
+import {
+  Typography,
+  Paper,
+  TextField,
+  Grid,
+  makeStyles,
+} from '@material-ui/core';
 
 import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
@@ -8,11 +14,43 @@ import GameContext from './GameContext';
 import OuterGrid from '../common/OuterGrid';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
 import ActionButton from '../common/ActionButton';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    margin: '0 auto',
+    maxWidth: '600px',
+    position: 'relative',
+    height: '100%',
+    textAlign: 'center',
+  },
+  buttonGroup: {
+    position: 'absolute',
+    width: '100%',
+    bottom: '0px',
+  },
+  button: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+  },
+  question: {
+    height: '150px',
+    overflow: 'auto',
+    padding: theme.spacing(2),
+  },
+  header: {
+    position: 'absolute',
+    width: '100%',
+    top: '24px',
+  },
+}));
+
 // TODO: Do we need a timer here? Kinda makes sense, but if they don't
 // answer then that's another state we need to account for :/
 const AnsweringQuestion: React.FC = () => {
   const [answer, setAnswer] = useState('');
   const [answered, setAnswered] = useState(false);
+
+  const classes = useStyles();
 
   const { state } = useContext(GameContext);
 
@@ -30,41 +68,47 @@ const AnsweringQuestion: React.FC = () => {
   };
 
   return (
-    <OuterGrid>
-      <CenteredInnerGrid>
-        <Grid item xs={12}>
-          <ProgressBarCountdownTimer countdownSeconds={60} />
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h4">What is your answer?</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper elevation={6}>
-            <Typography variant="body1">{questions[qnNum]}</Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper elevation={1} style={{ display: 'inline-block' }}>
+    <div className={classes.root}>
+      <ProgressBarCountdownTimer
+        countdownSeconds={60}
+        className={classes.header}
+      />
+      <OuterGrid>
+        <CenteredInnerGrid>
+          <Grid item xs={12}>
+            <Typography variant="h4">What is your answer?</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper elevation={1} className={classes.question}>
+              <Typography variant="body1" align="left">
+                {questions[qnNum]}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12}>
             <TextField
               placeholder="Your answer"
+              variant="outlined"
               value={answer}
+              fullWidth
               disabled={answered}
               onChange={handleChange}
             />
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <ActionButton
-            variant="contained"
-            color="primary"
-            disabled={answer.trim() === '' || answered}
-            onClick={handleAnswer}
-          >
-            {answered ? 'Loading' : 'Answer'}
-          </ActionButton>
-        </Grid>
-      </CenteredInnerGrid>
-    </OuterGrid>
+          </Grid>
+        </CenteredInnerGrid>
+      </OuterGrid>
+      <div className={classes.buttonGroup}>
+        <ActionButton
+          variant="contained"
+          color="primary"
+          disabled={answer.trim() === '' || answered}
+          onClick={handleAnswer}
+          className={classes.button}
+        >
+          {answered ? 'Loading' : 'Send Answer'}
+        </ActionButton>
+      </div>
+    </div>
   );
 };
 
