@@ -30,7 +30,14 @@ const ProgressBarCountdownTimer: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <LinearProgress variant="determinate" value={progress} {...props} />;
+  return (
+    <LinearProgress
+      variant="determinate"
+      value={progress}
+      color="secondary"
+      {...props}
+    />
+  );
 };
 
 export default ProgressBarCountdownTimer;

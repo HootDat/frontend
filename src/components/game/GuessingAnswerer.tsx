@@ -1,10 +1,46 @@
 import React, { useState, useContext } from 'react';
-import { Paper, Typography, Button } from '@material-ui/core';
+import { Paper, Typography, Button, makeStyles, Grid } from '@material-ui/core';
 
 import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 import HootAvatar from '../common/HootAvatar';
+import ActionButton from '../common/ActionButton';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    margin: '0 auto',
+    maxWidth: '600px',
+    position: 'relative',
+    height: '100%',
+    textAlign: 'center',
+  },
+  buttonGroup: {
+    position: 'absolute',
+    width: '100%',
+    bottom: '0px',
+  },
+  button: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+  },
+  container: {
+    display: 'flex',
+    flexFlow: 'column',
+    paddingTop: '50px',
+    height: 'calc(100% - 50px)',
+    width: '100%',
+  },
+  header: {
+    position: 'absolute',
+    width: '100%',
+    top: '30px',
+  },
+  questionCard: {
+    padding: theme.spacing(2),
+    textAlign: 'left',
+  },
+}));
 
 const GuessingAnswerer: React.FC = () => {
   // TODO: show who has guessed already? Might not be necessary though.
@@ -14,6 +50,8 @@ const GuessingAnswerer: React.FC = () => {
 
   const { cId, state } = useContext(GameContext);
   const { curAnswer, curAnswerer, qnNum, questions, players, host } = state!;
+
+  const classes = useStyles();
 
   const conn = useContext(ConnContext);
 
@@ -28,30 +66,27 @@ const GuessingAnswerer: React.FC = () => {
       .sort((a, b) => (a[0] === host ? -1 : a[0].localeCompare(b[0])))
       .map(([cId, player]) => {
         return (
-          <Button
-            key={cId}
-            variant={selected === cId ? 'outlined' : undefined}
-            color={selected === cId ? 'primary' : undefined}
-            disabled={guessed}
-            onClick={() => setSelected(cId)}
-          >
-            <HootAvatar number={player.iconNum} size="xsmall" /> {player.name}
-          </Button>
+          <Grid item key={cId} xs={6}>
+            <Button
+              variant="outlined"
+              color={selected === cId ? 'secondary' : 'primary'}
+              disabled={guessed}
+              style={{ width: '100%' }}
+              onClick={() => setSelected(cId)}
+            >
+              <HootAvatar number={player.iconNum} size="xsmall" />
+              <span style={{ padding: '0 4px' }}> {player.name}</span>
+            </Button>
+          </Grid>
         );
       });
 
   const guesserComponents = () => (
     <>
       <Typography variant="h6">Guess hoot dat</Typography>
-      {choices()}
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={selected === null || guessed}
-        onClick={handleGuess}
-      >
-        {guessed ? 'Guess' : 'Waiting for others'}
-      </Button>
+      <Grid container spacing={1} style={{ paddingTop: '8px', width: '100%' }}>
+        {choices()}
+      </Grid>
     </>
   );
 
@@ -65,20 +100,40 @@ const GuessingAnswerer: React.FC = () => {
   const isGuessing = curAnswerer !== cId;
 
   return (
-    <>
-      <ProgressBarCountdownTimer countdownSeconds={120} />
-      <Paper>
-        <Typography color="primary" variant="body2">
-          Question
-        </Typography>
-        <Typography variant="body1">{questions[qnNum]}</Typography>
-        <Typography color="primary" variant="body2">
-          Answer
-        </Typography>
-        <Typography variant="body1">{curAnswer}</Typography>
-      </Paper>
-      {isGuessing ? guesserComponents() : answererComponents()}
-    </>
+    <div className={classes.root}>
+      <ProgressBarCountdownTimer
+        countdownSeconds={120}
+        className={classes.header}
+      />
+      <div className={classes.container}>
+        <Paper className={classes.questionCard}>
+          <Typography color="primary" variant="body2">
+            Question
+          </Typography>
+          <Typography variant="body1">{questions[qnNum]}</Typography>
+          <Typography color="primary" variant="body2">
+            Answer
+          </Typography>
+          <Typography variant="body1">{curAnswer}</Typography>
+        </Paper>
+        <div style={{ height: '100%', overflow: 'auto' }}>
+          {isGuessing ? guesserComponents() : answererComponents()}
+        </div>
+      </div>
+      {isGuessing && (
+        <div className={classes.buttonGroup}>
+          <ActionButton
+            variant="contained"
+            color="primary"
+            disabled={selected === null || guessed}
+            onClick={handleGuess}
+            className={classes.button}
+          >
+            {guessed ? 'Waiting for others' : 'Guess hoot dat'}
+          </ActionButton>
+        </div>
+      )}
+    </div>
   );
 };
 

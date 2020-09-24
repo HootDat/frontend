@@ -41,6 +41,7 @@ const CreatePlayer: React.FC<{
   const classes = useStyles();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length > 9) return;
     setName(e.target.value);
   };
 
@@ -122,6 +123,7 @@ const CreatePlayer: React.FC<{
       <Grid item xs={12}>
         <TextField
           placeholder="Your name"
+          helperText="Less than 10 characters"
           label="Name"
           variant="outlined"
           fullWidth

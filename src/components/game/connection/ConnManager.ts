@@ -169,6 +169,24 @@ class ConnManager {
           iconNum: iconNum,
           online: true,
         },
+        cid2: {
+          cId: 'cid2',
+          name: 'player 2',
+          iconNum: 0,
+          online: true,
+        },
+        cid3: {
+          cId: 'cid3',
+          name: 'player 3',
+          iconNum: 0,
+          online: true,
+        },
+        cid4: {
+          cId: 'cid4',
+          name: 'player 4',
+          iconNum: 0,
+          online: true,
+        },
       },
     };
     this.mode = this.determineMode();
