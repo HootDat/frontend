@@ -7,7 +7,7 @@ const noOp = () => {};
 class ConnManager {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
   cId: string; // TODO put cId in local storage
-  loading: boolean;
+  loading: boolean; // only used for joining and creating room at the start
 
   socket: SocketIOClient.Socket;
   stateUpdater: (mode: GameState) => void;
@@ -106,7 +106,7 @@ class ConnManager {
       case 'lobby':
         return Mode.WAITING_ROOM;
       case 'answer':
-        return this.state.curAnswerer === this.cId
+        return this.state.yourRole === 'answerer'
           ? Mode.ANSWERING_QUESTION
           : Mode.WAITING_FOR_ANSWER;
       case 'guess':
@@ -118,6 +118,7 @@ class ConnManager {
     }
   }
 
+  // TODO handle on errors
   addEventHandlers() {
     this.socket.on('auth.loggedInElsewhere', () => {
       this.state = null;
@@ -146,51 +147,58 @@ class ConnManager {
       delete this.state.players[player.cId];
       this.push();
     });
+
+    // TODO we are ignoring the game.event.questions.update event for now
+
+    this.socket.on('game.event.transition', (gameState: SocketGameState) => {
+      // note that this game state is PARTIAL
+      // TODO what if i am actually in a different phase and
+      // received the events out of order?
+      switch (gameState.phase) {
+        case 'answer': {
+          const { yourRole, qnNum, phase } = gameState;
+          this.state = {
+            ...this.state!,
+            yourRole,
+            qnNum,
+            phase,
+            currAnswer: '',
+            currAnswerer: '',
+          };
+          break;
+        }
+        case 'guess': {
+          // only has currAnswer,
+          const { currAnswer, phase } = gameState;
+          this.state = { ...this.state!, currAnswer, phase };
+          break;
+        }
+        case 'results': {
+          const { currAnswerer, phase, results } = gameState;
+          this.state = { ...this.state!, currAnswerer, phase, results };
+          break;
+        }
+        case 'end': {
+          const { phase } = gameState;
+          this.state = {
+            ...this.state!,
+            phase,
+          };
+          break;
+        }
+        default: {
+          // should not happen
+          break;
+        }
+      }
+      this.mode = this.determineMode();
+      this.push();
+    });
   }
 
   createRoom(name: string, iconNum: number) {
     this.socket.emit('game.create', { name: name, iconNum: iconNum });
     this.loading = true;
-    // TODO remove this. this is here wghile socket isnt set up yet
-    this.state = {
-      yourRole: '',
-      gameCode: '1234',
-      host: this.cId,
-      qnNum: 0,
-      phase: 'lobby',
-      questions: [],
-      curAnswer: '',
-      curAnswerer: '',
-      results: [],
-      players: {
-        [this.cId]: {
-          cId: this.cId,
-          name: name,
-          iconNum: iconNum,
-          online: true,
-        },
-        cid2: {
-          cId: 'cid2',
-          name: 'player 2',
-          iconNum: 0,
-          online: true,
-        },
-        cid3: {
-          cId: 'cid3',
-          name: 'player 3',
-          iconNum: 0,
-          online: true,
-        },
-        cid4: {
-          cId: 'cid4',
-          name: 'player 4',
-          iconNum: 0,
-          online: true,
-        },
-      },
-    };
-    this.mode = this.determineMode();
-    this.loading = false;
     this.push();
   }
 
@@ -212,37 +220,31 @@ class ConnManager {
     this.push();
   }
 
-  startGame(questions: string[]) {
-    this.state = { ...this.state!, questions: questions };
-    this.mode = Mode.ANSWERING_QUESTION;
-    this.push();
+  sendQuestions(questions: string[]) {
+    this.socket.emit('game.event.questions.update', {
+      gameCode: this.state!.gameCode,
+      questions: questions,
+    });
+  }
+
+  startGame() {
+    this.socket.emit('game.event.host.start', {
+      gameCode: this.state!.gameCode,
+    });
   }
 
   sendAnswer(answer: string) {
-    this.state = { ...this.state! };
-    this.state.curAnswer = answer;
-    this.state.curAnswerer = this.cId;
-    /*
-    {
-      type: 'answer',
-      content: answer,
-    }
-    */
-    this.mode = Mode.GUESSING_ANSWERER;
-    this.push();
+    this.socket.emit('game.event.player.answer', {
+      gameCode: this.state!.gameCode,
+      answer: answer,
+    });
   }
 
   guessAnswerer(answerer: string) {
-    this.state = { ...this.state! };
-    this.state.results.push([
-      { cId: this.cId, score: 1, answer: answerer, role: this.state!.yourRole },
-    ]);
-    /*
-      type: 'guess',
-      content: answerer,
-    }*/
-    this.mode = Mode.ROUND_END;
-    this.push();
+    this.socket.emit('game.event.player.answer', {
+      gameCode: this.state!.gameCode,
+      answer: answerer,
+    });
   }
 
   readyForNextRound() {
@@ -250,12 +252,26 @@ class ConnManager {
     this.state.qnNum++;
     if (this.state.qnNum >= this.state.questions.length) {
       this.state.qnNum = 0;
-      this.state.curAnswer = '';
-      this.state.curAnswerer = '';
+      this.state.currAnswer = '';
+      this.state.currAnswerer = '';
       this.mode = Mode.GAME_END;
     } else {
       this.mode = Mode.ANSWERING_QUESTION;
     }
+    this.push();
+  }
+
+  backToLobby() {
+    this.state = {
+      ...this.state!,
+      currAnswer: '',
+      currAnswerer: '',
+      qnNum: -1,
+      yourRole: '',
+      phase: 'lobby',
+      results: [],
+    };
+    this.mode = this.determineMode();
     this.push();
   }
 }

@@ -31,7 +31,7 @@ const ScoreBoard: React.FC<{
   header?: boolean;
   winning?: boolean;
   host?: string;
-  results: Result[];
+  results: { [cId: string]: Result };
   players: { [cId: string]: Player };
 }> = ({ header, winning, host, results, players }) => {
   const classes = useStyles();
@@ -41,7 +41,7 @@ const ScoreBoard: React.FC<{
 
   const winningSort = (a: Result, b: Result) => b.score - a.score;
 
-  const scoreBoard = results
+  const scoreBoard = Object.values(results)
     .sort(winning ? winningSort : defaultSort)
     .map((result, index) => {
       return (

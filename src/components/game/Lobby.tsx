@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Typography,
   Button,
@@ -65,12 +65,14 @@ const Lobby: React.FC<{
   const conn = useContext(ConnContext);
   const { cId, state } = useContext(GameContext);
   const { host, gameCode, players } = state!;
+  const [started, setStarted] = useState(false);
 
   const history = useHistory();
   const classes = useStyles();
 
   const handleStart = () => {
-    conn.startGame(questions);
+    conn.startGame();
+    setStarted(true);
   };
 
   const handleQuit = () => {
@@ -143,11 +145,11 @@ const Lobby: React.FC<{
         <ActionButton
           variant="contained"
           color="primary"
-          disabled={false /*Object.keys(players).length < 3*/}
+          disabled={false /*Object.keys(players).length < 3 || started */}
           onClick={handleStart}
           className={classes.button}
         >
-          START GAME
+          {started ? 'loading' : 'start game'}
         </ActionButton>
       )
     ) : undefined;

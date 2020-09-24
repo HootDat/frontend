@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { Typography, makeStyles, Grid } from '@material-ui/core';
 
 import ScoreBoard from './common/ScoreBoard';
-import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 import ActionButton from '../common/ActionButton';
 
@@ -31,24 +30,27 @@ const RoundEnd: React.FC = () => {
   const { cId, state } = useContext(GameContext);
   const classes = useStyles();
 
-  const { curAnswerer, host, players, qnNum, results: fullResults } = state!;
+  const {
+    yourRole,
+    currAnswerer,
+    host,
+    players,
+    qnNum,
+    results: fullResults,
+  } = state!;
   const results = fullResults[qnNum];
-  const isLastRound = results.length - 1 === qnNum;
-  const isAnswerer = curAnswerer === cId;
-
-  const conn = useContext(ConnContext);
+  const isLastRound = fullResults.length - 1 === qnNum;
+  const isAnswerer = yourRole === 'answerer';
 
   const handleNextQuestion = () => {
     setIsReady(true);
-    // TODO probably can remove, since there will be auto advance by the server
-    conn.readyForNextRound();
   };
 
-  const myResult = results.find(result => result.cId === cId)!;
+  const myResult = results[cId]!;
 
   const header = () => {
     if (isAnswerer) {
-      const numRight = results.filter(
+      const numRight = Object.values(results).filter(
         result => result.role === 'guesser' && result.answer === cId
       ).length;
 
@@ -65,7 +67,7 @@ const RoundEnd: React.FC = () => {
     return (
       <Typography variant="h6">
         You got it
-        {myResult?.answer === curAnswerer! ? ' right :)' : ' wrong :('}
+        {myResult.answer === currAnswerer! ? ' right :)' : ' wrong :('}
       </Typography>
     );
   };
@@ -83,7 +85,7 @@ const RoundEnd: React.FC = () => {
           <Typography variant="h6">Who answered? </Typography>
         </Grid>
         <Grid item xs={12}>
-          <ScoreBoard players={players} results={[myResult]} />
+          <ScoreBoard players={players} results={{ [cId]: myResult }} />
         </Grid>
       </Grid>
       <div className={classes.buttonGroup}>

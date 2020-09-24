@@ -57,6 +57,7 @@ const GameShell: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // we only keep make the gameCode stay in the url if in game
   useEffect(() => {
     if (state && state.gameCode) {
       history.replace(`/?gameCode=${state.gameCode}`);

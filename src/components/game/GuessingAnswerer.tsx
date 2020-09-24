@@ -48,11 +48,11 @@ const GuessingAnswerer: React.FC = () => {
   const [selected, setSelected] = useState<string | null>(null);
   const [guessed, setGuessed] = useState(false);
 
-  const { cId, state } = useContext(GameContext);
-  const { curAnswer, curAnswerer, qnNum, questions, players, host } = state!;
-
   const classes = useStyles();
 
+  const { state } = useContext(GameContext);
+  const { yourRole, currAnswer, qnNum, questions, players, host } = state!;
+  const isGuessing = yourRole === 'guesser';
   const conn = useContext(ConnContext);
 
   const handleGuess = () => {
@@ -97,8 +97,6 @@ const GuessingAnswerer: React.FC = () => {
     </>
   );
 
-  const isGuessing = curAnswerer !== cId;
-
   return (
     <div className={classes.root}>
       <ProgressBarCountdownTimer
@@ -114,7 +112,7 @@ const GuessingAnswerer: React.FC = () => {
           <Typography color="primary" variant="body2">
             Answer
           </Typography>
-          <Typography variant="body1">{curAnswer}</Typography>
+          <Typography variant="body1">{currAnswer}</Typography>
         </Paper>
         <div style={{ height: '100%', overflow: 'auto' }}>
           {isGuessing ? guesserComponents() : answererComponents()}

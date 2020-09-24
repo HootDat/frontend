@@ -5,7 +5,6 @@ import { Typography, Button, makeStyles, Grid } from '@material-ui/core';
 import ScoreBoard from './common/ScoreBoard';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
-import { Mode } from './GameState';
 import ActionButton from '../common/ActionButton';
 
 const useStyles = makeStyles(theme => ({
@@ -39,11 +38,11 @@ const GameEnd: React.FC = () => {
   const history = useHistory();
 
   const handlePlayAgain = () => {
-    conn.updateMode(Mode.WAITING_ROOM);
+    conn.backToLobby();
   };
 
   const handleQuit = () => {
-    conn.updateMode(Mode.HOME);
+    conn.leaveRoom();
     history.replace('/');
   };
 

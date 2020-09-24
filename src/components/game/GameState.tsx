@@ -50,9 +50,9 @@ export type SocketGameState = {
   qnNum: number;
   phase: Phase;
   questions: string[];
-  curAnswer: string;
-  curAnswerer: string;
-  results: Result[][];
+  currAnswer: string;
+  currAnswerer: string;
+  results: { [cId: string]: Result }[];
   players: {
     [cId: string]: Player;
   };
