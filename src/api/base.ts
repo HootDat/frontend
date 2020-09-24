@@ -61,17 +61,9 @@ function processRequest<T>(
 
 // Extracts error message.
 function makeApiErrorResponse(error: AxiosError): ApiErrorResponse {
-  const code = error.response ? error.response.status : -1;
-  if (!error.response || !error.response.data || !error.response.data.error) {
-    return {
-      code: code,
-      error: '',
-    };
-  }
-
   return {
-    code: code,
-    error: error.response.data.error,
+    code: error.response?.status || -1,
+    body: error.response?.data,
   };
 }
 

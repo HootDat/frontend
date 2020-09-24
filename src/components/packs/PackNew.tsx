@@ -45,6 +45,7 @@ const PackNew: React.FC = () => {
       const createdPack = await packsAPI.newPack({ ...pack, id: 0 });
       store.downloadPack(createdPack);
       history.push('/packs');
+      return;
     } catch (error) {
       let apiError = error as ApiErrorResponse;
       if (apiError.code === 401) {
@@ -60,7 +61,10 @@ const PackNew: React.FC = () => {
       }
       if (apiError.code === 400) {
         // Bad request payload
-        pushNotif({ message: apiError.error, severity: 'error' });
+        pushNotif({
+          message: apiError.body?.error || 'Invalid input',
+          severity: 'error',
+        });
         return;
       }
 
@@ -71,6 +75,7 @@ const PackNew: React.FC = () => {
       });
       store.newLocalPack(pack, user.name);
       history.push('/packs');
+      return;
     }
   };
 
