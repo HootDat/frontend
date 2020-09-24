@@ -1,5 +1,6 @@
 import GameState, { Mode, reset, SocketGameState, Player } from '../GameState';
 import io from 'socket.io-client';
+import { Notification } from '../../common/notification/PushNotification';
 
 const noOp = () => {};
 
@@ -12,6 +13,7 @@ class ConnManager {
   socket: SocketIOClient.Socket;
   stateUpdater: (mode: GameState) => void;
   state: SocketGameState | null;
+  pushNotifier: (notif: Notification) => void;
 
   constructor() {
     // placeholders
@@ -24,6 +26,7 @@ class ConnManager {
     });
     this.addReconnectors();
     this.addEventHandlers();
+    this.addErrorHandlers();
 
     this.mode = mode;
     this.cId = cId;
@@ -31,22 +34,23 @@ class ConnManager {
     this.loading = false;
 
     this.stateUpdater = noOp;
+    this.pushNotifier = noOp;
   }
 
   addReconnectors() {
     this.socket.on('reconnecting', () => {
-      // TODO: on reconnecting, display disconencted, reconnecting banner
-      console.log('failed to connect to server, reconnecting');
+      this.pushNotifier({ message: 'Reconnecting...', severity: 'info' });
     });
 
     this.socket.on('disconnect', () => {
-      // TODO: on disconnect, display disconnected, reconnecting banner
-      console.log('server disconnected, reconnecting');
+      this.pushNotifier({
+        message: 'Disconnected from server',
+        severity: 'info',
+      });
     });
 
     this.socket.on('reconnect', () => {
-      // TODO: on reconnect, display reconnected banner
-      console.log('reconnected!');
+      this.pushNotifier({ message: 'Reconnected!', severity: 'success' });
     });
   }
 
@@ -70,6 +74,10 @@ class ConnManager {
   setStateUpdater(stateUpdater: (mode: GameState) => void) {
     this.stateUpdater = stateUpdater;
     this.push();
+  }
+
+  setPushNotifier(pushNotifier: (notif: Notification) => void) {
+    this.pushNotifier = pushNotifier;
   }
 
   push() {
@@ -119,6 +127,10 @@ class ConnManager {
   }
 
   // TODO handle on errors
+  // TODO we are ignoring
+  // game.event.questions.update
+  // game.event.player.update
+
   addEventHandlers() {
     this.socket.on('auth.loggedInElsewhere', () => {
       this.state = null;
@@ -129,31 +141,35 @@ class ConnManager {
 
     this.socket.on('game.join', (gameState: SocketGameState) => {
       this.state = gameState;
+
       this.mode = this.determineMode();
       this.loading = false;
       this.push();
     });
 
-    this.socket.on('game.event.join', (player: Player) => {
+    this.socket.on('game.event.player.join', (player: Player) => {
       if (this.state === null) return; // error
 
-      this.state.players[player.cId] = player;
+      this.state = {
+        ...this.state,
+        players: { ...this.state.players, [player.cId]: player },
+      };
       this.push();
     });
 
-    this.socket.on('game.event.leave', (player: Player) => {
+    this.socket.on('game.event.player.leave', (player: Player) => {
       if (this.state === null) return; // error
 
+      this.state = { ...this.state, players: { ...this.state.players } };
       delete this.state.players[player.cId];
       this.push();
     });
-
-    // TODO we are ignoring the game.event.questions.update event for now
 
     this.socket.on('game.event.transition', (gameState: SocketGameState) => {
       // note that this game state is PARTIAL
       // TODO what if i am actually in a different phase and
       // received the events out of order?
+      console.log(gameState);
       switch (gameState.phase) {
         case 'answer': {
           const { yourRole, qnNum, phase } = gameState;
@@ -165,6 +181,10 @@ class ConnManager {
             currAnswer: '',
             currAnswerer: '',
           };
+          // start of game
+          if (qnNum === 0) {
+            this.state.questions = gameState.questions;
+          }
           break;
         }
         case 'guess': {
@@ -196,6 +216,50 @@ class ConnManager {
     });
   }
 
+  // ignore game.leave.error (we left, we don't care.)
+  // game.event.questions.update.error
+  addErrorHandlers() {
+    const someError = () => {
+      this.pushNotifier({
+        message: 'Something went wrong.',
+        severity: 'error',
+      });
+      this.loading = false;
+      this.push();
+    };
+    this.socket.on('game.create.error', someError);
+    this.socket.on('game.event.host.start.error', someError);
+    this.socket.on('game.event.player.answer.error', someError);
+    this.socket.on('game.event.questions.update.error', someError);
+
+    this.socket.on('game.join.error', (maybeMessage: string | undefined) => {
+      if (maybeMessage === 'No such game exists.') {
+        this.pushNotifier({
+          message: 'This game code is invalid',
+          severity: 'error',
+        });
+      } else {
+        this.pushNotifier({
+          message: 'Something went wrong',
+          severity: 'error',
+        });
+      }
+      this.loading = false;
+      this.push();
+    });
+
+    this.socket.on('game.kick', () => {
+      this.pushNotifier({
+        message: 'Game room does not exist',
+        severity: 'error',
+      });
+      this.loading = false;
+      this.state = null;
+      this.mode = Mode.HOME;
+      this.push();
+    });
+  }
+
   createRoom(name: string, iconNum: number) {
     this.socket.emit('game.create', { name: name, iconNum: iconNum });
     this.loading = true;
@@ -213,7 +277,9 @@ class ConnManager {
   }
 
   leaveRoom() {
-    this.socket.emit('game.leave');
+    this.socket.emit('game.leave', {
+      gameCode: this.state!.gameCode,
+    });
     this.state = null;
     this.loading = false;
     this.mode = Mode.HOME;

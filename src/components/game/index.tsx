@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 
 import ConnContext from './connection/ConnContext';
@@ -19,6 +19,7 @@ import PaddedDiv from '../common/PaddedDiv';
 import LoggedInElsewhere from './LoggedInElsewhere';
 
 import { Backdrop, CircularProgress, makeStyles } from '@material-ui/core';
+import PushNotification from '../common/notification/PushNotification';
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
@@ -33,6 +34,8 @@ const GameShell: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(conn.getGameState());
   const { loading, mode, state } = gameState;
 
+  const pushNotifier = useContext(PushNotification);
+
   const history = useHistory();
   const gameCode = new URLSearchParams(useLocation().search).get('gameCode');
 
@@ -40,6 +43,7 @@ const GameShell: React.FC = () => {
 
   useEffect(() => {
     conn.setStateUpdater(setGameState);
+    conn.setPushNotifier(pushNotifier);
     conn.connectToServer();
 
     // we only want to auto join a room on load, so don't depend

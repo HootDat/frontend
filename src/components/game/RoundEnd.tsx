@@ -59,7 +59,7 @@ const RoundEnd: React.FC = () => {
       }
       return (
         <Typography variant="h6">
-          {numRight} people guessed it right!
+          {numRight} {numRight > 1 ? 'players' : 'player'} guessed it right!
         </Typography>
       );
     }
@@ -85,7 +85,10 @@ const RoundEnd: React.FC = () => {
           <Typography variant="h6">Who answered? </Typography>
         </Grid>
         <Grid item xs={12}>
-          <ScoreBoard players={players} results={{ [cId]: myResult }} />
+          <ScoreBoard
+            players={players}
+            results={{ [currAnswerer]: results[currAnswerer] }}
+          />
         </Grid>
       </Grid>
       <div className={classes.buttonGroup}>
