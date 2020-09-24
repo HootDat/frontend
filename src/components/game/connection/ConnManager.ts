@@ -169,48 +169,7 @@ class ConnManager {
       // note that this game state is PARTIAL
       // TODO what if i am actually in a different phase and
       // received the events out of order?
-      console.log(gameState);
-      switch (gameState.phase) {
-        case 'answer': {
-          const { yourRole, qnNum, phase } = gameState;
-          this.state = {
-            ...this.state!,
-            yourRole,
-            qnNum,
-            phase,
-            currAnswer: '',
-            currAnswerer: '',
-          };
-          // start of game
-          if (qnNum === 0) {
-            this.state.questions = gameState.questions;
-          }
-          break;
-        }
-        case 'guess': {
-          // only has currAnswer,
-          const { currAnswer, phase } = gameState;
-          this.state = { ...this.state!, currAnswer, phase };
-          break;
-        }
-        case 'results': {
-          const { currAnswerer, phase, results } = gameState;
-          this.state = { ...this.state!, currAnswerer, phase, results };
-          break;
-        }
-        case 'end': {
-          const { phase } = gameState;
-          this.state = {
-            ...this.state!,
-            phase,
-          };
-          break;
-        }
-        default: {
-          // should not happen
-          break;
-        }
-      }
+      this.state = { ...this.state!, ...gameState };
       this.mode = this.determineMode();
       this.push();
     });
@@ -313,33 +272,10 @@ class ConnManager {
     });
   }
 
-  // TODO remove
-  readyForNextRound() {
-    this.state = { ...this.state! };
-    this.state.qnNum++;
-    if (this.state.qnNum >= this.state.questions.length) {
-      this.state.qnNum = 0;
-      this.state.currAnswer = '';
-      this.state.currAnswerer = '';
-      this.mode = Mode.GAME_END;
-    } else {
-      this.mode = Mode.ANSWERING_QUESTION;
-    }
-    this.push();
-  }
-
   backToLobby() {
-    this.state = {
-      ...this.state!,
-      currAnswer: '',
-      currAnswerer: '',
-      qnNum: -1,
-      yourRole: '',
-      phase: 'lobby',
-      results: [],
-    };
-    this.mode = this.determineMode();
-    this.push();
+    this.socket.emit('game.event.host.playAgain', {
+      gameCode: this.state!.gameCode,
+    });
   }
 }
 

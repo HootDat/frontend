@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Typography, Button, makeStyles, Grid } from '@material-ui/core';
 
@@ -27,9 +27,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const GameEnd: React.FC = () => {
-  const { state } = useContext(GameContext);
+  const { cId, state } = useContext(GameContext);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { results: fullResults, qnNum, players } = state!;
+  const { host, results: fullResults, qnNum, players } = state!;
   const results = fullResults[qnNum];
 
   const conn = useContext(ConnContext);
@@ -39,6 +40,7 @@ const GameEnd: React.FC = () => {
 
   const handlePlayAgain = () => {
     conn.backToLobby();
+    setIsLoading(true);
   };
 
   const handleQuit = () => {
@@ -61,14 +63,17 @@ const GameEnd: React.FC = () => {
         </Grid>
       </Grid>
       <div className={classes.buttonGroup}>
-        <ActionButton
-          variant="contained"
-          color="primary"
-          onClick={handlePlayAgain}
-          className={classes.button}
-        >
-          PLAY AGAIN
-        </ActionButton>
+        {cId === host && (
+          <ActionButton
+            variant="contained"
+            color="primary"
+            onClick={handlePlayAgain}
+            disabled={isLoading}
+            className={classes.button}
+          >
+            {isLoading ? 'Loading' : 'PLAY AGAIN'}
+          </ActionButton>
+        )}
         <Button color="primary" onClick={handleQuit} className={classes.button}>
           QUIT
         </Button>

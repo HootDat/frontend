@@ -39,7 +39,6 @@ const RoundEnd: React.FC = () => {
     results: fullResults,
   } = state!;
   const results = fullResults[qnNum];
-  const isLastRound = fullResults.length - 1 === qnNum;
   const isAnswerer = yourRole === 'answerer';
 
   const handleNextQuestion = () => {
@@ -99,11 +98,7 @@ const RoundEnd: React.FC = () => {
           onClick={handleNextQuestion}
           className={classes.button}
         >
-          {isReady
-            ? 'WAITING FOR OTHERS'
-            : isLastRound
-            ? 'SUMMARY'
-            : 'NEXT QUESTION'}
+          {isReady ? 'WAITING FOR OTHERS' : 'READY'}
         </ActionButton>
       </div>
     </div>
