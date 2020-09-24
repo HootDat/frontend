@@ -10,7 +10,7 @@ import {
   makeStyles,
   IconButton,
 } from '@material-ui/core';
-import { Share, Edit } from '@material-ui/icons';
+import { Edit } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 
 import ConnContext from './connection/ConnContext';
@@ -18,6 +18,7 @@ import GameContext from './GameContext';
 import HootAvatar from '../common/HootAvatar';
 
 import ActionButton from '../common/ActionButton';
+import ShareButton from './common/ShareButton';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -53,7 +54,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-// TODO SHARE BUTTON
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
 // User joined room via gameCode, and chose a character already.
@@ -156,9 +156,7 @@ const Lobby: React.FC<{
     <div className={classes.root}>
       <Typography className={classes.header} color="secondary" variant="h4">
         <span className={classes.headerText}>Room pin: {gameCode}</span>
-        <IconButton>
-          <Share />
-        </IconButton>
+        <ShareButton gameCode={gameCode} />
       </Typography>
       <Grid container alignItems="center" justify="center" spacing={2}>
         <Grid item xs={12}>
