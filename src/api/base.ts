@@ -65,7 +65,7 @@ function makeApiErrorResponse(error: AxiosError): ApiErrorResponse {
   if (!error.response || !error.response.data || !error.response.data.error) {
     return {
       code: code,
-      error: [],
+      error: '',
     };
   }
 

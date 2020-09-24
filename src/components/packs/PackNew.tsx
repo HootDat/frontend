@@ -1,17 +1,18 @@
+import { Box, makeStyles, Typography } from '@material-ui/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { Typography, Box, makeStyles } from '@material-ui/core';
-
-import QuestionPackForm from './QuestionPackForm';
-import { LocalQuestionPack } from '../../types/questionPack';
-import store from '../../utils/store';
-import AuthContext from '../login/AuthContext';
 import { useHistory } from 'react-router-dom';
 import categoriesAPI from '../../api/categories';
-import { Category } from '../../types/category';
 import packsAPI from '../../api/packs';
+import { ApiErrorResponse } from '../../types/api';
+import { Category } from '../../types/category';
+import { LocalQuestionPack } from '../../types/questionPack';
+import store from '../../utils/store';
 import useOnlineStatus from '../../utils/useOnlineStatus';
-import PaddedDiv from '../common/PaddedDiv';
 import HootAvatar from '../common/HootAvatar';
+import PushNotification from '../common/notification/PushNotification';
+import PaddedDiv from '../common/PaddedDiv';
+import AuthContext from '../login/AuthContext';
+import QuestionPackForm from './QuestionPackForm';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,26 +25,53 @@ const useStyles = makeStyles(theme => ({
 
 const PackNew: React.FC = () => {
   const [categories, setCategories] = useState([] as Category[]);
-  const { user } = useContext(AuthContext);
+  const { user, setAuthState } = useContext(AuthContext);
   const history = useHistory();
   const online = useOnlineStatus();
   const classes = useStyles();
+  const pushNotif = useContext(PushNotification);
 
-  const handleSubmit = (pack: LocalQuestionPack) => {
-    let promise;
+  const handleSubmit = async (pack: LocalQuestionPack) => {
     if (user === null || !online) {
       // not logged in, so just store locally
       store.newLocalPack(pack, user === null ? '' : user.name);
-      promise = Promise.resolve();
-    } else {
-      // logged in, so attempt to send request. If fail,
-      // then store locally
-      promise = packsAPI.newPack({ ...pack, id: 0 }).then(
-        newPack => store.downloadPack(newPack),
-        () => store.newLocalPack(pack, user.name)
-      );
+      history.push('/packs');
+      return;
     }
-    promise.finally(() => history.push('/packs'));
+
+    // logged in, so attempt to send request. If fail,
+    // then store locally
+    try {
+      const createdPack = await packsAPI.newPack({ ...pack, id: 0 });
+      store.downloadPack(createdPack);
+      history.push('/packs');
+    } catch (error) {
+      let apiError = error as ApiErrorResponse;
+      if (apiError.code === 401) {
+        // Login expired
+        pushNotif({
+          message: 'Log in expired, please log in again',
+          severity: 'error',
+        });
+        setAuthState({ user: null, setAuthState: setAuthState });
+        store.removeLoginState();
+        history.push('/login');
+        return;
+      }
+      if (apiError.code === 400) {
+        // Bad request payload
+        pushNotif({ message: apiError.error, severity: 'error' });
+        return;
+      }
+
+      // Probably offline or server blew up
+      pushNotif({
+        message: "We couldn't save your pack now, we'll try again later",
+        severity: 'warning',
+      });
+      store.newLocalPack(pack, user.name);
+      history.push('/packs');
+    }
   };
 
   useEffect(() => {
