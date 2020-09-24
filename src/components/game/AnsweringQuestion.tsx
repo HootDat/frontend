@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
   buttonGroup: {
     position: 'absolute',
     width: '100%',
-    bottom: '0px',
+    bottom: '10px',
   },
   button: {
     paddingTop: theme.spacing(1),
