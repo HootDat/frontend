@@ -128,7 +128,7 @@ const PackEdit: React.FC = () => {
       }
 
       pushNotif({
-        message: "We couldn't save your pack now, we'll try again later",
+        message: "The server is unreachable now, we'll try again later",
         severity: 'warning',
       });
       store.editLocalPack(pack);

@@ -70,7 +70,7 @@ const PackNew: React.FC = () => {
 
       // Probably offline or server blew up
       pushNotif({
-        message: "We couldn't save your pack now, we'll try again later",
+        message: "The server is unreachable now, we'll try again later",
         severity: 'warning',
       });
       store.newLocalPack(pack, user.name);

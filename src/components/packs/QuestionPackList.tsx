@@ -211,7 +211,7 @@ const QuestionPackList: React.FC<Props> = ({
       } else {
         // network issue? try again later
         pushNotif({
-          message: "We couldn't delete your pack now, we'll try again later",
+          message: "The server is unreachable now, we'll try again later",
           severity: 'warning',
         });
         store.deleteLocalPack(pack);
