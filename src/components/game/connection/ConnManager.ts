@@ -39,18 +39,24 @@ class ConnManager {
 
   addReconnectors() {
     this.socket.on('reconnecting', () => {
-      this.pushNotifier({ message: 'Reconnecting...', severity: 'info' });
+      if (window.location.pathname === '/') {
+        this.pushNotifier({ message: 'Reconnecting...', severity: 'info' });
+      }
     });
 
     this.socket.on('disconnect', () => {
-      this.pushNotifier({
-        message: 'Disconnected from server',
-        severity: 'info',
-      });
+      if (window.location.pathname === '/') {
+        this.pushNotifier({
+          message: 'Disconnected from server',
+          severity: 'info',
+        });
+      }
     });
 
     this.socket.on('reconnect', () => {
-      this.pushNotifier({ message: 'Reconnected!', severity: 'success' });
+      if (window.location.pathname === '/') {
+        this.pushNotifier({ message: 'Reconnected!', severity: 'success' });
+      }
     });
   }
 
