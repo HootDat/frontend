@@ -173,6 +173,17 @@ class ConnManager {
       this.mode = this.determineMode();
       this.push();
     });
+
+    this.socket.on('game.event.newHost', (host: string) => {
+      this.state = { ...this.state!, host };
+      if (host === this.cId) {
+        this.pushNotifier({
+          message: "Hoot! You're the new host!",
+          severity: 'info',
+        });
+      }
+      this.push();
+    });
   }
 
   // ignore game.leave.error (we left, we don't care.)
