@@ -1,4 +1,4 @@
-import GameState, { Mode, home, SocketGameState, Player } from '../GameState';
+import GameState, { Mode, reset, SocketGameState, Player } from '../GameState';
 import io from 'socket.io-client';
 
 const noOp = () => {};
@@ -15,7 +15,7 @@ class ConnManager {
 
   constructor() {
     // placeholders
-    const { mode, cId, state } = home();
+    const { mode, cId, state } = reset();
     this.socket = io(process.env.REACT_APP_BACKEND_URL!, {
       query: {
         cId: cId,
@@ -77,7 +77,7 @@ class ConnManager {
   }
 
   resetAttributes() {
-    const { loading, mode, cId, state } = home();
+    const { loading, mode, cId, state } = reset();
 
     this.mode = mode;
     this.cId = cId;
@@ -247,6 +247,7 @@ class ConnManager {
     });
   }
 
+  // TODO remove
   readyForNextRound() {
     this.state = { ...this.state! };
     this.state.qnNum++;

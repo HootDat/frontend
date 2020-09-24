@@ -145,7 +145,7 @@ const Lobby: React.FC<{
         <ActionButton
           variant="contained"
           color="primary"
-          disabled={false /*Object.keys(players).length < 3 || started */}
+          disabled={false /*TODO Object.keys(players).length < 3 || started */}
           onClick={handleStart}
           className={classes.button}
         >

@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 export enum Mode {
   LOGGED_IN_ELSEWHERE,
   HOME,
@@ -58,11 +59,25 @@ export type SocketGameState = {
   };
 };
 
-export function home(): GameState {
+const CLIENT_ID = 'cId';
+export function reset(): GameState {
+  let cId;
+  try {
+    let maybeCId = localStorage.getItem(CLIENT_ID);
+    if (maybeCId === null) {
+      cId = uuid();
+      localStorage.setItem(CLIENT_ID, cId);
+    } else {
+      cId = maybeCId;
+    }
+  } catch (e) {
+    // no local storage
+    cId = uuid();
+  }
   return {
     mode: Mode.HOME,
     loading: false,
-    cId: 'cId1', // TODO generate own uuid
+    cId,
     state: null,
   };
 }
