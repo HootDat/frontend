@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Button, makeStyles } from '@material-ui/core';
 import AuthContext from './AuthContext';
 import store from '../../utils/store';
+import PushNotification from '../common/notification/PushNotification';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -13,6 +14,7 @@ const useStyles = makeStyles(theme => ({
 
 const LogInOutButton: React.FC = () => {
   const authState = useContext(AuthContext);
+  const pushNotif = useContext(PushNotification);
 
   const classes = useStyles();
 
@@ -30,6 +32,7 @@ const LogInOutButton: React.FC = () => {
   // TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
   const handleLogOut = () => {
     // TODO: tell server log out
+    pushNotif({ message: 'You have logged out', severity: 'success' });
     store.removeLoginState();
     authState.setAuthState({ ...authState, user: null });
   };
