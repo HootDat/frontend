@@ -143,7 +143,7 @@ const Lobby: React.FC<{
         <ActionButton
           variant="contained"
           color="primary"
-          disabled={Object.keys(players).length < 3}
+          disabled={false /*Object.keys(players).length < 3*/}
           onClick={handleStart}
           className={classes.button}
         >

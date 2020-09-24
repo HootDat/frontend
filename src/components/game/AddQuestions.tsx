@@ -31,7 +31,12 @@ const useStyles = makeStyles(theme => ({
     paddingTop: '20px',
   },
   container: {
-    maxHeight: 'calc(100% - 258px)',
+    height: 'calc(100% - 258px)',
+    overflow: 'auto',
+    marginTop: theme.spacing(2),
+  },
+  containerAddingFromPack: {
+    height: 'calc(100% - 178px)',
     overflow: 'auto',
     marginTop: theme.spacing(2),
   },
@@ -44,6 +49,7 @@ const AddQuestions: React.FC<{
 }> = ({ roomQuestions, setRoomQuestions, handleBack }) => {
   const [questions, setQuestions] = useState([...roomQuestions]);
   const [addingFromPack, setAddingFromPack] = useState(false);
+  const [hideButton, setHideButton] = useState(false);
 
   const handleAdd = () => {
     const trimmed = questions.map(s => s.trim());
@@ -82,12 +88,16 @@ const AddQuestions: React.FC<{
           </Grid>
         )}
       </Grid>
-      <div className={classes.container}>
+      <div
+        className={
+          addingFromPack ? classes.containerAddingFromPack : classes.container
+        }
+      >
         {addingFromPack ? (
           <QuestionPackList
             inRoom
             handleAdd={handleAddFromPack}
-            handleBack={() => setAddingFromPack(false)}
+            hideOutsideContent={setHideButton}
           />
         ) : (
           <EditQuestionsList
@@ -96,6 +106,15 @@ const AddQuestions: React.FC<{
           />
         )}
       </div>
+      {addingFromPack && !hideButton && (
+        <div className={classes.buttonGroup}>
+          <BackButton
+            text="Back to questions"
+            handleBack={() => setAddingFromPack(false)}
+            className={classes.button}
+          />
+        </div>
+      )}
       {!addingFromPack && (
         <div className={classes.buttonGroup}>
           <ActionButton

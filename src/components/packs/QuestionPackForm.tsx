@@ -15,6 +15,7 @@ import BackButton from '../common/BackButton';
 
 const INVALID_ID = 0;
 
+// TODO ensure invalid question packs cannot be submitted
 const QuestionPackForm: React.FC<{
   handleSubmit: (pack: LocalQuestionPack) => void;
   editPack?: LocalQuestionPack;

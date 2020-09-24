@@ -12,8 +12,17 @@ import {
   List,
   ListItemText,
   ListItemSecondaryAction,
+  makeStyles,
+  Grid,
 } from '@material-ui/core';
-import { Edit, Delete, Search, Filter, FilterList } from '@material-ui/icons';
+import {
+  Edit,
+  Delete,
+  Search,
+  Filter,
+  FilterList,
+  Add,
+} from '@material-ui/icons';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 import {
@@ -30,6 +39,59 @@ import useOnlineStatus from '../../utils/useOnlineStatus';
 import AuthContext from '../login/AuthContext';
 import packsAPI from '../../api/packs';
 import categoriesAPI from '../../api/categories';
+import ActionButton from '../common/ActionButton';
+
+const useStyles = makeStyles(theme => ({
+  searchBar: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+  },
+  packList: {
+    height: 'calc(100% - 128px)',
+    overflow: 'auto',
+    marginTop: theme.spacing(2),
+  },
+  padding: {
+    margin: theme.spacing(1),
+  },
+  drawerList: {
+    maxWidth: '250px',
+    height: 'calc(100% - 110px)',
+    overflow: 'auto',
+  },
+  filterButtons: {
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+    textAlign: 'center',
+  },
+  button: {
+    width: '100%',
+    position: 'absolute',
+    bottom: '0px',
+    paddingTop: theme.spacing(1),
+  },
+  text: {
+    wordWrap: 'break-word',
+  },
+  iconButtonRight: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+  },
+  iconButtonLeft: {
+    position: 'absolute',
+    left: theme.spacing(1),
+    top: theme.spacing(1),
+  },
+  individualContainer: {
+    height: '100%',
+    display: 'flex',
+    flexFlow: 'column',
+  },
+}));
 
 type Filter = {
   name: string;
@@ -40,7 +102,6 @@ type Filter = {
 type Props = {
   inRoom?: boolean;
   handleAdd?: (questions: string[]) => void;
-  handleBack?: () => void;
   hideOutsideContent?: (hide: boolean) => void;
 };
 
@@ -49,7 +110,6 @@ type Props = {
 const QuestionPackList: React.FC<Props> = ({
   inRoom,
   handleAdd,
-  handleBack,
   hideOutsideContent = () => {},
 }) => {
   // should fetching be done in parent?
@@ -60,6 +120,7 @@ const QuestionPackList: React.FC<Props> = ({
   // when in game room, no, just the selected pack (edit vs add to room)
   // when in view, also no.
   // then just fetch in this compoennt.
+  const classes = useStyles();
 
   const authState = useContext(AuthContext);
 
@@ -171,33 +232,44 @@ const QuestionPackList: React.FC<Props> = ({
       open={filterOpen}
       onClose={() => setFilterOpen(false)}
       onOpen={() => setFilterOpen(true)}
+      style={{ textAlign: 'left' }}
     >
-      <Typography variant="h6">Filter by Categories</Typography>
+      <span style={{ padding: '4px 8px' }}>
+        <Typography variant="h6">Filter by Categories</Typography>
+      </span>
       <Divider />
-      {categories.sort().map(category => (
-        <ListItem key={category}>
-          <Checkbox
-            color="primary"
-            checked={search.categories.has(category)}
-            value={category}
-            onChange={handleEditCategoryFilter(category)}
-            inputProps={{
-              'aria-label': `${category}-filter`,
-            }}
-          />
-          {category}
-        </ListItem>
-      ))}
-      <Button color="primary" onClick={handleClearCategoryFilter}>
-        Clear
-      </Button>
-      <Button
-        color="primary"
-        variant="contained"
-        onClick={() => setFilterOpen(false)}
-      >
-        Close
-      </Button>
+      <List className={classes.drawerList}>
+        {categories.sort().map(category => (
+          <ListItem key={category}>
+            <Checkbox
+              color="primary"
+              checked={search.categories.has(category)}
+              value={category}
+              onChange={handleEditCategoryFilter(category)}
+              inputProps={{
+                'aria-label': `${category}-filter`,
+              }}
+            />
+            <ListItemText
+              primary={category}
+              style={{ wordWrap: 'break-word' }}
+            />
+          </ListItem>
+        ))}
+      </List>
+      <div className={classes.filterButtons}>
+        <Button color="primary" fullWidth onClick={handleClearCategoryFilter}>
+          Clear
+        </Button>
+        <Button
+          color="primary"
+          fullWidth
+          variant="contained"
+          onClick={() => setFilterOpen(false)}
+        >
+          Close
+        </Button>
+      </div>
     </SwipeableDrawer>
   );
 
@@ -208,8 +280,13 @@ const QuestionPackList: React.FC<Props> = ({
     if (viewingPack === null) return <></>;
     const generateAction = () => {
       if (inRoom) {
+        // TODO if we remove chat shell, change this back to right
         return (
-          <Button onClick={() => handleAdd!(viewingPack.questions)}>
+          <Button
+            onClick={() => handleAdd!(viewingPack.questions)}
+            className={classes.iconButtonLeft}
+          >
+            <Add />
             Add to room
           </Button>
         );
@@ -218,38 +295,53 @@ const QuestionPackList: React.FC<Props> = ({
       if ((viewingPack as LocalQuestionPack).action === undefined) return;
 
       return (
-        <IconButton>
-          <Delete
-            onClick={() => handleDeletePack(viewingPack as LocalQuestionPack)}
-          />
+        <IconButton
+          onClick={() => handleDeletePack(viewingPack as LocalQuestionPack)}
+          className={classes.iconButtonRight}
+        >
+          <Delete />
         </IconButton>
       );
     };
 
     return (
       <>
-        <Typography variant="h5">{viewingPack!.name}</Typography>
         {generateAction()}
-        <Typography variant="h6">Owner: {viewingPack!.owner.name}</Typography>
-        <Typography variant="h6">
-          Categories: {viewingPack!.categories.join(', ')}
-        </Typography>
-        <Paper>
-          <List dense>
-            {viewingPack!.questions.map((question, index) => (
-              <ListItem key={question}>
-                <ListItemText primary={`Q${index + 1}. ${question}`} />
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
-        <BackButton
-          text="Back to Packs"
-          handleBack={() => {
-            setViewingPack(null);
-            hideOutsideContent(false);
-          }}
-        />
+        <div
+          className={classes.individualContainer}
+          style={inRoom ? {} : { paddingTop: '40px' }}
+        >
+          <Typography variant="h5" className={classes.text}>
+            {viewingPack!.name}
+          </Typography>
+          <Typography variant="h6" align="left" className={classes.text}>
+            Owner: {viewingPack!.owner.name}
+          </Typography>
+          <Typography variant="h6" align="left" className={classes.text}>
+            Categories: {viewingPack!.categories.sort().join(', ')}
+          </Typography>
+          <Typography variant="h6" align="center">
+            Questions
+          </Typography>
+          <Paper style={{ overflow: 'auto' }}>
+            <List dense>
+              {viewingPack!.questions.map((question, index) => (
+                <ListItem key={question}>
+                  <ListItemText primary={`Q${index + 1}. ${question}`} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </div>
+        <div className={classes.button}>
+          <BackButton
+            text="Back to Packs"
+            handleBack={() => {
+              setViewingPack(null);
+              hideOutsideContent(false);
+            }}
+          />
+        </div>
       </>
     );
   };
@@ -260,7 +352,8 @@ const QuestionPackList: React.FC<Props> = ({
       if (inRoom) {
         return (
           <Button size="small" onClick={() => handleAdd!(pack.questions)}>
-            Add to pack
+            <Add />
+            Add
           </Button>
         );
       }
@@ -270,7 +363,7 @@ const QuestionPackList: React.FC<Props> = ({
       }
 
       return (
-        <Button
+        <IconButton
           size="small"
           onClick={() =>
             history.push(`/packs/${Math.abs(pack.id)}/edit`, {
@@ -279,8 +372,7 @@ const QuestionPackList: React.FC<Props> = ({
           }
         >
           <Edit />
-          Edit
-        </Button>
+        </IconButton>
       );
     };
 
@@ -291,8 +383,14 @@ const QuestionPackList: React.FC<Props> = ({
           setViewingPack(pack);
           hideOutsideContent(true);
         }}
+        style={{ height: '30' }}
       >
-        <ListItemText primary={pack.name} secondary={pack.owner.name} />
+        <ListItemText
+          primary={pack.name}
+          primaryTypographyProps={{ noWrap: true }}
+          secondary={pack.owner.name}
+          secondaryTypographyProps={{ noWrap: true }}
+        />
         <ListItemSecondaryAction>{actionButton(pack)}</ListItemSecondaryAction>
       </ListItem>
     ));
@@ -316,6 +414,7 @@ const QuestionPackList: React.FC<Props> = ({
         value={search.tab}
         onChange={handleTabChange}
         aria-label="pack tab"
+        className={classes.padding}
       >
         <ToggleButton value="community" aria-label="community">
           Community Packs
@@ -324,21 +423,25 @@ const QuestionPackList: React.FC<Props> = ({
           My Packs
         </ToggleButton>
       </ToggleButtonGroup>
-      <Paper>
-        <Search />
+      <Paper elevation={3} className={classes.searchBar}>
         <InputBase
           placeholder="Search"
           value={search.name}
           onChange={handleNameSearch}
+          startAdornment={<Search />}
           inputProps={{
             'aria-label': 'search packs',
           }}
+          style={{ flex: 1 }}
         />
-        <IconButton onClick={() => setFilterOpen(true)}>
+        <IconButton
+          onClick={() => setFilterOpen(true)}
+          style={{ padding: '10px' }}
+        >
           <FilterList />
         </IconButton>
       </Paper>
-      <Paper>
+      <Paper className={classes.packList}>
         <List dense>
           {search.tab !==
           'community' ? undefined : communityPackAccordions.length === 0 ? (
@@ -354,7 +457,6 @@ const QuestionPackList: React.FC<Props> = ({
           )}
         </List>
       </Paper>
-      {inRoom && <BackButton handleBack={handleBack!} />}
     </>
   );
 };

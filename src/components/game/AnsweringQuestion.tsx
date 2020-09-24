@@ -12,7 +12,6 @@ import ActionButton from '../common/ActionButton';
 // answer then that's another state we need to account for :/
 const AnsweringQuestion: React.FC = () => {
   const [answer, setAnswer] = useState('');
-  const [error, setError] = useState('');
   const [answered, setAnswered] = useState(false);
 
   const { state } = useContext(GameContext);
@@ -22,59 +21,50 @@ const AnsweringQuestion: React.FC = () => {
   const conn = useContext(ConnContext);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (error !== '') {
-      setError('');
-    }
     setAnswer(e.target.value);
   };
 
   const handleAnswer = () => {
-    if (answer.trim() === '') {
-      setError('Your answer cannot be blank!');
-    }
-
     setAnswered(true);
     conn.sendAnswer(answer);
   };
 
   return (
-    <>
-      <OuterGrid>
-        <CenteredInnerGrid>
+    <OuterGrid>
+      <CenteredInnerGrid>
+        <Grid item xs={12}>
           <ProgressBarCountdownTimer countdownSeconds={60} />
-          <Grid item xs={12}>
-            <Typography variant="h4">What is your answer?</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper elevation={6}>
-              <Typography variant="body1">{questions[qnNum]}</Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper elevation={1} style={{ display: 'inline-block' }}>
-              <TextField
-                error={error !== ''}
-                helperText={error}
-                placeholder="Your answer"
-                value={answer}
-                disabled={answered}
-                onChange={handleChange}
-              />
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <ActionButton
-              variant="contained"
-              color="primary"
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h4">What is your answer?</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper elevation={6}>
+            <Typography variant="body1">{questions[qnNum]}</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper elevation={1} style={{ display: 'inline-block' }}>
+            <TextField
+              placeholder="Your answer"
+              value={answer}
               disabled={answered}
-              onClick={handleAnswer}
-            >
-              {answered ? 'Answer' : 'Loading'}
-            </ActionButton>
-          </Grid>
-        </CenteredInnerGrid>
-      </OuterGrid>
-    </>
+              onChange={handleChange}
+            />
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <ActionButton
+            variant="contained"
+            color="primary"
+            disabled={answer.trim() === '' || answered}
+            onClick={handleAnswer}
+          >
+            {answered ? 'Loading' : 'Answer'}
+          </ActionButton>
+        </Grid>
+      </CenteredInnerGrid>
+    </OuterGrid>
   );
 };
 
