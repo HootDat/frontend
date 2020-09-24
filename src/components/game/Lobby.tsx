@@ -5,9 +5,10 @@ import {
   Paper,
   List,
   ListItemText,
-  ListItemIcon,
   ListItem,
   Grid,
+  makeStyles,
+  IconButton,
 } from '@material-ui/core';
 import { Share, Edit } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
@@ -17,21 +18,56 @@ import GameContext from './GameContext';
 import HootAvatar from '../common/HootAvatar';
 
 import ActionButton from '../common/ActionButton';
-import OuterGrid from '../common/OuterGrid';
-import CenteredInnerGrid from '../common/CenteredInnerGrid';
 
+const useStyles = makeStyles(theme => ({
+  root: {
+    margin: '0 auto',
+    maxWidth: '600px',
+    position: 'relative',
+    height: '100%',
+    textAlign: 'center',
+  },
+  header: {
+    paddingTop: '20px',
+  },
+  headerText: {
+    position: 'relative',
+    top: '2px',
+  },
+  buttonGroup: {
+    position: 'absolute',
+    width: '100%',
+    bottom: '0px',
+  },
+  button: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+  },
+  cardListings: {
+    height: '120px',
+    overflow: 'auto',
+  },
+  icon: {
+    position: 'absolute',
+    right: 0,
+  },
+}));
+
+// TODO SHARE BUTTON
 // Reachable from:
 // Host told server to create room, and server responds with a room id.
-// User joined room via roomId, and chose a character already.
+// User joined room via gameCode, and chose a character already.
 // Users have finished a game and pressed play again
 const Lobby: React.FC<{
   questions: string[];
   handleAddQuestionButton: () => void;
 }> = ({ questions, handleAddQuestionButton }) => {
   const conn = useContext(ConnContext);
-  const { cid, hostCid, roomId, participants } = useContext(GameContext);
+  const { cId, state } = useContext(GameContext);
+  const { host, gameCode, players } = state!;
 
   const history = useHistory();
+  const classes = useStyles();
 
   const handleStart = () => {
     conn.startGame(questions);
@@ -42,20 +78,18 @@ const Lobby: React.FC<{
     history.replace('/');
   };
 
-  const participantCard = (
-    <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
+  const playersCard = (
+    <Paper className={classes.cardListings}>
       <List dense>
-        {Object.entries(participants)
+        {Object.entries(players)
           // sort to ensure everyone sees the same order, host is first.
-          .sort((a, b) => (a[0] === hostCid ? -1 : a[0].localeCompare(b[0])))
-          .map(([cid, [name, hoot, _]]) => {
+          .sort((a, b) => (a[0] === host ? -1 : a[0].localeCompare(b[0])))
+          .map(([cId, player]) => {
             return (
-              <ListItem key={cid}>
-                <ListItemIcon>
-                  <HootAvatar number={hoot} size="xsmall" />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography variant="body1">{name}</Typography>
+              <ListItem key={cId}>
+                <HootAvatar number={player.iconNum} size="xsmall" />
+                <ListItemText style={{ marginLeft: '8px' }}>
+                  <Typography variant="body1">{player.name}</Typography>
                 </ListItemText>
               </ListItem>
             );
@@ -66,11 +100,17 @@ const Lobby: React.FC<{
 
   const questionCard = (
     <>
-      <Typography variant="h6">Selected questions</Typography>
-      <Button size="small" onClick={handleAddQuestionButton}>
-        <Edit />
-      </Button>
-      <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
+      <Typography variant="h6">
+        Selected questions
+        <IconButton
+          size="small"
+          onClick={handleAddQuestionButton}
+          className={classes.icon}
+        >
+          <Edit />
+        </IconButton>
+      </Typography>
+      <Paper className={classes.cardListings}>
         <List dense>
           {questions.map((question, index) => {
             return (
@@ -88,61 +128,63 @@ const Lobby: React.FC<{
     </>
   );
 
-  // need to disable if less than 3 players
   const actionButton =
-    cid === hostCid ? (
+    cId === host ? (
       questions.length === 0 ? (
         <ActionButton
           variant="contained"
           color="primary"
           onClick={handleAddQuestionButton}
+          className={classes.button}
         >
           ADD QUESTIONS
         </ActionButton>
       ) : (
-        <ActionButton variant="contained" color="primary" onClick={handleStart}>
+        <ActionButton
+          variant="contained"
+          color="primary"
+          disabled={false /*Object.keys(players).length < 3*/}
+          onClick={handleStart}
+          className={classes.button}
+        >
           START GAME
         </ActionButton>
       )
     ) : undefined;
 
   return (
-    <>
-      <OuterGrid>
-        <CenteredInnerGrid>
-          <Grid item xs={12}>
-            <Typography color="secondary" variant="h4">
-              Room pin: {roomId}
-              <Share />
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h4">Hoot assembly ground</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              Start game when all players are here
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            {participantCard}
-          </Grid>
-          <Grid item xs={12}>
-            {cid === hostCid && questions.length !== 0
-              ? questionCard
-              : undefined}
-          </Grid>
-          <Grid item xs={12}>
-            {actionButton}
-          </Grid>
-          <Grid item xs={12}>
-            <Button color="primary" onClick={handleQuit}>
-              Quit
-            </Button>
-          </Grid>
-        </CenteredInnerGrid>
-      </OuterGrid>
-    </>
+    <div className={classes.root}>
+      <Typography className={classes.header} color="secondary" variant="h4">
+        <span className={classes.headerText}>Room pin: {gameCode}</span>
+        <IconButton>
+          <Share />
+        </IconButton>
+      </Typography>
+      <Grid container alignItems="center" justify="center" spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="h4">Hoot assembly ground</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="body1">
+            {cId === host
+              ? 'Start game when all players are here'
+              : 'Waiting for host to start the game'}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          {playersCard}
+        </Grid>
+        <Grid item xs={12}>
+          {cId === host && questions.length !== 0 ? questionCard : undefined}
+        </Grid>
+      </Grid>
+      <div className={classes.buttonGroup}>
+        {actionButton}
+        <Button color="primary" onClick={handleQuit} className={classes.button}>
+          Quit
+        </Button>
+      </div>
+    </div>
   );
 };
 

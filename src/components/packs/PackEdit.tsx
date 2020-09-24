@@ -3,12 +3,23 @@ import { useLocation, useParams, useHistory } from 'react-router-dom';
 import store from '../../utils/store';
 import QuestionPackForm from './QuestionPackForm';
 import { LocalQuestionPack } from '../../types/questionPack';
-import { Typography } from '@material-ui/core';
+import { Typography, makeStyles, Box } from '@material-ui/core';
 import { Category } from '../../types/category';
 import useOnlineStatus from '../../utils/useOnlineStatus';
 import categoriesAPI from '../../api/categories';
 import AuthContext from '../login/AuthContext';
 import packsAPI from '../../api/packs';
+import PaddedDiv from '../common/PaddedDiv';
+import HootAvatar from '../common/HootAvatar';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    margin: '0 auto',
+    maxWidth: '600px',
+    position: 'relative',
+    height: '100%',
+  },
+}));
 
 type Params = {
   id: string;
@@ -25,6 +36,7 @@ const PackEdit: React.FC = () => {
   const { user } = useContext(AuthContext);
   const history = useHistory();
   const id = parseInt(params.id, 10);
+  const classes = useStyles();
 
   const [categories, setCategories] = useState([] as Category[]);
   const online = useOnlineStatus();
@@ -72,14 +84,19 @@ const PackEdit: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <Typography variant="h4">Edit question pack</Typography>
-      <QuestionPackForm
-        handleSubmit={handleSubmit}
-        editPack={editPack}
-        categories={categories}
-      />
-    </>
+    <PaddedDiv>
+      <div className={classes.root}>
+        <Box textAlign="center">
+          <HootAvatar size="small" />
+          <Typography variant="h4">Edit question pack</Typography>
+        </Box>
+        <QuestionPackForm
+          handleSubmit={handleSubmit}
+          editPack={editPack}
+          categories={categories}
+        />
+      </div>
+    </PaddedDiv>
   );
 };
 

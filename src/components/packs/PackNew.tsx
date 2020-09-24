@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Typography } from '@material-ui/core';
+import { Typography, Box, makeStyles } from '@material-ui/core';
 
 import QuestionPackForm from './QuestionPackForm';
 import { LocalQuestionPack } from '../../types/questionPack';
@@ -10,12 +10,24 @@ import categoriesAPI from '../../api/categories';
 import { Category } from '../../types/category';
 import packsAPI from '../../api/packs';
 import useOnlineStatus from '../../utils/useOnlineStatus';
+import PaddedDiv from '../common/PaddedDiv';
+import HootAvatar from '../common/HootAvatar';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    margin: '0 auto',
+    maxWidth: '600px',
+    position: 'relative',
+    height: '100%',
+  },
+}));
 
 const PackNew: React.FC = () => {
   const [categories, setCategories] = useState([] as Category[]);
   const { user } = useContext(AuthContext);
   const history = useHistory();
   const online = useOnlineStatus();
+  const classes = useStyles();
 
   const handleSubmit = (pack: LocalQuestionPack) => {
     let promise;
@@ -51,10 +63,16 @@ const PackNew: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <Typography variant="h4">New question pack</Typography>
-      <QuestionPackForm categories={categories} handleSubmit={handleSubmit} />
-    </>
+    <PaddedDiv>
+      <div className={classes.root}>
+        <Box textAlign="center">
+          <HootAvatar size="small" />
+          <Typography variant="h4">New question pack</Typography>
+        </Box>
+
+        <QuestionPackForm categories={categories} handleSubmit={handleSubmit} />
+      </div>
+    </PaddedDiv>
   );
 };
 

@@ -8,7 +8,10 @@ import GameContext from './GameContext';
 import { Mode } from './GameState';
 
 const GameEnd: React.FC = () => {
-  const { participants } = useContext(GameContext);
+  const { state } = useContext(GameContext);
+
+  const { results: fullResults, qnNum, players } = state!;
+  const results = fullResults[qnNum];
 
   const conn = useContext(ConnContext);
 
@@ -28,7 +31,7 @@ const GameEnd: React.FC = () => {
     <>
       <Typography variant="h4">Final Scoreboard</Typography>
       <Typography variant="body1">{"Who's the best hoot?"}</Typography>
-      <ScoreBoard winning participants={participants} />
+      <ScoreBoard winning results={results} players={players} />
       <Button variant="contained" color="primary" onClick={handlePlayAgain}>
         PLAY AGAIN
       </Button>

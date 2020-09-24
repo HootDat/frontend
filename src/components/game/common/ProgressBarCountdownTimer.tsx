@@ -18,6 +18,7 @@ const ProgressBarCountdownTimer: React.FC<{
     }
   };
 
+  // TODO for some reason, this doesn't work on chrome
   useEffect(() => {
     frame.current = requestAnimationFrame(updateProgress);
 
