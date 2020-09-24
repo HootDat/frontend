@@ -16,7 +16,12 @@ class ConnManager {
   constructor() {
     // placeholders
     const { mode, cId, state } = home();
-    this.socket = io({ autoConnect: false });
+    this.socket = io(process.env.REACT_APP_BACKEND_URL!, {
+      query: {
+        cId: cId,
+      },
+      autoConnect: false,
+    });
     this.addReconnectors();
     this.addEventHandlers();
 
@@ -146,6 +151,28 @@ class ConnManager {
   createRoom(name: string, iconNum: number) {
     this.socket.emit('game.create', { name: name, iconNum: iconNum });
     this.loading = true;
+    // TODO remove this. this is here wghile socket isnt set up yet
+    this.state = {
+      yourRole: '',
+      gameCode: '1234',
+      host: this.cId,
+      qnNum: 0,
+      phase: 'lobby',
+      questions: [],
+      curAnswer: '',
+      curAnswerer: '',
+      results: [],
+      players: {
+        [this.cId]: {
+          cId: this.cId,
+          name: name,
+          iconNum: iconNum,
+          online: true,
+        },
+      },
+    };
+    this.mode = this.determineMode();
+    this.loading = false;
     this.push();
   }
 
@@ -170,7 +197,6 @@ class ConnManager {
   startGame(questions: string[]) {
     this.state = { ...this.state!, questions: questions };
     this.mode = Mode.ANSWERING_QUESTION;
-    this.loading = true;
     this.push();
   }
 
