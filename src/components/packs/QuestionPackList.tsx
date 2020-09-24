@@ -13,7 +13,6 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   makeStyles,
-  Grid,
 } from '@material-ui/core';
 import {
   Edit,
@@ -39,7 +38,6 @@ import useOnlineStatus from '../../utils/useOnlineStatus';
 import AuthContext from '../login/AuthContext';
 import packsAPI from '../../api/packs';
 import categoriesAPI from '../../api/categories';
-import ActionButton from '../common/ActionButton';
 
 const useStyles = makeStyles(theme => ({
   searchBar: {

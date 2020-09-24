@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import {
   TextField,
-  Button,
   Chip,
   FormControlLabel,
   Switch,
+  makeStyles,
 } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import EditQuestionsList from './EditQuestionsList';
@@ -12,8 +12,32 @@ import { useHistory } from 'react-router-dom';
 import { LocalQuestionPack } from '../../types/questionPack';
 import { Category } from '../../types/category';
 import BackButton from '../common/BackButton';
+import ActionButton from '../common/ActionButton';
 
 const INVALID_ID = 0;
+
+const useStyles = makeStyles(theme => ({
+  buttonGroup: {
+    position: 'absolute',
+    width: '100%',
+    bottom: '0px',
+    textAlign: 'center',
+  },
+  button: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+  },
+  container: {
+    overflow: 'auto',
+    marginTop: theme.spacing(2),
+    textAlign: 'center',
+  },
+  root: {
+    height: 'calc(100% - 168px)',
+    display: 'flex',
+    flexFlow: 'column',
+  },
+}));
 
 // TODO ensure invalid question packs cannot be submitted
 const QuestionPackForm: React.FC<{
@@ -36,8 +60,10 @@ const QuestionPackForm: React.FC<{
   categories,
 }) => {
   const [pack, setPack] = useState<LocalQuestionPack>(editPack);
+  const [tempCategory, setTempCategory] = useState('');
 
   const history = useHistory();
+  const classes = useStyles();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPack({ ...pack, name: e.target.value });
@@ -56,14 +82,28 @@ const QuestionPackForm: React.FC<{
     setPack({ ...pack, categories: categories });
   };
 
+  const handleSave = () => {
+    if (tempCategory.trim() !== '') {
+      pack.categories.push(tempCategory.trim());
+    }
+    handleSubmit(pack);
+  };
+
   const handlePublicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPack({ ...pack, public: event.target.checked });
   };
 
+  const disableButton =
+    pack.name.trim() === '' ||
+    pack.questions.some(question => question.trim() === '') ||
+    pack.questions.length === 0;
+
   return (
-    <>
+    <div className={classes.root}>
       <TextField
         label="Pack name"
+        error={pack.name.trim() === ''}
+        helperText={pack.name.trim() === '' ? 'Pack name cannot be blank!' : ''}
         value={pack.name}
         onChange={handleNameChange}
       />
@@ -85,14 +125,24 @@ const QuestionPackForm: React.FC<{
           ))
         }
         renderInput={params => (
-          <TextField {...params} label="Categories" placeholder="e.g. Fun" />
+          <TextField
+            {...params}
+            label="Categories"
+            placeholder="e.g. Fun"
+            value={tempCategory}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setTempCategory(e.target.value)
+            }
+          />
         )}
       />
 
-      <EditQuestionsList
-        questions={pack.questions}
-        setQuestions={handleSetQuestions}
-      />
+      <div className={classes.container}>
+        <EditQuestionsList
+          questions={pack.questions}
+          setQuestions={handleSetQuestions}
+        />
+      </div>
       <FormControlLabel
         control={
           <Switch
@@ -103,16 +153,23 @@ const QuestionPackForm: React.FC<{
         }
         label={pack.public ? 'Public' : 'Private'}
       />
-      <Button
-        variant="contained"
-        color="primary"
-        disabled={pack.questions.length === 0}
-        onClick={() => handleSubmit(pack)}
-      >
-        {pack.id === INVALID_ID ? 'CREATE PACK' : 'SAVE PACK'}
-      </Button>
-      <BackButton handleBack={() => history.push('/packs')} />
-    </>
+      <div className={classes.buttonGroup}>
+        <ActionButton
+          variant="contained"
+          color="primary"
+          disabled={disableButton}
+          onClick={handleSave}
+          className={classes.button}
+        >
+          {pack.id === INVALID_ID ? 'CREATE PACK' : 'SAVE PACK'}
+        </ActionButton>
+        <BackButton
+          text="back to packs"
+          handleBack={() => history.push('/packs')}
+          className={classes.button}
+        />
+      </div>
+    </div>
   );
 };
 
