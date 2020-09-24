@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ApiErrorResponse } from '../types/api';
 import store from '../utils/store';
 
@@ -62,16 +62,16 @@ function processRequest<T>(
 // Extracts error message.
 function makeApiErrorResponse(error: AxiosError): ApiErrorResponse {
   const code = error.response ? error.response.status : -1;
-  if (!error.response || !error.response.data || !error.response.data.errors) {
+  if (!error.response || !error.response.data || !error.response.data.error) {
     return {
       code: code,
-      errors: [],
+      error: [],
     };
   }
 
   return {
     code: code,
-    errors: error.response.data.errors,
+    error: error.response.data.error,
   };
 }
 
