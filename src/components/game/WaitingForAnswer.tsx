@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Typography, makeStyles, Grid } from '@material-ui/core';
 
-import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import GameContext from './GameContext';
 import ScoreBoard from './common/ScoreBoard';
 import OuterGrid from '../common/OuterGrid';
@@ -31,10 +30,6 @@ const WaitingForAnswer: React.FC = () => {
   // -1 as we are showing previous round's results
   return (
     <div className={classes.root}>
-      <ProgressBarCountdownTimer
-        countdownSeconds={60}
-        className={classes.header}
-      />
       <OuterGrid>
         <CenteredInnerGrid>
           <Grid item xs={12}>
