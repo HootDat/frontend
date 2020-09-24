@@ -1,43 +1,44 @@
-import React, { useState, useEffect, useContext } from 'react';
 import {
   Button,
-  Typography,
-  Paper,
-  InputBase,
-  IconButton,
-  SwipeableDrawer,
-  Divider,
-  ListItem,
   Checkbox,
+  Divider,
+  IconButton,
+  InputBase,
   List,
-  ListItemText,
+  ListItem,
   ListItemSecondaryAction,
+  ListItemText,
   makeStyles,
+  Paper,
+  SwipeableDrawer,
+  Typography,
 } from '@material-ui/core';
 import {
-  Edit,
+  Add,
   Delete,
-  Search,
+  Edit,
   Filter,
   FilterList,
-  Add,
+  Search,
 } from '@material-ui/icons';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
-
+import React, { useContext, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import categoriesAPI from '../../api/categories';
+import packsAPI from '../../api/packs';
+import { ApiErrorResponse } from '../../types/api';
+import { Category } from '../../types/category';
 import {
   CommunityQuestionPack,
-  QuestionPackPostData,
   LocalQuestionPack,
   QuestionPack,
+  QuestionPackPostData,
 } from '../../types/questionPack';
-import { Category } from '../../types/category';
 import store from '../../utils/store';
-import { useHistory } from 'react-router-dom';
-import BackButton from '../common/BackButton';
 import useOnlineStatus from '../../utils/useOnlineStatus';
+import BackButton from '../common/BackButton';
+import PushNotification from '../common/notification/PushNotification';
 import AuthContext from '../login/AuthContext';
-import packsAPI from '../../api/packs';
-import categoriesAPI from '../../api/categories';
 
 const useStyles = makeStyles(theme => ({
   searchBar: {
@@ -121,6 +122,7 @@ const QuestionPackList: React.FC<Props> = ({
   const classes = useStyles();
 
   const authState = useContext(AuthContext);
+  const pushNotif = useContext(PushNotification);
 
   const [communityPacks, setCommunityPacks] = useState(
     [] as CommunityQuestionPack[]
@@ -169,35 +171,55 @@ const QuestionPackList: React.FC<Props> = ({
     }
   };
 
-  const handleDeletePack = (pack: LocalQuestionPack) => {
+  const handleDeletePack = async (pack: LocalQuestionPack) => {
     // TODO use a modal to invoke this function
     if (authState.user === null || !online) {
       store.deleteLocalPack(pack);
       setMyPacks(store.getLocalPacks());
-    } else {
-      packsAPI
-        .deletePack(pack.id)
-        .then(
-          success => store.deletePack(pack.id),
-          failure => {
-            if (failure.code === 400) {
-              // probably deleted already, so pack
-              // does not exist
-              store.deletePack(pack.id);
-            } else if (failure.code === 401) {
-              store.removeLoginState();
-              authState.setAuthState({ ...authState, user: null });
-              // TODO notify user expired, logout
-              // otherwise, network issue? try again later
-            }
-          }
-        )
-        .then(() => {
-          setMyPacks(store.getLocalPacks());
-          setViewingPack(null);
-          hideOutsideContent(false);
-        });
+      return;
     }
+
+    try {
+      await packsAPI.deletePack(pack.id);
+      store.deletePack(pack.id);
+    } catch (error) {
+      const apiError = error as ApiErrorResponse;
+      if (apiError.code === 401) {
+        store.removeLoginState();
+        authState.setAuthState({ ...authState, user: null });
+        pushNotif({
+          message: 'Log in expired, please log in again',
+          severity: 'error',
+        });
+        history.push('/login');
+        return;
+      }
+      if (apiError.code === 403) {
+        pushNotif({
+          message: apiError.body?.error || 'Permission denied',
+          severity: 'error',
+        });
+        return;
+      }
+      if (apiError.code === 400) {
+        // probably deleted already, so pack does not exist
+        pushNotif({
+          message: apiError.body?.error || 'Something went wrong',
+          severity: 'warning',
+        });
+        store.deletePack(pack.id);
+      } else {
+        // network issue? try again later
+        pushNotif({
+          message: "We couldn't delete your pack now, we'll try again later",
+          severity: 'warning',
+        });
+        store.deleteLocalPack(pack);
+      }
+    }
+    setMyPacks(store.getLocalPacks());
+    setViewingPack(null);
+    hideOutsideContent(false);
   };
 
   const handleClearCategoryFilter = () => {
