@@ -1,8 +1,8 @@
+import { Category } from '../types/category';
 import {
   CommunityQuestionPack,
   LocalQuestionPack,
 } from '../types/questionPack';
-import { Category } from '../types/category';
 import { User } from '../types/user';
 
 const ACCESS_TOKEN = 'access_token';
@@ -164,7 +164,7 @@ class Store {
         name: name, // only meaningful if user is logged in
       },
       action: 'new',
-      updated_at: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     this.setPack(PackNew);
   }
@@ -179,7 +179,7 @@ class Store {
     const editedPack: LocalQuestionPack = {
       ...pack,
       action: action,
-      updated_at: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     this.setPack(editedPack);
   }
@@ -195,14 +195,14 @@ class Store {
       const deletedPack: LocalQuestionPack = {
         ...pack,
         action: 'delete',
-        updated_at: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
       this.setPack(deletedPack);
     }
   }
 
   // replaces the pack with the same id in
-  // storage if updated_at is later
+  // storage if updatedAt is later
   downloadPack(pack: CommunityQuestionPack) {
     if (!this.isAvailable()) {
       return;
@@ -211,8 +211,8 @@ class Store {
     const maybeLocalPack = this.getLocalPack(pack.id);
 
     if (maybeLocalPack !== undefined) {
-      const localUpdateTime = new Date(maybeLocalPack.updated_at);
-      const serverUpdateTime = new Date(pack.updated_at);
+      const localUpdateTime = new Date(maybeLocalPack.updatedAt);
+      const serverUpdateTime = new Date(pack.updatedAt);
       if (localUpdateTime > serverUpdateTime) {
         // use local copy
         return;
