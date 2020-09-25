@@ -77,7 +77,7 @@ const Lobby: React.FC<{
 
   const handleQuit = () => {
     conn.leaveRoom();
-    history.replace('/');
+    history.push('/');
   };
 
   const playersCard = (

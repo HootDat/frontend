@@ -45,7 +45,7 @@ const GameEnd: React.FC = () => {
 
   const handleQuit = () => {
     conn.leaveRoom();
-    history.replace('/');
+    history.push('/');
   };
 
   // TODO FACEBOOK SHARE?

@@ -52,7 +52,7 @@ const GameShell: React.FC = () => {
     if (gameCode !== null && re.test(gameCode)) {
       conn.updateMode(Mode.JOIN_ROOM);
     } else if (gameCode !== null) {
-      history.replace('/');
+      history.push('/');
     }
 
     return () => {
@@ -64,7 +64,7 @@ const GameShell: React.FC = () => {
   // we only keep make the gameCode stay in the url if in game
   useEffect(() => {
     if (state && state.gameCode) {
-      history.replace(`/?gameCode=${state.gameCode}`);
+      history.push(`/?gameCode=${state.gameCode}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);

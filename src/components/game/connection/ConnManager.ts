@@ -1,6 +1,7 @@
 import GameState, { Mode, reset, SocketGameState, Player } from '../GameState';
 import io from 'socket.io-client';
 import { Notification } from '../../common/notification/PushNotification';
+import { ChatMessage } from '../common/ChatMessage';
 
 const noOp = () => {};
 
@@ -14,6 +15,8 @@ class ConnManager {
   stateUpdater: (mode: GameState) => void;
   state: SocketGameState | null;
   pushNotifier: (notif: Notification) => void;
+  chatHandler: (messages: ChatMessage[]) => void;
+  chatMessages: ChatMessage[];
 
   constructor() {
     // placeholders
@@ -35,6 +38,8 @@ class ConnManager {
 
     this.stateUpdater = noOp;
     this.pushNotifier = noOp;
+    this.chatHandler = noOp;
+    this.chatMessages = [];
   }
 
   addReconnectors() {
@@ -86,6 +91,10 @@ class ConnManager {
     this.pushNotifier = pushNotifier;
   }
 
+  setChatHandler(chatHandler: (messages: ChatMessage[]) => void) {
+    this.chatHandler = chatHandler;
+  }
+
   push() {
     this.stateUpdater(this.getGameState());
   }
@@ -97,6 +106,7 @@ class ConnManager {
     this.cId = cId;
     this.loading = loading;
     this.state = state;
+    this.chatHandler = noOp;
   }
 
   updateMode(mode: Mode) {
@@ -148,6 +158,7 @@ class ConnManager {
     this.socket.on('game.join', (gameState: SocketGameState) => {
       this.state = gameState;
 
+      this.chatMessages = [];
       this.mode = this.determineMode();
       this.loading = false;
       this.push();
@@ -189,6 +200,15 @@ class ConnManager {
         });
       }
       this.push();
+    });
+
+    this.socket.on('game.event.chat', (message: ChatMessage) => {
+      // ignore as we already added it ourselves
+      if (this.cId === message.cId) return;
+
+      this.chatMessages.push(message);
+
+      this.chatHandler([...this.chatMessages]);
     });
   }
 
@@ -258,6 +278,8 @@ class ConnManager {
     });
     this.state = null;
     this.loading = false;
+    this.chatHandler = noOp;
+    this.chatMessages = [];
     this.mode = Mode.HOME;
     this.push();
   }
@@ -293,6 +315,15 @@ class ConnManager {
     this.socket.emit('game.event.host.playAgain', {
       gameCode: this.state!.gameCode,
     });
+  }
+
+  sendMessage(message: string) {
+    this.socket.emit('game.event.chat', {
+      gameCode: this.state!.gameCode,
+      message,
+    });
+    this.chatMessages.push({ cId: this.cId, message });
+    this.chatHandler([...this.chatMessages]);
   }
 }
 

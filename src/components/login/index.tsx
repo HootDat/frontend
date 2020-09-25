@@ -39,7 +39,7 @@ const Login: React.FC = () => {
             // store will choose whether to use server or local copy
             myPacks.forEach(pack => store.downloadPack(pack));
 
-            history.replace('/');
+            history.push('/');
           });
         // TODO notificiaton to inform user that we are syncing
       } catch (err) {
