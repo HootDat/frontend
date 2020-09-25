@@ -147,9 +147,7 @@ const QuestionPackList: React.FC<Props> = ({
     }
 
     // TODO add pagination
-    packsAPI
-      .getPacks(undefined, undefined, 'community')
-      .then(setCommunityPacks, () => {});
+    packsAPI.getPacks({ scope: 'community' }).then(setCommunityPacks, () => {});
 
     categoriesAPI
       .getCategories()

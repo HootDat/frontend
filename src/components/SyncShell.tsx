@@ -18,7 +18,7 @@ export const SyncShell: React.FC = ({ children }) => {
     store.keepPacksForUser(user.id);
     // fetch my packs and merge
     // appshell will send the remaining requests for new packs
-    const myPacks = await packsAPI.getPacks(undefined, undefined, 'own');
+    const myPacks = await packsAPI.getPacks({ scope: 'own' });
     // store will choose whether to use server or local copy
     myPacks.forEach(pack => store.downloadPack(pack));
   };

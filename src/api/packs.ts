@@ -5,14 +5,16 @@ import {
 } from '../types/questionPack';
 import base from './base';
 
+type getParams = {
+  limit?: number;
+  offset?: number;
+  scope?: 'all' | 'own' | 'community';
+  categories?: Category[];
+};
+
 const packsAPI = {
-  getPacks: async (
-    limit?: number,
-    offset?: number,
-    scope?: 'all' | 'own' | 'community',
-    categories?: Category[]
-  ): Promise<[CommunityQuestionPack]> => {
-    return base.getData(`/packs`, { limit, offset, scope, categories });
+  getPacks: async (params: getParams): Promise<[CommunityQuestionPack]> => {
+    return base.getData(`/packs`, params);
   },
 
   newPack: async (
