@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   IconButton,
   makeStyles,
@@ -7,9 +7,10 @@ import {
   Dialog,
   DialogContent,
 } from '@material-ui/core';
-import { Share, Close } from '@material-ui/icons';
+import { Share, Close, Link } from '@material-ui/icons';
 import { ReactComponent as Whatsapp } from '../../../svg/whatsapp-brands.svg';
 import { ReactComponent as Telegram } from '../../../svg/telegram-brands.svg';
+import PushNotification from '../../common/notification/PushNotification';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -33,6 +34,7 @@ const ShareButton: React.FC<{ gameCode: string }> = ({ gameCode }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const classes = useStyles();
+  const pushNotif = useContext(PushNotification);
   const url = `${window.location.origin}/?gameCode=${gameCode}`;
 
   const WhatsappIcon = () => (
@@ -54,6 +56,14 @@ const ShareButton: React.FC<{ gameCode: string }> = ({ gameCode }) => {
     window.open(apiLink, '_blank');
   };
 
+  const handleCopy = async () => {
+    await navigator.clipboard
+      .writeText(url)
+      .then(() =>
+        pushNotif({ message: 'Copied link to clipboard', severity: 'info' })
+      );
+  };
+
   const handleClick = () => {
     if ((navigator as any).share !== undefined) {
       (navigator as any).share({
@@ -61,7 +71,6 @@ const ShareButton: React.FC<{ gameCode: string }> = ({ gameCode }) => {
         url: url,
       });
     } else {
-      console.log('opened dialog');
       setIsOpen(true);
     }
   };
@@ -92,6 +101,10 @@ const ShareButton: React.FC<{ gameCode: string }> = ({ gameCode }) => {
 
         <IconButton onClick={handleTelegram}>
           <TelegramIcon />
+        </IconButton>
+
+        <IconButton onClick={handleCopy}>
+          <Link className={classes.icon} />
         </IconButton>
       </DialogContent>
     </Dialog>

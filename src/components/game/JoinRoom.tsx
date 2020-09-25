@@ -15,12 +15,12 @@ const JoinRoom: React.FC = () => {
   const history = useHistory();
 
   const handleGameCode = (gameCode: string) => {
-    history.replace(`/?gameCode=${gameCode}`);
+    history.push(`/?gameCode=${gameCode}`);
   };
 
   const handleBack = () => {
     conn.updateMode(Mode.HOME);
-    history.replace('/');
+    history.push('/');
   };
 
   const handleJoinRoom = (name: string, iconNum: number) => {

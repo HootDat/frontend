@@ -4,6 +4,7 @@ import { Button, makeStyles } from '@material-ui/core';
 import AuthContext from './AuthContext';
 import store from '../../utils/store';
 import PushNotification from '../common/notification/PushNotification';
+import useOnlineStatus from '../../utils/useOnlineStatus';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -15,6 +16,7 @@ const useStyles = makeStyles(theme => ({
 const LogInOutButton: React.FC = () => {
   const authState = useContext(AuthContext);
   const pushNotif = useContext(PushNotification);
+  const online = useOnlineStatus();
 
   const classes = useStyles();
 
@@ -24,6 +26,7 @@ const LogInOutButton: React.FC = () => {
       component={RouterLink}
       to="/login"
       className={classes.root}
+      disabled={!online}
     >
       LOG IN
     </Button>

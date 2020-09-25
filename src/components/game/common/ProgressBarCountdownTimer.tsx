@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LinearProgress, LinearProgressProps } from '@material-ui/core';
+import {
+  LinearProgress,
+  LinearProgressProps,
+  Typography,
+} from '@material-ui/core';
 
 type Props = LinearProgressProps & {
   countdownSeconds: number;
@@ -30,13 +34,20 @@ const ProgressBarCountdownTimer: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const timeLeft = Math.ceil(((100 - progress) * countdownSeconds) / 100);
   return (
-    <LinearProgress
-      variant="determinate"
-      value={progress}
-      color="secondary"
-      {...props}
-    />
+    <>
+      <Typography variant="h4" align="center">
+        {timeLeft}
+      </Typography>
+      <LinearProgress
+        variant="determinate"
+        value={progress}
+        color="secondary"
+        style={{ marginTop: '8px' }}
+        {...props}
+      />
+    </>
   );
 };
 

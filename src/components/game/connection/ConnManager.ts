@@ -1,5 +1,7 @@
-import GameState, { Mode, home, SocketGameState, Player } from '../GameState';
+import GameState, { Mode, reset, SocketGameState, Player } from '../GameState';
 import io from 'socket.io-client';
+import { Notification } from '../../common/notification/PushNotification';
+import { ChatMessage } from '../common/ChatMessage';
 
 const noOp = () => {};
 
@@ -7,15 +9,18 @@ const noOp = () => {};
 class ConnManager {
   mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
   cId: string; // TODO put cId in local storage
-  loading: boolean;
+  loading: boolean; // only used for joining and creating room at the start
 
   socket: SocketIOClient.Socket;
   stateUpdater: (mode: GameState) => void;
   state: SocketGameState | null;
+  pushNotifier: (notif: Notification) => void;
+  chatHandler: (messages: ChatMessage[]) => void;
+  chatMessages: ChatMessage[];
 
   constructor() {
     // placeholders
-    const { mode, cId, state } = home();
+    const { mode, cId, state } = reset();
     this.socket = io(process.env.REACT_APP_BACKEND_URL!, {
       query: {
         cId: cId,
@@ -24,6 +29,7 @@ class ConnManager {
     });
     this.addReconnectors();
     this.addEventHandlers();
+    this.addErrorHandlers();
 
     this.mode = mode;
     this.cId = cId;
@@ -31,22 +37,37 @@ class ConnManager {
     this.loading = false;
 
     this.stateUpdater = noOp;
+    this.pushNotifier = noOp;
+    this.chatHandler = noOp;
+    this.chatMessages = [];
   }
 
   addReconnectors() {
+    this.socket.on('connect', () => {
+      if (window.location.pathname === '/') {
+        this.pushNotifier({
+          message: 'Connected to server!',
+          severity: 'success',
+        });
+      }
+    });
+
     this.socket.on('reconnecting', () => {
-      // TODO: on reconnecting, display disconencted, reconnecting banner
-      console.log('failed to connect to server, reconnecting');
+      if (window.location.pathname === '/') {
+        this.pushNotifier({
+          message: 'Attempting to connect to server...',
+          severity: 'info',
+        });
+      }
     });
 
     this.socket.on('disconnect', () => {
-      // TODO: on disconnect, display disconnected, reconnecting banner
-      console.log('server disconnected, reconnecting');
-    });
-
-    this.socket.on('reconnect', () => {
-      // TODO: on reconnect, display reconnected banner
-      console.log('reconnected!');
+      if (window.location.pathname === '/') {
+        this.pushNotifier({
+          message: 'Disconnected from server',
+          severity: 'info',
+        });
+      }
     });
   }
 
@@ -72,17 +93,26 @@ class ConnManager {
     this.push();
   }
 
+  setPushNotifier(pushNotifier: (notif: Notification) => void) {
+    this.pushNotifier = pushNotifier;
+  }
+
+  setChatHandler(chatHandler: (messages: ChatMessage[]) => void) {
+    this.chatHandler = chatHandler;
+  }
+
   push() {
     this.stateUpdater(this.getGameState());
   }
 
   resetAttributes() {
-    const { loading, mode, cId, state } = home();
+    const { loading, mode, cId, state } = reset();
 
     this.mode = mode;
     this.cId = cId;
     this.loading = loading;
     this.state = state;
+    this.chatHandler = noOp;
   }
 
   updateMode(mode: Mode) {
@@ -106,7 +136,7 @@ class ConnManager {
       case 'lobby':
         return Mode.WAITING_ROOM;
       case 'answer':
-        return this.state.curAnswerer === this.cId
+        return this.state.yourRole === 'answerer'
           ? Mode.ANSWERING_QUESTION
           : Mode.WAITING_FOR_ANSWER;
       case 'guess':
@@ -118,6 +148,11 @@ class ConnManager {
     }
   }
 
+  // TODO handle on errors
+  // TODO we are ignoring
+  // game.event.questions.update
+  // game.event.player.update
+
   addEventHandlers() {
     this.socket.on('auth.loggedInElsewhere', () => {
       this.state = null;
@@ -128,73 +163,127 @@ class ConnManager {
 
     this.socket.on('game.join', (gameState: SocketGameState) => {
       this.state = gameState;
+
+      this.chatMessages = [];
       this.mode = this.determineMode();
       this.loading = false;
       this.push();
     });
 
-    this.socket.on('game.event.join', (player: Player) => {
+    this.socket.on('game.event.player.join', (player: Player) => {
       if (this.state === null) return; // error
 
-      this.state.players[player.cId] = player;
+      this.state = {
+        ...this.state,
+        players: { ...this.state.players, [player.cId]: player },
+      };
+
       this.push();
     });
 
-    this.socket.on('game.event.leave', (player: Player) => {
+    this.socket.on('game.event.player.leave', (player: Player) => {
       if (this.state === null) return; // error
 
+      this.state = { ...this.state, players: { ...this.state.players } };
       delete this.state.players[player.cId];
+      this.push();
+    });
+
+    this.socket.on('game.event.transition', (gameState: SocketGameState) => {
+      // note that this game state is PARTIAL
+      // TODO what if i am actually in a different phase and
+      // received the events out of order?
+      this.state = { ...this.state!, ...gameState };
+      this.mode = this.determineMode();
+      this.push();
+    });
+
+    this.socket.on('game.event.newHost', (host: string) => {
+      this.state = { ...this.state!, host };
+      if (host === this.cId) {
+        this.pushNotifier({
+          message: "Hoot! You're the new host!",
+          severity: 'info',
+        });
+      }
+      this.push();
+    });
+
+    this.socket.on('game.event.chat', (message: ChatMessage) => {
+      // ignore as we already added it ourselves
+      if (this.cId === message.cId) return;
+
+      this.chatMessages.push(message);
+
+      this.chatHandler([...this.chatMessages]);
+    });
+  }
+
+  // ignore game.leave.error (we left, we don't care.)
+  // game.event.questions.update.error
+  addErrorHandlers() {
+    const someError = () => {
+      this.pushNotifier({
+        message: 'Something went wrong.',
+        severity: 'error',
+      });
+      this.loading = false;
+      this.push();
+    };
+    this.socket.on('game.create.error', someError);
+    this.socket.on('game.event.host.start.error', someError);
+    this.socket.on('game.event.player.answer.error', someError);
+    this.socket.on('game.event.questions.update.error', someError);
+
+    this.socket.on('game.join.error', (maybeMessage: string | undefined) => {
+      if (maybeMessage === 'No such game exists.') {
+        this.pushNotifier({
+          message: 'This game code is invalid',
+          severity: 'error',
+        });
+      } else {
+        this.pushNotifier({
+          message: 'Something went wrong',
+          severity: 'error',
+        });
+      }
+      this.loading = false;
+      this.push();
+    });
+
+    this.socket.on('game.kick', () => {
+      this.pushNotifier({
+        message: 'Game room does not exist',
+        severity: 'error',
+      });
+      this.loading = false;
+      this.state = null;
+      this.mode = Mode.HOME;
       this.push();
     });
   }
 
   createRoom(name: string, iconNum: number) {
+    if (this.socket.disconnected) {
+      this.pushNotifier({
+        message: 'Failed to connect to server',
+        severity: 'error',
+      });
+      return;
+    }
     this.socket.emit('game.create', { name: name, iconNum: iconNum });
     this.loading = true;
-    // TODO remove this. this is here wghile socket isnt set up yet
-    this.state = {
-      yourRole: '',
-      gameCode: '1234',
-      host: this.cId,
-      qnNum: 0,
-      phase: 'lobby',
-      questions: [],
-      curAnswer: '',
-      curAnswerer: '',
-      results: [],
-      players: {
-        [this.cId]: {
-          cId: this.cId,
-          name: name,
-          iconNum: iconNum,
-          online: true,
-        },
-        cid2: {
-          cId: 'cid2',
-          name: 'player 2',
-          iconNum: 0,
-          online: true,
-        },
-        cid3: {
-          cId: 'cid3',
-          name: 'player 3',
-          iconNum: 0,
-          online: true,
-        },
-        cid4: {
-          cId: 'cid4',
-          name: 'player 4',
-          iconNum: 0,
-          online: true,
-        },
-      },
-    };
-    this.mode = this.determineMode();
-    this.loading = false;
     this.push();
   }
 
   joinRoom(gameCode: string, name: string, iconNum: number) {
+    if (this.socket.disconnected) {
+      this.pushNotifier({
+        message: 'Failed to connect to server',
+        severity: 'error',
+      });
+      return;
+    }
     this.socket.emit('game.join', {
       gameCode: gameCode,
       name: name,
@@ -205,58 +294,57 @@ class ConnManager {
   }
 
   leaveRoom() {
-    this.socket.emit('game.leave');
+    this.socket.emit('game.leave', {
+      gameCode: this.state!.gameCode,
+    });
     this.state = null;
     this.loading = false;
+    this.chatHandler = noOp;
+    this.chatMessages = [];
     this.mode = Mode.HOME;
     this.push();
   }
 
-  startGame(questions: string[]) {
-    this.state = { ...this.state!, questions: questions };
-    this.mode = Mode.ANSWERING_QUESTION;
-    this.push();
+  sendQuestions(questions: string[]) {
+    this.socket.emit('game.event.questions.update', {
+      gameCode: this.state!.gameCode,
+      questions: questions,
+    });
+  }
+
+  startGame() {
+    this.socket.emit('game.event.host.start', {
+      gameCode: this.state!.gameCode,
+    });
   }
 
   sendAnswer(answer: string) {
-    this.state = { ...this.state! };
-    this.state.curAnswer = answer;
-    this.state.curAnswerer = this.cId;
-    /*
-    {
-      type: 'answer',
-      content: answer,
-    }
-    */
-    this.mode = Mode.GUESSING_ANSWERER;
-    this.push();
+    this.socket.emit('game.event.player.answer', {
+      gameCode: this.state!.gameCode,
+      answer: answer,
+    });
   }
 
   guessAnswerer(answerer: string) {
-    this.state = { ...this.state! };
-    this.state.results.push([
-      { cId: this.cId, score: 1, answer: answerer, role: this.state!.yourRole },
-    ]);
-    /*
-      type: 'guess',
-      content: answerer,
-    }*/
-    this.mode = Mode.ROUND_END;
-    this.push();
+    this.socket.emit('game.event.player.answer', {
+      gameCode: this.state!.gameCode,
+      answer: answerer,
+    });
   }
 
-  readyForNextRound() {
-    this.state = { ...this.state! };
-    this.state.qnNum++;
-    if (this.state.qnNum >= this.state.questions.length) {
-      this.state.qnNum = 0;
-      this.state.curAnswer = '';
-      this.state.curAnswerer = '';
-      this.mode = Mode.GAME_END;
-    } else {
-      this.mode = Mode.ANSWERING_QUESTION;
-    }
-    this.push();
+  backToLobby() {
+    this.socket.emit('game.event.host.playAgain', {
+      gameCode: this.state!.gameCode,
+    });
+  }
+
+  sendMessage(message: string) {
+    this.socket.emit('game.event.chat', {
+      gameCode: this.state!.gameCode,
+      message,
+    });
+    this.chatMessages.push({ cId: this.cId, message });
+    this.chatHandler([...this.chatMessages]);
   }
 }
 

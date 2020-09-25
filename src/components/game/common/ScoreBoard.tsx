@@ -31,7 +31,7 @@ const ScoreBoard: React.FC<{
   header?: boolean;
   winning?: boolean;
   host?: string;
-  results: Result[];
+  results: { [cId: string]: Result };
   players: { [cId: string]: Player };
 }> = ({ header, winning, host, results, players }) => {
   const classes = useStyles();
@@ -41,22 +41,26 @@ const ScoreBoard: React.FC<{
 
   const winningSort = (a: Result, b: Result) => b.score - a.score;
 
-  const scoreBoard = results
+  const scoreBoard = Object.values(results)
     .sort(winning ? winningSort : defaultSort)
     .map((result, index) => {
       return (
-        <ListItem key={result.cId} className={classes.listItem}>
-          <HootAvatar number={players[result.cId].iconNum} size="xsmall" />
-          <Typography variant="body1" className={classes.playerText}>
-            <Box
-              fontWeight={winning && index === 0 ? 'fontWeightBold' : undefined}
-              display="inline"
-            >
-              {players[result.cId].name}
-            </Box>
-          </Typography>
-          <Chip size="small" color="secondary" label={`${result.score}PT`} />
-        </ListItem>
+        players[result.cId] !== undefined && (
+          <ListItem key={result.cId} className={classes.listItem}>
+            <HootAvatar number={players[result.cId].iconNum} size="xsmall" />
+            <Typography variant="body1" className={classes.playerText}>
+              <Box
+                fontWeight={
+                  winning && index === 0 ? 'fontWeightBold' : undefined
+                }
+                display="inline"
+              >
+                {players[result.cId].name}
+              </Box>
+            </Typography>
+            <Chip size="small" color="secondary" label={`${result.score}PT`} />
+          </ListItem>
+        )
       );
     });
 

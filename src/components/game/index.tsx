@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 
 import ConnContext from './connection/ConnContext';
@@ -19,6 +19,8 @@ import PaddedDiv from '../common/PaddedDiv';
 import LoggedInElsewhere from './LoggedInElsewhere';
 
 import { Backdrop, CircularProgress, makeStyles } from '@material-ui/core';
+import PushNotification from '../common/notification/PushNotification';
+import useOnlineStatus from '../../utils/useOnlineStatus';
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
@@ -33,33 +35,47 @@ const GameShell: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(conn.getGameState());
   const { loading, mode, state } = gameState;
 
+  const pushNotifier = useContext(PushNotification);
+
   const history = useHistory();
   const gameCode = new URLSearchParams(useLocation().search).get('gameCode');
+  const online = useOnlineStatus();
 
   const classes = useStyles();
 
   useEffect(() => {
     conn.setStateUpdater(setGameState);
-    conn.connectToServer();
+    conn.setPushNotifier(pushNotifier);
 
     // we only want to auto join a room on load, so don't depend
     // on history and gamecode
     const re = /^[0-9]{4}$/;
-    if (gameCode !== null && re.test(gameCode)) {
+    if (gameCode !== null && re.test(gameCode) && online) {
       conn.updateMode(Mode.JOIN_ROOM);
     } else if (gameCode !== null) {
-      history.replace('/');
+      history.push('/');
     }
 
-    return () => {
-      conn.cleanup();
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    if (!online) {
+      return;
+    }
+
+    // otherwise try to connect
+    conn.connectToServer();
+
+    return () => {
+      conn.cleanup();
+    };
+  }, [online]);
+
+  // we only keep make the gameCode stay in the url if in game
+  useEffect(() => {
     if (state && state.gameCode) {
-      history.replace(`/?gameCode=${state.gameCode}`);
+      history.push(`/?gameCode=${state.gameCode}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);

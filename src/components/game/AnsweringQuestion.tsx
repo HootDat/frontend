@@ -7,7 +7,6 @@ import {
   makeStyles,
 } from '@material-ui/core';
 
-import ProgressBarCountdownTimer from './common/ProgressBarCountdownTimer';
 import ConnContext from './connection/ConnContext';
 import GameContext from './GameContext';
 
@@ -67,12 +66,16 @@ const AnsweringQuestion: React.FC = () => {
     conn.sendAnswer(answer);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (answer.trim() === '' || answered) return;
+
+    if (e.key === 'Enter') {
+      handleAnswer();
+    }
+  };
+
   return (
     <div className={classes.root}>
-      <ProgressBarCountdownTimer
-        countdownSeconds={60}
-        className={classes.header}
-      />
       <OuterGrid>
         <CenteredInnerGrid>
           <Grid item xs={12}>
@@ -93,6 +96,7 @@ const AnsweringQuestion: React.FC = () => {
               fullWidth
               disabled={answered}
               onChange={handleChange}
+              onKeyPress={handleKeyPress}
             />
           </Grid>
         </CenteredInnerGrid>

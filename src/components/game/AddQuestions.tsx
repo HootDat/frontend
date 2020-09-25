@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Typography, Button, Grid, makeStyles } from '@material-ui/core';
 import EditQuestionsList from '../packs/EditQuestionsList';
 import QuestionPackList from '../packs/QuestionPackList';
@@ -6,6 +6,7 @@ import BackButton from '../common/BackButton';
 import HootAvatar from '../common/HootAvatar';
 
 import ActionButton from '../common/ActionButton';
+import ConnContext from './connection/ConnContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,11 +51,11 @@ const AddQuestions: React.FC<{
   const [questions, setQuestions] = useState([...roomQuestions]);
   const [addingFromPack, setAddingFromPack] = useState(false);
   const [hideButton, setHideButton] = useState(false);
+  const conn = useContext(ConnContext);
 
   const handleAdd = () => {
-    const trimmed = questions.map(s => s.trim());
-    if (trimmed.includes('')) return;
-    setRoomQuestions([...trimmed]);
+    setRoomQuestions([...questions]);
+    conn.sendQuestions(questions);
     handleBack();
   };
 
@@ -121,6 +122,10 @@ const AddQuestions: React.FC<{
             variant="contained"
             color="primary"
             onClick={handleAdd}
+            disabled={
+              questions.length === 0 ||
+              questions.some(question => question.trim() === '')
+            }
             className={classes.button}
           >
             SAVE QUESTIONS

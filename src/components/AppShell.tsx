@@ -31,6 +31,12 @@ const AppShell: React.FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    if (online) return;
+
+    setNotification({ message: 'You are currently offline', severity: 'info' });
+  }, [online]);
+
+  useEffect(() => {
     if (notification.message === '') return;
 
     setOpen(true);
@@ -58,6 +64,7 @@ const AppShell: React.FC = ({ children }) => {
           elevation={6}
           variant="filled"
           severity={notification.severity}
+          style={{ width: '100%' }}
         >
           {notification.message}
         </Alert>

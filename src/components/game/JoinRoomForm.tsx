@@ -22,10 +22,13 @@ const JoinRoomForm: React.FC<{
 }> = ({ handleJoin, handleBack }) => {
   const [input, setInput] = useState('');
 
+  const re = /^[0-9\b]{0,4}$/;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const re = /^[0-9\b]{0,4}$/;
-
     if (re.test(e.target.value)) setInput(e.target.value);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && re.test(input)) handleJoin(input);
   };
 
   return (
@@ -42,6 +45,7 @@ const JoinRoomForm: React.FC<{
           onChange={handleChange}
           value={input}
           autoFocus
+          onKeyPress={handleKeyPress}
         />
       </Grid>
       <Grid item xs={12}>

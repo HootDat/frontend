@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import authAPI from '../../api/auth';
 import { ApiErrorResponse } from '../../types/api';
 import store from '../../utils/store';
+import useOnlineStatus from '../../utils/useOnlineStatus';
 import ActionButton from '../common/ActionButton';
 import BackButton from '../common/BackButton';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
@@ -17,6 +18,7 @@ import AuthContext from './AuthContext';
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);
   const history = useHistory();
+  const online = useOnlineStatus();
   const pushNotif = useContext(PushNotification);
 
   const loggedInCallback = (response: fb.StatusResponse) => {
@@ -34,7 +36,7 @@ const Login: React.FC = () => {
       .then(async user => {
         authState.setAuthState({ ...authState, user: user });
         store.setCurrentUser(user);
-        history.replace('/');
+        history.push('/');
       })
       .catch((err: ApiErrorResponse) => {
         // No body: request timed out
@@ -85,6 +87,7 @@ const Login: React.FC = () => {
             <ActionButton
               variant="contained"
               color="primary"
+              disabled={!online}
               onClick={handleFacebookLogin}
             >
               <Facebook />
