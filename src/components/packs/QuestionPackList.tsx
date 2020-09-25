@@ -147,14 +147,16 @@ const QuestionPackList: React.FC<Props> = ({
     }
 
     // TODO add pagination
-    packsAPI.getPacks().then(setCommunityPacks, () => {});
+    packsAPI
+      .getPacks(undefined, undefined, 'community')
+      .then(setCommunityPacks, () => {});
+
     categoriesAPI
       .getCategories()
       .then(
         categories => setCategories([...categories, ...store.getCategories()]),
         setLocalCategories
       );
-    // TODO when we fetch, we filter my own ones and merge with local store as necessary
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -176,6 +178,8 @@ const QuestionPackList: React.FC<Props> = ({
     if (authState.user === null || !online) {
       store.deleteLocalPack(pack);
       setMyPacks(store.getLocalPacks());
+      setViewingPack(null);
+      hideOutsideContent(false);
       return;
     }
 
