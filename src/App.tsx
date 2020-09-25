@@ -5,7 +5,6 @@ import {
   ThemeProvider,
 } from '@material-ui/core';
 import React from 'react';
-import './App.css';
 import AppRouter from './components/AppRouter';
 import AppShell from './components/AppShell';
 import { SyncShell } from './components/SyncShell';
