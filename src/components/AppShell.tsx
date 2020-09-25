@@ -3,6 +3,7 @@ import { Close } from '@material-ui/icons';
 import { Alert } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react';
 import store from '../utils/store';
+import useOnlineStatus from '../utils/useOnlineStatus';
 import PushNotification, {
   Notification,
 } from './common/notification/PushNotification';
@@ -21,6 +22,7 @@ const AppShell: React.FC = ({ children }) => {
     message: '',
   });
   const [open, setOpen] = useState(false);
+  const online = useOnlineStatus();
 
   useEffect(() => {
     setAuthState({
