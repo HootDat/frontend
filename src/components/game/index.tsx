@@ -20,6 +20,7 @@ import LoggedInElsewhere from './LoggedInElsewhere';
 
 import { Backdrop, CircularProgress, makeStyles } from '@material-ui/core';
 import PushNotification from '../common/notification/PushNotification';
+import useOnlineStatus from '../../utils/useOnlineStatus';
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
@@ -38,28 +39,38 @@ const GameShell: React.FC = () => {
 
   const history = useHistory();
   const gameCode = new URLSearchParams(useLocation().search).get('gameCode');
+  const online = useOnlineStatus();
 
   const classes = useStyles();
 
   useEffect(() => {
     conn.setStateUpdater(setGameState);
     conn.setPushNotifier(pushNotifier);
-    conn.connectToServer();
 
     // we only want to auto join a room on load, so don't depend
     // on history and gamecode
     const re = /^[0-9]{4}$/;
-    if (gameCode !== null && re.test(gameCode)) {
+    if (gameCode !== null && re.test(gameCode) && online) {
       conn.updateMode(Mode.JOIN_ROOM);
     } else if (gameCode !== null) {
       history.push('/');
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!online) {
+      return;
+    }
+
+    // otherwise try to connect
+    conn.connectToServer();
+
     return () => {
       conn.cleanup();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [online]);
 
   // we only keep make the gameCode stay in the url if in game
   useEffect(() => {

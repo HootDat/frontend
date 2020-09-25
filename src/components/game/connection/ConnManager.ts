@@ -43,9 +43,21 @@ class ConnManager {
   }
 
   addReconnectors() {
+    this.socket.on('connect', () => {
+      if (window.location.pathname === '/') {
+        this.pushNotifier({
+          message: 'Connected to server!',
+          severity: 'success',
+        });
+      }
+    });
+
     this.socket.on('reconnecting', () => {
       if (window.location.pathname === '/') {
-        this.pushNotifier({ message: 'Reconnecting...', severity: 'info' });
+        this.pushNotifier({
+          message: 'Attempting to connect to server...',
+          severity: 'info',
+        });
       }
     });
 
@@ -55,12 +67,6 @@ class ConnManager {
           message: 'Disconnected from server',
           severity: 'info',
         });
-      }
-    });
-
-    this.socket.on('reconnect', () => {
-      if (window.location.pathname === '/') {
-        this.pushNotifier({ message: 'Reconnected!', severity: 'success' });
       }
     });
   }
@@ -258,12 +264,26 @@ class ConnManager {
   }
 
   createRoom(name: string, iconNum: number) {
+    if (this.socket.disconnected) {
+      this.pushNotifier({
+        message: 'Failed to connect to server',
+        severity: 'error',
+      });
+      return;
+    }
     this.socket.emit('game.create', { name: name, iconNum: iconNum });
     this.loading = true;
     this.push();
   }
 
   joinRoom(gameCode: string, name: string, iconNum: number) {
+    if (this.socket.disconnected) {
+      this.pushNotifier({
+        message: 'Failed to connect to server',
+        severity: 'error',
+      });
+      return;
+    }
     this.socket.emit('game.join', {
       gameCode: gameCode,
       name: name,

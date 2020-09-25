@@ -12,10 +12,14 @@ import PaddedDiv from '../common/PaddedDiv';
 import HootAvatar from '../common/HootAvatar';
 import authAPI from '../../api/auth';
 import packsAPI from '../../api/packs';
+import useOnlineStatus from '../../utils/useOnlineStatus';
+import PushNotification from '../common/notification/PushNotification';
 
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);
   const history = useHistory();
+  const online = useOnlineStatus();
+  const pushNotif = useContext(PushNotification);
 
   const loggedInCallback = (response: fb.StatusResponse) => {
     if (response.status === 'connected') {
@@ -58,8 +62,11 @@ const Login: React.FC = () => {
     if (typeof FB !== 'undefined') {
       FB.login(loggedInCallback);
     } else {
-      // TODO fix
-      console.log('FB not available. Turn off ad block / tracking protection');
+      pushNotif({
+        message:
+          'Login failed. Make sure ad-block / tracking protection is off before proceeding.',
+        severity: 'error',
+      });
     }
   };
 
@@ -82,6 +89,7 @@ const Login: React.FC = () => {
             <ActionButton
               variant="contained"
               color="primary"
+              disabled={!online}
               onClick={handleFacebookLogin}
             >
               <Facebook />
