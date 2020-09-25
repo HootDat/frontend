@@ -119,6 +119,20 @@ const PackEdit: React.FC = () => {
         return;
       }
 
+      if (
+        apiError.code === 400 &&
+        apiError.body?.error?.includes('does not exist')
+      ) {
+        store.deletePack(pack.id);
+        pushNotif({
+          message:
+            'The pack has been deleted at the server side, local copy will be deleted too',
+          severity: 'error',
+        });
+        history.push('/packs');
+        return;
+      }
+
       if (apiError.code === 400 || apiError.code === 403) {
         pushNotif({
           message: apiError.body?.error || 'Something went wrong',
