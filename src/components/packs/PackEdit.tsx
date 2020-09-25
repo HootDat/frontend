@@ -106,7 +106,7 @@ const PackEdit: React.FC = () => {
         handleUnauthenticated();
         return;
       }
-      if (apiError.code === 400 && apiError.body && apiError.body.serverCopy) {
+      if (apiError.code === 400 && apiError.body?.serverCopy) {
         const serverCopy = apiError.body.serverCopy;
         store.deletePack(pack.id);
         store.downloadPack(serverCopy);
@@ -142,7 +142,8 @@ const PackEdit: React.FC = () => {
       }
 
       pushNotif({
-        message: "The server is unreachable now, we'll try again later",
+        message:
+          "The server is unreachable now; we'll save the edit locally and sync with the server later",
         severity: 'warning',
       });
       store.editLocalPack(pack);

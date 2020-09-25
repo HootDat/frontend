@@ -34,7 +34,7 @@ const PackNew: React.FC = () => {
   const handleSubmit = async (pack: LocalQuestionPack) => {
     if (user === null || !online) {
       // not logged in, so just store locally
-      store.newLocalPack(pack, user === null ? '' : user.name);
+      store.newLocalPack(pack, user);
       history.push('/packs');
       return;
     }
@@ -70,10 +70,11 @@ const PackNew: React.FC = () => {
 
       // Probably offline or server blew up
       pushNotif({
-        message: "The server is unreachable now, we'll try again later",
+        message:
+          "The server is unreachable now; we'll save the pack locally and sync with the server later",
         severity: 'warning',
       });
-      store.newLocalPack(pack, user.name);
+      store.newLocalPack(pack, user);
       history.push('/packs');
       return;
     }

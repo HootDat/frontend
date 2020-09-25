@@ -151,7 +151,7 @@ class Store {
     return this.getPacks()[id];
   }
 
-  newLocalPack(pack: LocalQuestionPack, name: string) {
+  newLocalPack(pack: LocalQuestionPack, user: User | null) {
     if (!this.isAvailable()) {
       return;
     }
@@ -159,9 +159,10 @@ class Store {
     const PackNew: LocalQuestionPack = {
       ...pack,
       id: this.genRandomLocalId(),
-      owner: {
-        id: 0, // placeholder, since the server will overwrite this
-        name: name, // only meaningful if user is logged in
+      // placeholder, since the server will overwrite this
+      owner: user || {
+        id: 0,
+        name: '',
       },
       action: 'new',
       updatedAt: new Date().toISOString(),
@@ -232,6 +233,24 @@ class Store {
     }
 
     this.storage!.removeItem(LOCAL_PACKS);
+  }
+
+  keepPacksForUser(userID: number) {
+    if (!this.isAvailable()) {
+      return;
+    }
+
+    const packs = this.getPacks();
+    for (const packID in packs) {
+      const pack = packs[packID];
+      // If pack was synced from the server, and the owner ID is not userID
+      // we remove the pack.
+      // This will keep packs that were created locally but not synced with server.
+      if (pack.id > 0 && packs[packID].owner.id !== userID) {
+        delete packs[packID];
+      }
+    }
+    this.storage!.setItem(LOCAL_PACKS, JSON.stringify(packs));
   }
 
   getCategories(): Category[] {
