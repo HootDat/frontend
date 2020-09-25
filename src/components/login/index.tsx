@@ -3,9 +3,7 @@ import { Facebook } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import authAPI from '../../api/auth';
-import packsAPI from '../../api/packs';
 import { ApiErrorResponse } from '../../types/api';
-import { User } from '../../types/user';
 import store from '../../utils/store';
 import ActionButton from '../common/ActionButton';
 import BackButton from '../common/BackButton';
@@ -36,8 +34,7 @@ const Login: React.FC = () => {
       .then(async user => {
         authState.setAuthState({ ...authState, user: user });
         store.setCurrentUser(user);
-        // Managed to log in, start to sync own packs with server
-        await syncOwnPacks(user);
+        history.replace('/');
       })
       .catch((err: ApiErrorResponse) => {
         // No body: request timed out
@@ -55,32 +52,6 @@ const Login: React.FC = () => {
         });
         return;
       });
-  };
-
-  const syncOwnPacks = async (user: User) => {
-    pushNotif({
-      message: 'Syncing local changes to the server',
-      severity: 'info',
-    });
-    try {
-      // remove packs with different owner id
-      store.keepPacksForUser(user.id);
-      // fetch my packs and merge
-      // appshell will send the remaining requests for new packs
-      const myPacks = await packsAPI.getPacks(undefined, undefined, 'own');
-      // store will choose whether to use server or local copy
-      myPacks.forEach(pack => store.downloadPack(pack));
-      history.replace('/');
-      pushNotif({
-        message: 'Local changes successfully synced to the server!',
-        severity: 'success',
-      });
-    } catch (error) {
-      pushNotif({
-        message: 'Could not sync, will try again later',
-        severity: 'warning',
-      });
-    }
   };
 
   const handleFacebookLogin = () => {

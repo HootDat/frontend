@@ -1,15 +1,16 @@
-import React from 'react';
-import './App.css';
-import AppShell from './components/AppShell';
-import AppRouter from './components/AppRouter';
 import {
   createMuiTheme,
+  CssBaseline,
   responsiveFontSizes,
   ThemeProvider,
-  CssBaseline,
 } from '@material-ui/core';
-import bg_top from './svg/bg-top.svg';
+import React from 'react';
+import './App.css';
+import AppRouter from './components/AppRouter';
+import AppShell from './components/AppShell';
+import { SyncShell } from './components/SyncShell';
 import bg_bot from './svg/bg-bot.svg';
+import bg_top from './svg/bg-top.svg';
 
 let theme = createMuiTheme({
   palette: {
@@ -66,7 +67,9 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AppShell>
-        <AppRouter />
+        <SyncShell>
+          <AppRouter />
+        </SyncShell>
       </AppShell>
     </ThemeProvider>
   );
