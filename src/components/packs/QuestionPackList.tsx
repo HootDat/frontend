@@ -104,8 +104,6 @@ type Props = {
   hideOutsideContent?: (hide: boolean) => void;
 };
 
-// TODO need to fetch more often. After deleting/editing/creating,
-// the community packs arent updated
 const QuestionPackList: React.FC<Props> = ({
   inRoom,
   handleAdd,

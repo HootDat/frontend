@@ -12,8 +12,6 @@ import AuthState from './login/AuthState';
 
 // Sets up notifications and auth context
 const AppShell: React.FC = ({ children }) => {
-  // getAccessToken will verify and return a proper token if it exists.
-  // TODO fill in name
   const [authState, setAuthState] = useState<AuthState>({
     user: store.getCurrentUser(),
     setAuthState: () => {},

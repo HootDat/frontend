@@ -43,8 +43,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-// TODO: Do we need a timer here? Kinda makes sense, but if they don't
-// answer then that's another state we need to account for :/
 const AnsweringQuestion: React.FC = () => {
   const [answer, setAnswer] = useState('');
   const [answered, setAnswered] = useState(false);

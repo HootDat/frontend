@@ -39,7 +39,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-// TODO ensure invalid question packs cannot be submitted
 const QuestionPackForm: React.FC<{
   handleSubmit: (pack: LocalQuestionPack) => void;
   editPack?: LocalQuestionPack;
@@ -73,7 +72,6 @@ const QuestionPackForm: React.FC<{
     setPack({ ...pack, questions: questions });
   };
 
-  // TODO if enter is not pressed in categories, the input won't get captured
   const handleCategoriesChange = (
     e: React.ChangeEvent<{}>,
     categories: string[],

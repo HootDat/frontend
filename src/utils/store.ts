@@ -51,11 +51,8 @@ class Store {
     return this.storage !== null;
   }
 
-  // TODO api requests
   getAccessToken() {
     if (!this.isAvailable()) {
-      // generate new token whenever called (should only be called once
-      // on each load)
       return undefined;
     }
 

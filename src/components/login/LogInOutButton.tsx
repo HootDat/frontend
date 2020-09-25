@@ -32,7 +32,6 @@ const LogInOutButton: React.FC = () => {
     </Button>
   );
 
-  // TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
   const handleLogOut = () => {
     pushNotif({ message: 'You have logged out', severity: 'success' });
     store.removeLoginState();

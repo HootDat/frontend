@@ -77,7 +77,6 @@ const ShareButton: React.FC<{ gameCode: string }> = ({ gameCode }) => {
 
   const handleClose = () => setIsOpen(false);
 
-  // TODO show snackbar after copy link success
   const ShareDialog = () => (
     <Dialog
       onClose={handleClose}
