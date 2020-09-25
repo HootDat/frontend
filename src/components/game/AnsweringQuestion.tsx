@@ -66,6 +66,14 @@ const AnsweringQuestion: React.FC = () => {
     conn.sendAnswer(answer);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (answer.trim() === '' || answered) return;
+
+    if (e.key === 'Enter') {
+      handleAnswer();
+    }
+  };
+
   return (
     <div className={classes.root}>
       <OuterGrid>
@@ -88,6 +96,7 @@ const AnsweringQuestion: React.FC = () => {
               fullWidth
               disabled={answered}
               onChange={handleChange}
+              onKeyPress={handleKeyPress}
             />
           </Grid>
         </CenteredInnerGrid>

@@ -71,7 +71,6 @@ const ShareButton: React.FC<{ gameCode: string }> = ({ gameCode }) => {
         url: url,
       });
     } else {
-      console.log('opened dialog');
       setIsOpen(true);
     }
   };

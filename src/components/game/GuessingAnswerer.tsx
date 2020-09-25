@@ -27,8 +27,8 @@ const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
     flexFlow: 'column',
-    paddingTop: '50px',
-    height: 'calc(100% - 60px)',
+    paddingTop: '20px',
+    height: 'calc(100% - 90px)',
     width: '100%',
   },
   header: {
@@ -100,7 +100,7 @@ const GuessingAnswerer: React.FC = () => {
   return (
     <div className={classes.root}>
       <ProgressBarCountdownTimer
-        countdownSeconds={120}
+        countdownSeconds={30}
         className={classes.header}
       />
       <div className={classes.container}>
@@ -114,7 +114,7 @@ const GuessingAnswerer: React.FC = () => {
           </Typography>
           <Typography variant="body1">{currAnswer}</Typography>
         </Paper>
-        <div style={{ height: '100%', overflow: 'auto' }}>
+        <div style={{ height: '100%', overflow: 'auto', paddingTop: '8px' }}>
           {isGuessing ? guesserComponents() : answererComponents()}
         </div>
       </div>

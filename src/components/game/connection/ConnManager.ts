@@ -171,6 +171,7 @@ class ConnManager {
         ...this.state,
         players: { ...this.state.players, [player.cId]: player },
       };
+
       this.push();
     });
 
