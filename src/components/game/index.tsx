@@ -80,8 +80,6 @@ const GameShell: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  // TODO we should disallow users from creating rooms when connection is
-  // down
   const render = () => {
     const wrapInChatShell = (element: JSX.Element) => (
       <ChatShell>{element}</ChatShell>

@@ -1,11 +1,11 @@
-import { User } from './user';
 import { Category } from './category';
+import { User } from './user';
 
 export type QuestionPack = CommunityQuestionPack | LocalQuestionPack;
 
 export type CommunityQuestionPack = QuestionPackPostData & {
   owner: User;
-  updated_at: string;
+  updatedAt: string;
 };
 
 // for an owned pack that is not synced to the server, id is negative.
@@ -29,7 +29,7 @@ export type LocalQuestionPack = CommunityQuestionPack & {
 // if id is invalid, dont need to track changes
 
 // if id is valid, then need to track changes
-// with change and updated_at
+// with change and updatedAt
 
 // on logout, delete all local packs
 // on login, download all owned packs and store locally

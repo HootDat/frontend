@@ -23,7 +23,6 @@ const authAPI = {
   },
 };
 
-// TODO
 const extractTokenFromResponse = (res: AxiosResponse): string => {
   const token = res.headers.authorization;
   if (!token) {

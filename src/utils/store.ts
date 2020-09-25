@@ -1,8 +1,8 @@
+import { Category } from '../types/category';
 import {
   CommunityQuestionPack,
   LocalQuestionPack,
 } from '../types/questionPack';
-import { Category } from '../types/category';
 import { User } from '../types/user';
 
 const ACCESS_TOKEN = 'access_token';
@@ -51,11 +51,8 @@ class Store {
     return this.storage !== null;
   }
 
-  // TODO api requests
   getAccessToken() {
     if (!this.isAvailable()) {
-      // generate new token whenever called (should only be called once
-      // on each load)
       return undefined;
     }
 
@@ -151,7 +148,7 @@ class Store {
     return this.getPacks()[id];
   }
 
-  newLocalPack(pack: LocalQuestionPack, name: string) {
+  newLocalPack(pack: LocalQuestionPack, user: User | null) {
     if (!this.isAvailable()) {
       return;
     }
@@ -159,12 +156,13 @@ class Store {
     const PackNew: LocalQuestionPack = {
       ...pack,
       id: this.genRandomLocalId(),
-      owner: {
-        id: 0, // placeholder, since the server will overwrite this
-        name: name, // only meaningful if user is logged in
+      // placeholder, since the server will overwrite this
+      owner: user || {
+        id: 0,
+        name: '',
       },
       action: 'new',
-      updated_at: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     this.setPack(PackNew);
   }
@@ -179,7 +177,7 @@ class Store {
     const editedPack: LocalQuestionPack = {
       ...pack,
       action: action,
-      updated_at: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     this.setPack(editedPack);
   }
@@ -195,14 +193,14 @@ class Store {
       const deletedPack: LocalQuestionPack = {
         ...pack,
         action: 'delete',
-        updated_at: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
       this.setPack(deletedPack);
     }
   }
 
   // replaces the pack with the same id in
-  // storage if updated_at is later
+  // storage if updatedAt is later
   downloadPack(pack: CommunityQuestionPack) {
     if (!this.isAvailable()) {
       return;
@@ -211,8 +209,8 @@ class Store {
     const maybeLocalPack = this.getLocalPack(pack.id);
 
     if (maybeLocalPack !== undefined) {
-      const localUpdateTime = new Date(maybeLocalPack.updated_at);
-      const serverUpdateTime = new Date(pack.updated_at);
+      const localUpdateTime = new Date(maybeLocalPack.updatedAt);
+      const serverUpdateTime = new Date(pack.updatedAt);
       if (localUpdateTime > serverUpdateTime) {
         // use local copy
         return;
@@ -232,6 +230,24 @@ class Store {
     }
 
     this.storage!.removeItem(LOCAL_PACKS);
+  }
+
+  keepPacksForUser(userID: number) {
+    if (!this.isAvailable()) {
+      return;
+    }
+
+    const packs = this.getPacks();
+    for (const packID in packs) {
+      const pack = packs[packID];
+      // If pack was synced from the server, and the owner ID is not userID
+      // we remove the pack.
+      // This will keep packs that were created locally but not synced with server.
+      if (pack.id > 0 && packs[packID].owner.id !== userID) {
+        delete packs[packID];
+      }
+    }
+    this.storage!.setItem(LOCAL_PACKS, JSON.stringify(packs));
   }
 
   getCategories(): Category[] {

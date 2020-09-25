@@ -127,9 +127,6 @@ const ChatShell: React.FC = ({ children }) => {
     if (e.key === 'Enter') handleSend();
   };
 
-  // TODO send & receive messages
-  // render message cards
-
   const renderMessages = () => {
     return messages.map((message, index) => {
       // ignore messages from players who have left already

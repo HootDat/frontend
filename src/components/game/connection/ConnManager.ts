@@ -7,8 +7,8 @@ const noOp = () => {};
 
 // Processes and sends updates to and from the server.
 class ConnManager {
-  mode: Mode /* enum, ANSWERING, WAITING, LOBBY, etc. */;
-  cId: string; // TODO put cId in local storage
+  mode: Mode;
+  cId: string;
   loading: boolean; // only used for joining and creating room at the start
 
   socket: SocketIOClient.Socket;
@@ -148,11 +148,9 @@ class ConnManager {
     }
   }
 
-  // TODO handle on errors
-  // TODO we are ignoring
+  // we are ignoring
   // game.event.questions.update
   // game.event.player.update
-
   addEventHandlers() {
     this.socket.on('auth.loggedInElsewhere', () => {
       this.state = null;
@@ -191,8 +189,6 @@ class ConnManager {
 
     this.socket.on('game.event.transition', (gameState: SocketGameState) => {
       // note that this game state is PARTIAL
-      // TODO what if i am actually in a different phase and
-      // received the events out of order?
       this.state = { ...this.state!, ...gameState };
       this.mode = this.determineMode();
       this.push();

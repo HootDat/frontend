@@ -1,19 +1,19 @@
-import React, { useContext } from 'react';
-import { Typography, Grid } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { Grid, Typography } from '@material-ui/core';
 import { Facebook } from '@material-ui/icons';
-import AuthContext from './AuthContext';
+import React, { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
+import authAPI from '../../api/auth';
+import { ApiErrorResponse } from '../../types/api';
 import store from '../../utils/store';
+import useOnlineStatus from '../../utils/useOnlineStatus';
 import ActionButton from '../common/ActionButton';
 import BackButton from '../common/BackButton';
 import CenteredInnerGrid from '../common/CenteredInnerGrid';
+import HootAvatar from '../common/HootAvatar';
+import PushNotification from '../common/notification/PushNotification';
 import OuterGrid from '../common/OuterGrid';
 import PaddedDiv from '../common/PaddedDiv';
-import HootAvatar from '../common/HootAvatar';
-import authAPI from '../../api/auth';
-import packsAPI from '../../api/packs';
-import useOnlineStatus from '../../utils/useOnlineStatus';
-import PushNotification from '../common/notification/PushNotification';
+import AuthContext from './AuthContext';
 
 const Login: React.FC = () => {
   const authState = useContext(AuthContext);
@@ -22,40 +22,38 @@ const Login: React.FC = () => {
   const pushNotif = useContext(PushNotification);
 
   const loggedInCallback = (response: fb.StatusResponse) => {
-    if (response.status === 'connected') {
-      // send api request to server to get access token
-      try {
-        authAPI
-          .postLogin(response.authResponse.accessToken)
-          .then(async user => {
-            authState.setAuthState({ ...authState, user: user });
-            store.setCurrentUser(user);
-
-            // remove packs with different owner id
-            // fetch my packs and merge
-            // appshell will send the remaining requests for new packs
-            const myPacks = await packsAPI.getPacks(
-              undefined,
-              undefined,
-              'own'
-            );
-
-            // store will choose whether to use server or local copy
-            myPacks.forEach(pack => store.downloadPack(pack));
-
-            history.push('/');
-          });
-        // TODO notificiaton to inform user that we are syncing
-      } catch (err) {
-        switch (err.code) {
-          // TODO notify user that auth failed
-          case 400:
-          case 401:
-          case 403:
-          default:
-        }
-      }
+    if (response.status !== 'connected') {
+      pushNotif({
+        message: 'Facebook authentication failed, please try again',
+        severity: 'warning',
+      });
+      return;
     }
+
+    // send api request to server to get access token
+    authAPI
+      .postLogin(response.authResponse.accessToken)
+      .then(async user => {
+        authState.setAuthState({ ...authState, user: user });
+        store.setCurrentUser(user);
+        history.push('/');
+      })
+      .catch((err: ApiErrorResponse) => {
+        // No body: request timed out
+        if (!err.body) {
+          pushNotif({
+            message: 'Server is currently unreachable, please try again later',
+            severity: 'warning',
+          });
+          return;
+        }
+        // received server response but is not 2xx
+        pushNotif({
+          message: `Login failed: ${err.body.error}`,
+          severity: 'error',
+        });
+        return;
+      });
   };
 
   const handleFacebookLogin = () => {
@@ -64,7 +62,7 @@ const Login: React.FC = () => {
     } else {
       pushNotif({
         message:
-          'Login failed. Make sure ad-block / tracking protection is off before proceeding.',
+          'Could not reach Facebook. Please turn off ad block / tracking protection',
         severity: 'error',
       });
     }

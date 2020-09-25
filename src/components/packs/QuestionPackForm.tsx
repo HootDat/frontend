@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
 import {
-  TextField,
   Chip,
   FormControlLabel,
-  Switch,
   makeStyles,
+  Switch,
+  TextField,
 } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
-import EditQuestionsList from './EditQuestionsList';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { LocalQuestionPack } from '../../types/questionPack';
 import { Category } from '../../types/category';
-import BackButton from '../common/BackButton';
+import { LocalQuestionPack } from '../../types/questionPack';
 import ActionButton from '../common/ActionButton';
+import BackButton from '../common/BackButton';
+import EditQuestionsList from './EditQuestionsList';
 
 const INVALID_ID = 0;
 
@@ -39,7 +39,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-// TODO ensure invalid question packs cannot be submitted
 const QuestionPackForm: React.FC<{
   handleSubmit: (pack: LocalQuestionPack) => void;
   editPack?: LocalQuestionPack;
@@ -54,7 +53,7 @@ const QuestionPackForm: React.FC<{
     action: 'new',
     // these are placeholders, which will be overwritten in local storage
     id: INVALID_ID,
-    updated_at: '',
+    updatedAt: '',
     owner: { id: INVALID_ID, name: '' },
   } as LocalQuestionPack,
   categories,
@@ -73,7 +72,6 @@ const QuestionPackForm: React.FC<{
     setPack({ ...pack, questions: questions });
   };
 
-  // TODO if enter is not pressed in categories, the input won't get captured
   const handleCategoriesChange = (
     e: React.ChangeEvent<{}>,
     categories: string[],
