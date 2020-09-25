@@ -1,10 +1,10 @@
+import { Button, makeStyles } from '@material-ui/core';
 import React, { useContext } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, makeStyles } from '@material-ui/core';
-import AuthContext from './AuthContext';
 import store from '../../utils/store';
-import PushNotification from '../common/notification/PushNotification';
 import useOnlineStatus from '../../utils/useOnlineStatus';
+import PushNotification from '../common/notification/PushNotification';
+import AuthContext from './AuthContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,9 +34,9 @@ const LogInOutButton: React.FC = () => {
 
   // TODO: Add dialog for logout confirmation (Should the login page just be a modal too)
   const handleLogOut = () => {
-    // TODO: tell server log out
     pushNotif({ message: 'You have logged out', severity: 'success' });
     store.removeLoginState();
+    store.clearPacks();
     authState.setAuthState({ ...authState, user: null });
   };
 
